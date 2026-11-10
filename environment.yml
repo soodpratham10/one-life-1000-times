@@ -1,0 +1,14 @@
+# Conda environment for One Life, 1,000 Times
+# Create:   conda env create -f environment.yml
+# Activate: conda activate onelife
+# Update after edits: conda env update -f environment.yml --prune
+
+name: onelife
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - numpy        # simulation maths
+  - pandas       # cleaning source tables
+  - openpyxl     # reading/writing Excel cross-check files
+  - pytest       # tests

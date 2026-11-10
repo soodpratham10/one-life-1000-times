@@ -1,0 +1,28 @@
+# ----- Course files: reference only, never published -----
+reference/
+
+# ----- Built outputs (re-created by the pipeline) -----
+data/clean/*.db
+data/clean/*.sqlite
+
+# ----- Python -----
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ----- R -----
+.Rhistory
+.RData
+.Rproj.user/
+
+# ----- Excel lock files -----
+~$*.xlsx
+
+# ----- Website tooling -----
+node_modules/
+web/dist/
+
+# ----- Mac and secrets -----
+.DS_Store
+.env
