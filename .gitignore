@@ -1,6 +1,9 @@
 # ----- Course files: reference only, never published -----
 reference/
 
+# ----- Raw downloads (re-created by pipeline/01_*.py scripts; too large for GitHub) -----
+data/raw/statcan_*/
+
 # ----- Built outputs (re-created by the pipeline) -----
 data/clean/*.db
 data/clean/*.sqlite
@@ -26,3 +29,6 @@ web/dist/
 # ----- Mac and secrets -----
 .DS_Store
 .env
+
+# ----- Editor settings (personal to each machine) -----
+.vscode/
