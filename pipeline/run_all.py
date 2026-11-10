@@ -38,6 +38,7 @@ STEPS = [
     ("12_cpp_disability.py", [], [RAW / "oca" / "cpp32-rev-ed-en.pdf"]),
     ("13_cpp_retirement.py", [], [RAW / "oca" / "cpp32-rev-ed-en.pdf"]),
     ("14_family_events.py", ["39100057", "39100053", "13100421"], []),
+    ("15_risk_prevalence.py", ["13100096"], []),
 ]
 
 

@@ -230,6 +230,25 @@ First marriage, remarriage, divorce and first child, Canada 2019. Sources: Stati
 
 ---
 
+### `risk_prevalence.csv`
+One row per year x region x sex x age group x risk factor: the share of people with that factor. Canadian Community Health Survey, 2015–2022 (the engine uses one year per factor, marked in `base`). Source: Statistics Canada, Table 13-10-0096-01. Built by `pipeline/15_risk_prevalence.py`. Tests: `tests/test_risk_prevalence.py`. Assumption A18.
+
+| Column | Meaning |
+| --- | --- |
+| `year` | Survey year |
+| `region` | `CA` is Canada excluding the territories |
+| `sex` | M, F or B |
+| `age_lo` | First age of the group: 18, 35, 50 or 65 (12 and 18 for the two totals) |
+| `age_hi` | Last age of the group (110 for 65+ and for the totals) |
+| `indicator` | current_smoker, daily_smoker, heavy_drinking, active_150 (150+ minutes of activity a week), overweight (BMI 25 to under 30), obese (BMI 30+), fruit_veg_5 (fruit and vegetables 5+ times a day) |
+| `pct` | Percent of people in the group with the factor (blank if StatCan did not publish it) |
+| `pct_low` | Lower end of StatCan's 95% confidence interval |
+| `pct_high` | Upper end of StatCan's 95% confidence interval |
+| `quality` | Blank = fine; E = use with caution; F = too unreliable to publish; x = suppressed; .. = not collected that year |
+| `base` | True on the rows of the year the engine uses for that factor: the latest year up to 2019 with complete Canadian data (A18) |
+
+---
+
 ### Not in the public repo
 
 `cia_mi2024.csv`: the CIA MI-2024 mortality improvement scale (columns `sex`, `age`, `year`, `mi`), built locally by `pipeline/03_clean_mi2024.py` from the CIA's own file. It is the CIA's copyrighted material, so it is listed in `.gitignore`; see the README for how to get it.

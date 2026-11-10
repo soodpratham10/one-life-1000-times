@@ -68,6 +68,7 @@ All inputs come from official public sources. Every cleaned file and column is d
 | Office of the Chief Actuary, 32nd CPP Actuarial Report | Disability and retirement |
 | Statistics Canada marriages, divorces, births (39-10-0057-01, 39-10-0053-01, 13-10-0421-01) | Marriage, divorce, remarriage, first child |
 | Statistics Canada population (17-10-0005-01) | Denominators for event rates |
+| Statistics Canada, Canadian Community Health Survey (13-10-0096-01) | How common smoking, inactivity, obesity and low fruit and vegetable intake are, by age and sex |
 
 <details>
 <summary><b>Full source details, and how to get the hand-downloaded files</b></summary>
@@ -82,6 +83,7 @@ All inputs come from official public sources. Every cleaned file and column is d
 | Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer) | New cancer cases (all, and lung) by sex and 5-year age group, Canada, Quebec and Canada excluding Quebec, 1992–2023 | Cleaned extract yes (`data/clean/cancer_incidence.csv`); raw file (about 1.8 GB) via `python pipeline/download_statcan.py 13100111` |
 | Public Health Agency of Canada, Canadian Chronic Disease Surveillance System (Health Infobase data tool) | Newly identified heart attacks and strokes by sex and 5-year age group, Canada and provinces, 2000–01 to 2023–24 | Cleaned copy yes (`data/clean/heart_stroke_incidence.csv`); raw files downloaded by hand (below) |
 | Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan (Tables 73, 76, 85, 88) | CPP disability: chance per year of a severe and prolonged disability by age and sex, how long it lasts, and the share of adults eligible. Retirement: share starting the CPP pension at each age 60–70 | Extracted tables yes (`data/clean/cpp_disability_*.csv`, `data/clean/cpp_retirement.csv`); report PDF downloaded by hand (below) |
+| Statistics Canada, Table 13-10-0096-01 (health characteristics, Canadian Community Health Survey) | Percent of people who smoke, drink heavily, are active 150+ minutes a week, are overweight or obese, or eat fruit and vegetables 5+ times a day, by sex and age group (18–34, 35–49, 50–64, 65+), Canada and provinces, 2015–2022 | Cleaned copy yes (`data/clean/risk_prevalence.csv`); raw file via `python pipeline/download_statcan.py 13100096` |
 | Statistics Canada, Tables 39-10-0057-01, 39-10-0053-01 and 13-10-0421-01 (marriages, divorces, births by parity) | First marriage, remarriage, divorce and first-child rates by sex and age group, Canada, 2019 | Rates yes (`data/clean/family_events.csv`); raw files via `python pipeline/download_statcan.py 39100057` (and `39100053`, `13100421`) |
 | Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
 
@@ -134,12 +136,12 @@ pytest
 .github/workflows/   automatic test run on every push
 data/raw/            source files as published (not committed; rebuilt by the pipeline)
 data/clean/          cleaned tables used by the model (see docs/data_dictionary.md)
-pipeline/            numbered scripts 01–14 that build data/clean, run in order by run_all.py
+pipeline/            numbered scripts 01–15 that build data/clean, run in order by run_all.py
   download_statcan.py   helper: download and summarise any Statistics Canada table
   inspect_excel.py      helper: show what is inside an Excel workbook
 tests/               pytest suite: one file per data source, plus the data dictionary check
 docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
-engine/              simulation engine (Phases 2–3, not built yet)
+engine/              simulation engine (Phases 2–3, in progress: mortality.py done)
 crosscheck/          independent R and Excel checks (Phase 4, not built yet)
 web/                 survey and visuals (Phase 5, not built yet)
 ```
