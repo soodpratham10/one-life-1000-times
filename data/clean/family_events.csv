@@ -1,0 +1,87 @@
+event,sex,age_lo,age_hi,rate_per_1000,rate_both_2019,sex_relativity,ref_year,count_2019,at_risk_2019,counts_cover,at_risk_group
+divorce,F,15,19,1.90909,2.1,0.909091,2017,6,2857.14,both sexes,married
+divorce,F,20,24,11.8069,10.7,1.10345,2017,993,92803.7,both sexes,married
+divorce,F,25,29,11.6163,11.1,1.04651,2017,6105,550000,both sexes,married
+divorce,F,30,34,11.7614,11.5,1.02273,2017,13488,1.17287e+06,both sexes,married
+divorce,F,35,39,11.4307,11.6,0.985401,2017,17001,1.4656e+06,both sexes,married
+divorce,F,40,44,12.0876,12,1.0073,2017,17913,1.49275e+06,both sexes,married
+divorce,F,45,49,11.4341,11.8,0.968992,2017,17862,1.51373e+06,both sexes,married
+divorce,F,50,54,9.33333,9.8,0.952381,2017,15303,1.56153e+06,both sexes,married
+divorce,F,55,59,6.13889,6.8,0.902778,2017,11919,1.75279e+06,both sexes,married
+divorce,F,60,64,3.64565,4.3,0.847826,2017,7131,1.65837e+06,both sexes,married
+divorce,F,65,110,1.31765,1.6,0.823529,2017,6150,3.84375e+06,both sexes,married
+divorce,M,15,19,2.60909,2.1,1.24242,2017,6,2857.14,both sexes,married
+divorce,M,20,24,8.48621,10.7,0.793103,2017,993,92803.7,both sexes,married
+divorce,M,25,29,10.4116,11.1,0.937984,2017,6105,550000,both sexes,married
+divorce,M,30,34,11.2386,11.5,0.977273,2017,13488,1.17287e+06,both sexes,married
+divorce,M,35,39,11.6847,11.6,1.0073,2017,17001,1.4656e+06,both sexes,married
+divorce,M,40,44,12,12,1,2017,17913,1.49275e+06,both sexes,married
+divorce,M,45,49,12.1659,11.8,1.03101,2017,17862,1.51373e+06,both sexes,married
+divorce,M,50,54,10.2667,9.8,1.04762,2017,15303,1.56153e+06,both sexes,married
+divorce,M,55,59,7.46111,6.8,1.09722,2017,11919,1.75279e+06,both sexes,married
+divorce,M,60,64,4.86087,4.3,1.13043,2017,7131,1.65837e+06,both sexes,married
+divorce,M,65,110,1.78824,1.6,1.11765,2017,6150,3.84375e+06,both sexes,married
+first_child,F,10,14,0.0631977,,,,62.9688,996377,women,all women of that age
+first_child,F,15,19,5.35467,,,,5454.05,1.01856e+06,women,all women of that age
+first_child,F,20,24,18.715,,,,22286.5,1.19084e+06,women,all women of that age
+first_child,F,25,29,40.472,,,,51971.4,1.28413e+06,women,all women of that age
+first_child,F,30,34,41.1141,,,,52746.4,1.28293e+06,women,all women of that age
+first_child,F,35,39,16.3612,,,,21000.8,1.28357e+06,women,all women of that age
+first_child,F,40,44,3.10425,,,,3777.2,1.21678e+06,women,all women of that age
+first_child,F,45,49,0.266949,,,,322.62,1.20854e+06,women,all women of that age
+first_marriage,F,15,19,1.94286,1.2,1.61905,2002,2523,2.1025e+06,both sexes,never legally married
+first_marriage,F,20,24,16.9921,13,1.30709,2002,30873,2.37485e+06,both sexes,never legally married
+first_marriage,F,25,29,46.4191,40.6,1.14333,2002,83103,2.04687e+06,both sexes,never legally married
+first_marriage,F,30,34,47.3247,46.3,1.02213,2002,62892,1.35836e+06,both sexes,never legally married
+first_marriage,F,35,39,25.827,27.5,0.939163,2002,26847,976255,both sexes,never legally married
+first_marriage,F,40,44,14.8771,16.4,0.907143,2002,11667,711402,both sexes,never legally married
+first_marriage,F,45,49,10.5284,10.9,0.965909,2002,6444,591193,both sexes,never legally married
+first_marriage,F,50,54,7.14286,8,0.892857,2002,4302,537750,both sexes,never legally married
+first_marriage,F,55,59,5.08333,6.1,0.833333,2002,2790,457377,both sexes,never legally married
+first_marriage,F,60,64,3.91852,4.6,0.851852,2002,1377,299348,both sexes,never legally married
+first_marriage,F,65,69,2.55294,3.1,0.823529,2002,540,174194,both sexes,never legally married
+first_marriage,F,70,74,1.20909,1.9,0.636364,2002,201,105789,both sexes,never legally married
+first_marriage,F,75,79,0.52,1.3,0.4,2002,75,57692.3,both sexes,never legally married
+first_marriage,F,80,110,0.4,0.6,0.666667,2002,42,70000,both sexes,never legally married
+first_marriage,M,15,19,0.457143,1.2,0.380952,2002,2523,2.1025e+06,both sexes,never legally married
+first_marriage,M,20,24,9.41732,13,0.724409,2002,30873,2.37485e+06,both sexes,never legally married
+first_marriage,M,25,29,35.9848,40.6,0.886326,2002,83103,2.04687e+06,both sexes,never legally married
+first_marriage,M,30,34,45.6479,46.3,0.985915,2002,62892,1.35836e+06,both sexes,never legally married
+first_marriage,M,35,39,28.6502,27.5,1.04183,2002,26847,976255,both sexes,never legally married
+first_marriage,M,40,44,17.5714,16.4,1.07143,2002,11667,711402,both sexes,never legally married
+first_marriage,M,45,49,11.1477,10.9,1.02273,2002,6444,591193,both sexes,never legally married
+first_marriage,M,50,54,8.57143,8,1.07143,2002,4302,537750,both sexes,never legally married
+first_marriage,M,55,59,6.77778,6.1,1.11111,2002,2790,457377,both sexes,never legally married
+first_marriage,M,60,64,5.11111,4.6,1.11111,2002,1377,299348,both sexes,never legally married
+first_marriage,M,65,69,3.64706,3.1,1.17647,2002,540,174194,both sexes,never legally married
+first_marriage,M,70,74,2.76364,1.9,1.45455,2002,201,105789,both sexes,never legally married
+first_marriage,M,75,79,2.6,1.3,2,2002,75,57692.3,both sexes,never legally married
+first_marriage,M,80,110,1.2,0.6,2,2002,42,70000,both sexes,never legally married
+remarriage,F,15,19,50.5434,222.2,1.10171,2002,6,27.0027,both sexes,divorced (under 20: 20-24 rate used)
+remarriage,F,20,24,50.5434,39.9,1.26675,2002,144,3609.02,both sexes,divorced
+remarriage,F,25,29,71.2421,66,1.07943,2002,1506,22818.2,both sexes,divorced
+remarriage,F,30,34,67.8232,70.8,0.957955,2002,4917,69449.2,both sexes,divorced
+remarriage,F,35,39,50.6334,54.5,0.929054,2002,7167,131505,both sexes,divorced
+remarriage,F,40,44,33.2072,37.3,0.890274,2002,7446,199625,both sexes,divorced
+remarriage,F,45,49,25.6368,29.7,0.863192,2002,8133,273838,both sexes,divorced
+remarriage,F,50,54,17.0142,22.1,0.769874,2002,7860,355656,both sexes,divorced
+remarriage,F,55,59,10.7727,15.8,0.681818,2002,6957,440316,both sexes,divorced
+remarriage,F,60,64,6.10077,10.3,0.592308,2002,4299,417379,both sexes,divorced
+remarriage,F,65,69,3.83333,6.9,0.555556,2002,2292,332174,both sexes,divorced
+remarriage,F,70,74,2.54237,5,0.508475,2002,1158,231600,both sexes,divorced
+remarriage,F,75,79,1.4,3.8,0.368421,2002,444,116842,both sexes,divorced
+remarriage,F,80,110,0.518182,1.9,0.272727,2002,168,88421.1,both sexes,divorced
+remarriage,M,15,19,21.5389,222.2,,2002,6,27.0027,both sexes,divorced (under 20: 20-24 rate used)
+remarriage,M,20,24,21.5389,39.9,0.539823,2002,144,3609.02,both sexes,divorced
+remarriage,M,25,29,56.8421,66,0.861244,2002,1506,22818.2,both sexes,divorced
+remarriage,M,30,34,75.3055,70.8,1.06364,2002,4917,69449.2,both sexes,divorced
+remarriage,M,35,39,59.3792,54.5,1.08953,2002,7167,131505,both sexes,divorced
+remarriage,M,40,44,42.3229,37.3,1.13466,2002,7446,199625,both sexes,divorced
+remarriage,M,45,49,34.6339,29.7,1.16612,2002,8133,273838,both sexes,divorced
+remarriage,M,50,54,28.1105,22.1,1.27197,2002,7860,355656,both sexes,divorced
+remarriage,M,55,59,21.725,15.8,1.375,2002,6957,440316,both sexes,divorced
+remarriage,M,60,64,15.2915,10.3,1.48462,2002,4299,417379,both sexes,divorced
+remarriage,M,65,69,10.5033,6.9,1.52222,2002,2292,332174,both sexes,divorced
+remarriage,M,70,74,8.13559,5,1.62712,2002,1158,231600,both sexes,divorced
+remarriage,M,75,79,7.3,3.8,1.92105,2002,444,116842,both sexes,divorced
+remarriage,M,80,110,4.40455,1.9,2.31818,2002,168,88421.1,both sexes,divorced

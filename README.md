@@ -2,7 +2,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development (Phase 1 — data).** Nine data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
+**Status: in development (Phase 1 — data, complete).** All Phase 1 data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
 
 ## What this is
 
@@ -50,6 +50,7 @@ All inputs come from official or peer-reviewed public sources. Loaded so far:
 | Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer) | New cancer cases (all, and lung) by sex and 5-year age group, Canada, Quebec and Canada excluding Quebec, 1992–2023 | Cleaned extract yes (`data/clean/cancer_incidence.csv`); raw file (about 1.8 GB) via `python pipeline/download_statcan.py 13100111` |
 | Public Health Agency of Canada, Canadian Chronic Disease Surveillance System (Health Infobase data tool) | Newly identified heart attacks and strokes by sex and 5-year age group, Canada and provinces, 2000–01 to 2023–24 | Cleaned copy yes (`data/clean/heart_stroke_incidence.csv`); raw files downloaded by hand (below) |
 | Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan (Tables 73, 76, 85, 88) | CPP disability: chance per year of a severe and prolonged disability by age and sex, how long it lasts, and the share of adults eligible. Retirement: share starting the CPP pension at each age 60–70 | Extracted tables yes (`data/clean/cpp_disability_*.csv`, `data/clean/cpp_retirement.csv`); report PDF downloaded by hand (below) |
+| Statistics Canada, Tables 39-10-0057-01, 39-10-0053-01 and 13-10-0421-01 (marriages, divorces, births by parity) | First marriage, remarriage, divorce and first-child rates by sex and age group, Canada, 2019 | Rates yes (`data/clean/family_events.csv`); raw files via `python pipeline/download_statcan.py 39100057` (and `39100053`, `13100421`) |
 | Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
 
 ### Getting the CIA MI-2024 file
@@ -109,6 +110,7 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 - Crash data cannot separate minor from serious injuries; cancer counts are counts of cancers, not people.
 - Disability means CPP disability (severe and prolonged, people with enough CPP contributions; outside Quebec).
 - Retirement means starting the CPP retirement pension, which is not always the same as stopping work.
+- Marriage means legal marriage; common-law unions are not covered by the marriage and divorce tables.
 - Territories are not modelled.
 
 ## Licence

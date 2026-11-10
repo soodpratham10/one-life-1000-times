@@ -22,6 +22,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A14 | Heart attack and stroke events | Yearly probability = newly identified cases ÷ CCDSS population, by sex and 5-year age group (20–24 … 90+), Canada, fiscal year 2018–19 (April 2018 – March 2019). Ages 18–19 use the 20–24 rate | Public Health Agency of Canada, Canadian Chronic Disease Surveillance System (CCDSS), Health Infobase data tool, crude incidence rate of acute myocardial infarction and of stroke (data as of April 2025) | 2026-11-10 | National data from provincial health-insurance records, covering nearly everyone; 2018–19 is the last full fiscal year before COVID-19 | Case definitions are PHAC's (from hospital and physician claims; whether repeat events are counted is set by those definitions and not checked here); registry population runs about 2–3% above StatCan's estimates; Quebec diagnostic coding may slightly undercount from 2016–17; national rates used for every province | Loaded |
 | A15 | Disability event | Event = becoming entitled to a CPP disability pension (a "severe and prolonged" disability). Yearly rate per 1,000 eligible, ultimate (2029+), by sex and age: published at ages 25, 30, …, 55 and 60–64; other ages log-linear interpolation; ages 18–24 held at the age-25 rate. Ends (termination) per 1,000 by sex, age (read as age at onset) and duration 1–6+ years, 2025 and 2035. Share of adults 20–64 eligible kept by year (2025: men 71.7%, women 65.7%) | Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan as at 31 December 2024 (revised version): Tables 73, 85 and 88, read from the PDF | 2026-11-10 | The actuarial assumptions used to value the CPP; the report found incidence not significantly affected by COVID-19; termination rates allow a disability to end | Covers only people eligible for CPP disability (enough contributions) and only severe and prolonged disability; CPP excludes Quebec (QPP); termination includes recovery and death, so using it as recovery would double-count deaths the engine models separately (to handle in Phase 3); rates are projections for 2029+, not one observed year; ages under 25 not published | Loaded |
 | A16 | Retirement event | Event = starting the CPP retirement pension. Share of a cohort starting at each age 60–70 (ultimate, cohort aged 65 in 2031+); men 21% at 60, 32% at 65, 10% at 70; converted to a yearly chance of starting given not yet started (1 at age 70) | Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan, Table 76, read from the PDF | 2026-11-10 | The CPP's own best-estimate assumption; covers nearly all workers outside Quebec | Starting the pension is not the same as stopping work (people can work while receiving it, and some retire from work earlier or later); people not eligible for CPP are not covered; Quebec has the QPP | Loaded |
+| A17 | Family events | Canada, 2019, by sex and 5-year age group: first marriage (per 1,000 never legally married), remarriage (per 1,000 divorced), divorce (per 1,000 married), first child (first live births per 1,000 women of that age; parity not stated spread in proportion). Marriage and divorce tables have no sex split after 2002 and 2017, so: rate(sex) = 2019 rate for both sexes x sex relativity from 2002 (marriage) or 2017 (divorce). Remarriage under 20 uses the 20–24 rate (almost nobody is divorced before 20) | Statistics Canada, Tables 39-10-0057-01 (marriages), 39-10-0053-01 (divorces), 13-10-0421-01 (live births by age and parity of mother); population from A12 | 2026-11-10 | Official vital statistics; 2019 is the last year before COVID-19 disrupted weddings and divorce courts; the relational method keeps the latest level and a real sex pattern | Assumes the male/female gap is the same as in 2002 (marriage) and 2017 (divorce); legal marriage only, so common-law unions (about a fifth of couples) are not covered; first-child rate is per woman, not per childless woman, so it understates the chance for a childless woman; national rates used for every province | Loaded |
 
 ## Data checks on A04
 
@@ -138,10 +139,26 @@ What the source showed: national totals in this table run to 2019 only, while Qu
 - values quoted in the report's text read correctly (21%/22% at 60, 32% at 65, 10% at 70)
 - running the yearly chances forward from 60 gives back the published shares exactly, and everyone has started by 70
 
+## Data checks on A17
+
+`tests/test_family_events.py` (11 tests, all passing on the real tables on 2026-11-10):
+
+- grid complete: 28 first-marriage, 28 remarriage, 22 divorce and 8 first-child rows; every rate filled in
+- rates between 0 and 1,000; counts not negative
+- men's and women's rates sit either side of the 2019 both-sexes rate in every group (relational method)
+- persons divorced in 2019 (113,871) within 0.5% of twice StatCan's published 56,937 divorces
+- overall divorce rate 7.5 per 1,000 married persons, as published
+- first marriage peaks at 25–34 (2019: 30–34 for both sexes); women's first-marriage rate at 20–24 above men's (17.0 vs 9.4)
+- divorce rate at 65+ below the rate at 30–34
+- first-child rate peaks at 25–34; first births are 40–44% of all births (42%); mean age at first birth between 28 and 32 (29.85)
+
+What the source showed: the marriage table is split by gender only up to 2002 and the divorce table by sex only up to 2017; from then on only totals are published.
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A17 | Marriage, remarriage, divorce and first child loaded and tested |
 | 2026-11-10 | A16 | CPP retirement take-up loaded and tested |
 | 2026-11-10 | A15 | CPP disability incidence, termination and eligibility loaded and tested |
 | 2026-11-10 | A09 | Event base years recorded; mortality base period left open |
