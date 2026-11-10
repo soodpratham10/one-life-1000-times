@@ -15,6 +15,8 @@ Nova Scotia and New Brunswick, and scaling it to PEI's own LEVEL:
 Input : data/raw/statcan_13100140/13100140.csv   (python pipeline/download_statcan.py 13100140)
         data/clean/life_tables.csv                (from 02_clean_life_tables.py)
 Output: data/clean/life_tables_pei.csv            (same columns as life_tables.csv, region 'PE')
+        data/clean/life_tables_pei_abridged.csv   (StatCan's published PEI p and e by age group,
+                                                   kept so the checks can run without the raw file)
 
 Run from the project folder:
     python pipeline/05_build_pei_life_table.py
@@ -29,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW_CSV = ROOT / "data" / "raw" / "statcan_13100140" / "13100140.csv"
 COMPLETE_CSV = ROOT / "data" / "clean" / "life_tables.csv"
 OUT_CSV = ROOT / "data" / "clean" / "life_tables_pei.csv"
+ABRIDGED_CSV = ROOT / "data" / "clean" / "life_tables_pei_abridged.csv"  # StatCan's published PEI values
 
 REFERENCE = ["NS", "NB"]
 SEXES = {"Both sexes": "B", "Males": "M", "Females": "F"}
@@ -142,6 +145,9 @@ def report(df: pd.DataFrame, pei: pd.DataFrame) -> None:
 
 if __name__ == "__main__":
     table = build()
-    report(table, read_pei())
+    published = read_pei()
+    report(table, published)
     table.to_csv(OUT_CSV, index=False)
+    published.to_csv(ABRIDGED_CSV, index=False)
+    print(f"Saved {ABRIDGED_CSV.relative_to(ROOT)}")
     print(f"\nSaved {OUT_CSV.relative_to(ROOT)} ({OUT_CSV.stat().st_size / 1e6:.1f} MB)")
