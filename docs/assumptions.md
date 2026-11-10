@@ -16,7 +16,8 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A08 | Cap on combined multipliers | To set | Design decision, tested | — | Stops stacked risks compounding | Cap level is a judgement | To set (Phase 2) |
 | A09 | Base data period | To set | Design decision | — | Choice of whether COVID-era years are included | Any choice shifts the base rates | To set (Phase 1) |
 | A10 | PEI single-age mortality | Derived: within each PEI age group, the single-age force of mortality is the NS–NB average scaled by one factor; ages 0–89 match PEI's published group survival exactly; ages 90–109 match PEI's published e(90+); q = 1 at 110+ | Statistics Canada, Table 13-10-0140-01 (abridged life tables, PEI and territories), with NS and NB from 13-10-0114-01 | 2026-11-10 | StatCan publishes only 5-year groups for PEI; borrowing the shape of similar Atlantic provinces keeps PEI's own level | The within-group shape is assumed, not observed; territories excluded from v1 (tiny populations, recent Yukon tables not published); PEI's small population makes some published rates noisy (e.g. 2022–2024 infant death rate higher for girls than boys), which does not affect the model since it starts at 18 | Loaded (derived) |
-| A11 | Car crash event | Event = injured in a police-reported motor vehicle collision (any road user: driver, passenger, pedestrian, cyclist, motorcyclist). Counts by sex and single age; base year 2019. Unknown age or sex (about 2%) spread in proportion. Annual probability = count ÷ population (population: to set) | Transport Canada, National Collision Database open data, 2019 and 2020 files | 2026-11-10 | Only national source of injury counts by age and sex | Open data does not separate minor from serious injuries; police-reported only (some injuries never reported); national only, no province; 2020 distorted by COVID (kept as comparison only) | Counts loaded (rates: next step) |
+| A11 | Car crash event | Event = injured in a police-reported motor vehicle collision (any road user: driver, passenger, pedestrian, cyclist, motorcyclist). Counts by sex and single age; base year 2019. Unknown age or sex (about 2%) spread in proportion. Annual probability = count ÷ Canada's July 1 population of the same sex, age and year (A12); ages 99 and 100+ combined | Transport Canada, National Collision Database open data, 2019 and 2020 files | 2026-11-10 | Only national source of injury counts by age and sex | Open data does not separate minor from serious injuries; police-reported only (some injuries never reported); national only, no province; 2020 distorted by COVID (kept as comparison only) | Loaded (rates by sex and age, 2019 and 2020) |
+| A12 | Population (denominator for event rates) | July 1 population by year 2000–2026, Canada and 10 provinces, single age 0–100+. StatCan's gender categories mapped to sex: Men+ → M, Women+ → F | Statistics Canada, Table 17-10-0005-01 (population estimates on July 1, by age and gender) | 2026-11-10 | Official population estimates, same source family as the life tables | Reported by gender, while the life tables are by sex: non-binary people (a very small share) are distributed between Men+ and Women+; territories not used; years before 2000 not used because StatCan does not publish every single age up to 100+ for them (before 1991 the oldest group is 90+; in 1991–1999 ages 90–100 are blank) | Loaded |
 
 ## Data checks on A04
 
@@ -75,10 +76,21 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 - 2020 injuries at least 15% below 2019 (COVID): actual drop 26%
 - 2020 deaths equal Transport Canada's published 1,746
 
+## Data checks on A11 rates and A12
+
+`tests/test_population.py` (4 tests) and `tests/test_crash_rates.py` (4 tests):
+
+- population grid complete from 2000 (earlier years lack single ages 90–100, found by these tests); single ages sum exactly to StatCan's "All ages" totals; Men+ + Women+ = total
+- the 10 provinces hold 99–100% of Canada's population
+- crash probabilities between 0 and 1, deaths below injuries; rate x population gives back the counts
+- adults 18–24 are injured more often than adults 55–64: 2019 rates per 1,000 were 7.1 (women) and 6.1 (men) at 18–24, versus 3.4 and 3.3 at 55–64
+- cross-source check: police-reported crash deaths (Transport Canada) are 80–100% of motor vehicle deaths on death certificates (StatCan): 2019 1,762 vs 1,926 (91%); 2020 1,746 vs 1,818 (96%). StatCan's count is higher because it includes crashes off public roads and deaths after 30 days
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A11, A12 | Population loaded; crash probabilities built and tested |
 | 2026-11-10 | A11 | Crash injury and death counts loaded and tested |
 | 2026-11-10 | A04, A06, A10 | Review fixes: PEI checks run without raw file; outdated A04 note; PEI noise note; external death-count check |
 | 2026-11-10 | A10 | PEI single-age table derived and tested |
