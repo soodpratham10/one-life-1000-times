@@ -1,6 +1,6 @@
 # Data dictionary
 
-Every cleaned file in `data/clean/`: what one row is, what each column means, where it comes from, which script builds it and which tests check it. `tests/test_data_dictionary.py` fails if a file or column here does not match the real files.
+Every cleaned file in `data/clean/`, and every hand-entered assumption table in `data/assumptions/`: what one row is, what each column means, where it comes from, which script builds it and which tests check it. `tests/test_data_dictionary.py` fails if a file or column here does not match the real files.
 
 Codes used throughout: **sex** `M` men, `F` women, `B` both · **region** `CA` Canada, `NL` `PE` `NS` `NB` `QC` `ON` `MB` `SK` `AB` `BC` provinces (`YT` `NT` `NU` territories, where present) · **age_lo / age_hi** first and last age of a group (`110` = open top group) · probabilities are per year unless stated.
 
@@ -246,6 +246,35 @@ One row per year x region x sex x age group x risk factor: the share of people w
 | `pct_high` | Upper end of StatCan's 95% confidence interval |
 | `quality` | Blank = fine; E = use with caution; F = too unreliable to publish; x = suppressed; .. = not collected that year |
 | `base` | True on the rows of the year the engine uses for that factor: the latest year up to 2019 with complete Canadian data (A18) |
+
+---
+
+## Assumption tables (`data/assumptions/`)
+
+Small tables typed in from published studies, used by the engine. Each row carries its source.
+
+### `assumptions/hazard_ratios.csv`
+One row per risk factor x level (x sex where the study gives one). Read by `engine/risk.py`. Tests: `tests/test_risk.py`. Assumption A07.
+
+| Column | Meaning |
+| --- | --- |
+| `factor` | smoking, activity, bmi, alcohol or fruit_veg |
+| `level` | The answer group, e.g. quit_35_44, 150_299 (minutes a week), 25_27.5 (BMI), 25_44g (grams of alcohol a day), 5_plus (servings a day) |
+| `sex` | M, F, or B where the same ratio is used for both |
+| `hr` | Hazard ratio against the factor's reference level (which has 1.00) |
+| `source` | Study and table the number comes from, or how it was derived |
+
+### `assumptions/former_smokers.csv`
+Share of adults who are former smokers, by sex and CCHS age group, mapped from the survey's own age groups. Read by `engine/risk.py`. Assumption A19.
+
+| Column | Meaning |
+| --- | --- |
+| `sex` | M or F |
+| `age_lo` | First age of the CCHS group (18, 35, 50, 65) |
+| `age_hi` | Last age of the group (110 for 65+) |
+| `pct` | Percent of all adults in the group who are former smokers |
+| `ctns_group` | The survey age group the figure is taken from (25-44 or 45+) |
+| `source` | Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1 |
 
 ---
 

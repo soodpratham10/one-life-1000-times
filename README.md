@@ -37,6 +37,20 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 
 Widowhood, job loss and home purchase are planned for version 2.
 
+## Survey questions (version 1)
+
+Each answer moves your death rates by a hazard ratio from a large published study. All ratios, with their sources, are in [`data/assumptions/hazard_ratios.csv`](data/assumptions/hazard_ratios.csv).
+
+| Question | Study |
+| --- | --- |
+| Smoking: never, former (and the age you quit), current | Jha et al., *NEJM* 2013; Pirie et al., *Lancet* 2013 |
+| Minutes of moderate or vigorous activity a week | Arem et al., *JAMA Internal Medicine* 2015 |
+| Height and weight (BMI) | Global BMI Mortality Collaboration, *Lancet* 2016 |
+| Drinks a week | Zhao et al., *JAMA Network Open* 2023 |
+| Servings of fruit and vegetables a day | Wang et al., *Circulation* 2021 |
+
+Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study (Manuel et al., *PLOS Medicine* 2016).
+
 ## Method (planned)
 
 The structure follows how life insurers underwrite: a base mortality table, personal risk multipliers, future mortality improvement, competing risks between events, and an actual-to-expected check against official data. Published data is used where insurers use proprietary underwriting manuals. Every assumption, its source and its weakness is listed in [`docs/assumptions.md`](docs/assumptions.md).
@@ -69,6 +83,7 @@ All inputs come from official public sources. Every cleaned file and column is d
 | Statistics Canada marriages, divorces, births (39-10-0057-01, 39-10-0053-01, 13-10-0421-01) | Marriage, divorce, remarriage, first child |
 | Statistics Canada population (17-10-0005-01) | Denominators for event rates |
 | Statistics Canada, Canadian Community Health Survey (13-10-0096-01) | How common smoking, inactivity, obesity and low fruit and vegetable intake are, by age and sex |
+| Health Canada, Canadian Tobacco and Nicotine Survey 2019 | How common former smokers are, by age and sex |
 
 <details>
 <summary><b>Full source details, and how to get the hand-downloaded files</b></summary>
@@ -85,6 +100,7 @@ All inputs come from official public sources. Every cleaned file and column is d
 | Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan (Tables 73, 76, 85, 88) | CPP disability: chance per year of a severe and prolonged disability by age and sex, how long it lasts, and the share of adults eligible. Retirement: share starting the CPP pension at each age 60–70 | Extracted tables yes (`data/clean/cpp_disability_*.csv`, `data/clean/cpp_retirement.csv`); report PDF downloaded by hand (below) |
 | Statistics Canada, Table 13-10-0096-01 (health characteristics, Canadian Community Health Survey) | Percent of people who smoke, drink heavily, are active 150+ minutes a week, are overweight or obese, or eat fruit and vegetables 5+ times a day, by sex and age group (18–34, 35–49, 50–64, 65+), Canada and provinces, 2015–2022 | Cleaned copy yes (`data/clean/risk_prevalence.csv`); raw file via `python pipeline/download_statcan.py 13100096` |
 | Statistics Canada, Tables 39-10-0057-01, 39-10-0053-01 and 13-10-0421-01 (marriages, divorces, births by parity) | First marriage, remarriage, divorce and first-child rates by sex and age group, Canada, 2019 | Rates yes (`data/clean/family_events.csv`); raw files via `python pipeline/download_statcan.py 39100057` (and `39100053`, `13100421`) |
+| Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1 | Percent of former smokers by sex and age group (25–44, 45+) | Typed in (`data/assumptions/former_smokers.csv`) |
 | Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
 
 ### Getting the CIA MI-2024 file
@@ -136,12 +152,13 @@ pytest
 .github/workflows/   automatic test run on every push
 data/raw/            source files as published (not committed; rebuilt by the pipeline)
 data/clean/          cleaned tables used by the model (see docs/data_dictionary.md)
+data/assumptions/    small tables typed in from published studies (hazard ratios, former smokers)
 pipeline/            numbered scripts 01–15 that build data/clean, run in order by run_all.py
   download_statcan.py   helper: download and summarise any Statistics Canada table
   inspect_excel.py      helper: show what is inside an Excel workbook
 tests/               pytest suite: one file per data source, plus the data dictionary check
 docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
-engine/              simulation engine (Phases 2–3, in progress: mortality.py done)
+engine/              simulation engine (Phases 2–3, in progress: mortality.py, risk.py done)
 crosscheck/          independent R and Excel checks (Phase 4, not built yet)
 web/                 survey and visuals (Phase 5, not built yet)
 ```

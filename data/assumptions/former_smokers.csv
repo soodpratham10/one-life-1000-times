@@ -1,0 +1,9 @@
+sex,age_lo,age_hi,pct,ctns_group,source
+M,18,34,16.9,25-44,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, men 25-44"
+M,35,49,16.9,25-44,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, men 25-44"
+M,50,64,38.1,45+,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, men 45+"
+M,65,110,38.1,45+,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, men 45+"
+F,18,34,17.3,25-44,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, women 25-44"
+F,35,49,17.3,25-44,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, women 25-44"
+F,50,64,32.2,45+,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, women 45+"
+F,65,110,32.2,45+,"Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1: former smokers, women 45+"
