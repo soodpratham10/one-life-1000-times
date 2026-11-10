@@ -2,7 +2,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development (Phase 1 — data).** Six data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
+**Status: in development (Phase 1 — data).** Seven data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
 
 ## What this is
 
@@ -47,6 +47,7 @@ All inputs come from official or peer-reviewed public sources. Loaded so far:
 | Statistics Canada, Table 13-10-0392-01 (deaths by selected grouped causes) | Deaths by 12 cause groups, sex and 5-year age group, Canada, 2000–2024 | Cleaned copy yes (`data/clean/causes_of_death.csv`); raw file via `python pipeline/download_statcan.py 13100392` |
 | Transport Canada, National Collision Database (open data, 2019 and 2020) | People injured and killed in police-reported collisions, by sex and age | Cleaned counts yes (`data/clean/crash_casualties.csv`); raw files downloaded by `pipeline/06_clean_ncdb.py` |
 | Statistics Canada, Table 17-10-0005-01 (population on July 1, by age and gender) | Population by province, sex and single age, 2000–2026: the denominator for event rates | Cleaned copy yes (`data/clean/population.csv`); raw file via `python pipeline/download_statcan.py 17100005` |
+| Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer) | New cancer cases (all, and lung) by sex and 5-year age group, Canada, Quebec and Canada excluding Quebec, 1992–2023 | Cleaned extract yes (`data/clean/cancer_incidence.csv`); raw file (about 1.8 GB) via `python pipeline/download_statcan.py 13100111` |
 | Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
 
 ### Getting the CIA MI-2024 file

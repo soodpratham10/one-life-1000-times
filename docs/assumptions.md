@@ -18,6 +18,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A10 | PEI single-age mortality | Derived: within each PEI age group, the single-age force of mortality is the NS–NB average scaled by one factor; ages 0–89 match PEI's published group survival exactly; ages 90–109 match PEI's published e(90+); q = 1 at 110+ | Statistics Canada, Table 13-10-0140-01 (abridged life tables, PEI and territories), with NS and NB from 13-10-0114-01 | 2026-11-10 | StatCan publishes only 5-year groups for PEI; borrowing the shape of similar Atlantic provinces keeps PEI's own level | The within-group shape is assumed, not observed; territories excluded from v1 (tiny populations, recent Yukon tables not published); PEI's small population makes some published rates noisy (e.g. 2022–2024 infant death rate higher for girls than boys), which does not affect the model since it starts at 18 | Loaded (derived) |
 | A11 | Car crash event | Event = injured in a police-reported motor vehicle collision (any road user: driver, passenger, pedestrian, cyclist, motorcyclist). Counts by sex and single age; base year 2019. Unknown age or sex (about 2%) spread in proportion. Annual probability = count ÷ Canada's July 1 population of the same sex, age and year (A12); ages 99 and 100+ combined | Transport Canada, National Collision Database open data, 2019 and 2020 files | 2026-11-10 | Only national source of injury counts by age and sex | Open data does not separate minor from serious injuries; police-reported only (some injuries never reported); national only, no province; 2020 distorted by COVID (kept as comparison only) | Loaded (rates by sex and age, 2019 and 2020) |
 | A12 | Population (denominator for event rates) | July 1 population by year 2000–2026, Canada and 10 provinces, single age 0–100+. StatCan's gender categories mapped to sex: Men+ → M, Women+ → F | Statistics Canada, Table 17-10-0005-01 (population estimates on July 1, by age and gender) | 2026-11-10 | Official population estimates, same source family as the life tables | Reported by gender, while the life tables are by sex: non-binary people (a very small share) are distributed between Men+ and Women+; territories not used; years before 2000 not used because StatCan does not publish every single age up to 100+ for them (before 1991 the oldest group is 90+; in 1991–1999 ages 90–100 are blank) | Loaded |
+| A13 | Cancer diagnosis event | Yearly probability of a new primary cancer = new cases ÷ population, by sex and 5-year age group (90+ = 90–100+), Canada, 2019. Split into lung (lung and bronchus) and other cancers, matching the cause-of-death groups (A06) | Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer, Canadian Cancer Registry), with population from A12 | 2026-11-10 | 2019 is the latest year with complete national data in this table and the last before COVID-19 disrupted screening and diagnosis | Counts primary cancers, not people (a second primary cancer counts again), so the chance of a first diagnosis is slightly overstated; 5-year age groups; national rates used for every province; StatCan rounds counts to the nearest 5; lung cancer counts under age 30 are suppressed for privacy and set to 0 (flagged), a negligible effect since even 4 cases would be a chance below 1 in a million | Loaded |
 
 ## Data checks on A04
 
@@ -86,10 +87,25 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 - adults 18–24 are injured more often than adults 55–64: 2019 rates per 1,000 were 7.1 (women) and 6.1 (men) at 18–24, versus 3.4 and 3.3 at 55–64
 - cross-source check: police-reported crash deaths (Transport Canada) are 80–100% of motor vehicle deaths on death certificates (StatCan): 2019 1,762 vs 1,926 (91%); 2020 1,746 vs 1,818 (96%). StatCan's count is higher because it includes crashes off public roads and deaths after 30 days
 
+## Data checks on A13
+
+`tests/test_cancer.py` (7 tests):
+
+- Canada = Canada excluding Quebec + Quebec, within rounding (2019 all ages: 219,125 vs 161,785 + 57,345)
+- complete grid for Canada 2019: 2 sexes x 19 age groups, no blanks
+- probabilities valid; lung never above all cancers
+- privacy suppression only affects lung cancer under age 30
+- our rate (cases ÷ our population) within 2% of StatCan's published rate in every group with at least 100 cases
+- risk at 70–74 more than 10 times risk at 30–34
+- 2019 cancer deaths (A06) are 30–50% of 2019 new cases, a typical mortality-to-incidence ratio
+
+What the source showed: national totals in this table run to 2019 only, while Quebec's run to 2023; Quebec's 2020 count fell about 8% below 2019 (screening disruption).
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A13 | Cancer incidence loaded; diagnosis probabilities built and tested |
 | 2026-11-10 | A11, A12 | Population loaded; crash probabilities built and tested |
 | 2026-11-10 | A11 | Crash injury and death counts loaded and tested |
 | 2026-11-10 | A04, A06, A10 | Review fixes: PEI checks run without raw file; outdated A04 note; PEI noise note; external death-count check |
