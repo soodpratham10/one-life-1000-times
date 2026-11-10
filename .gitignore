@@ -1,8 +1,15 @@
 # ----- Course files: reference only, never published -----
 reference/
 
-# ----- Raw downloads (re-created by pipeline/01_*.py scripts; too large for GitHub) -----
-data/raw/statcan_*/
+# ----- Raw source files -----
+# Never committed: StatCan files are re-downloaded by the pipeline scripts, and
+# CIA files are the CIA's copyrighted material (download them from cia-ica.ca;
+# see README). Only the folder placeholder is kept.
+data/raw/*
+!data/raw/.gitkeep
+
+# ----- Cleaned data derived from CIA publications (rebuilt locally) -----
+data/clean/cia_*
 
 # ----- Built outputs (re-created by the pipeline) -----
 data/clean/*.db
@@ -26,9 +33,9 @@ __pycache__/
 node_modules/
 web/dist/
 
+# ----- Editor settings (personal to each machine) -----
+.vscode/
+
 # ----- Mac and secrets -----
 .DS_Store
 .env
-
-# ----- Editor settings (personal to each machine) -----
-.vscode/
