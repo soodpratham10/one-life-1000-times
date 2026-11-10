@@ -84,13 +84,14 @@ def table_73(page: str) -> pd.DataFrame:
     """Rows like '2025 101.1 98.2 97.7 79.1 77.9 70.0 71.7 65.7 51.5 45.8'; columns 7-8 =
     disability benefit eligibility at ages 20-64 (males, females)."""
     rows = []
-    for m in re.finditer(rf"^(20\d\d)((?: +{NUM}){{10}})\s*$", page, re.M):
+    for m in re.finditer(rf"^((?:20|21)\d\d)((?: +{NUM}){{10}})\s*$", page, re.M):   # 2025 ... 2100
         v = [float(x) for x in m.group(2).split()]
         rows += [{"year": int(m.group(1)), "sex": "M", "eligible_pct": v[6]},
                  {"year": int(m.group(1)), "sex": "F", "eligible_pct": v[7]}]
     df = pd.DataFrame(rows)
-    if df.empty or 2025 not in set(df["year"]):
-        raise ValueError("Table 73: could not read the eligibility rows")
+    expected = list(range(2025, 2036)) + list(range(2040, 2101, 5))
+    if sorted(df["year"].unique()) != expected:
+        raise ValueError(f"Table 73: expected years {expected[0]}-{expected[-1]}, found {sorted(df['year'].unique())}")
     return df
 
 

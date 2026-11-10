@@ -2,14 +2,17 @@
 # Create:   conda env create -f environment.yml
 # Activate: conda activate onelife
 # Update after edits: conda env update -f environment.yml --prune
+#
+# Lower bounds are the versions the project has been tested with. The exact versions
+# used are recorded in environment.lock.yml (conda env export, macOS arm64).
 
 name: onelife
 channels:
   - conda-forge
 dependencies:
   - python=3.13
-  - numpy        # simulation maths
-  - pandas       # cleaning source tables
-  - openpyxl     # reading/writing Excel cross-check files
-  - pytest       # tests
-  - pypdf        # reading tables from the CPP actuarial report PDF
+  - numpy>=2.0        # simulation maths
+  - pandas>=2.2       # cleaning source tables
+  - openpyxl>=3.1     # reading the CIA Excel file
+  - pytest>=8.0       # tests
+  - pypdf>=6.0        # reading tables from the CPP actuarial report PDF

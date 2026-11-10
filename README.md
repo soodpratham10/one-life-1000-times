@@ -1,5 +1,7 @@
 # One Life, 1,000 Times
 
+[![tests](https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml/badge.svg)](https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml)
+
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
 **Status: in development (Phase 1 — data, complete).** All Phase 1 data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
@@ -38,7 +40,7 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 
 ## Data
 
-All inputs come from official or peer-reviewed public sources. Loaded so far:
+All inputs come from official or peer-reviewed public sources. Every cleaned file and column is described in [`docs/data_dictionary.md`](docs/data_dictionary.md). Sources:
 
 | Source | What it gives | In this repo? |
 | --- | --- | --- |
@@ -79,15 +81,17 @@ The download contains every year, whatever year the tool shows on screen.
 ## Repository layout
 
 ```
-data/raw/          source tables, as published
-data/clean/        tidy tables (database is rebuilt, not committed)
-pipeline/          scripts that build data/clean
-engine/            Python reference engine
-tests/             pytest suite
-crosscheck/r/      independent R checks
-crosscheck/excel/  hand calculations
-web/               survey, browser engine, visuals
-docs/              assumptions, methodology, limits
+.github/workflows/   automatic test run on every push
+data/raw/            source files as published (not committed; rebuilt by the pipeline)
+data/clean/          cleaned tables used by the model (see docs/data_dictionary.md)
+pipeline/            numbered scripts 01–14 that build data/clean, run in order by run_all.py
+  download_statcan.py   helper: download and summarise any Statistics Canada table
+  inspect_excel.py      helper: show what is inside an Excel workbook
+tests/               pytest suite: one file per data source, plus the data dictionary check
+docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
+engine/              simulation engine (Phase 2, not built yet)
+web/                 survey and visuals (Phase 5, not built yet)
+crosscheck/          independent R and Excel checks (Phase 4, not built yet)
 ```
 
 ## Run it locally
@@ -97,6 +101,14 @@ Requires [Anaconda or Miniconda](https://docs.conda.io/).
 ```bash
 conda env create -f environment.yml
 conda activate onelife
+pytest                          # checks the cleaned data already in data/clean/
+```
+
+To rebuild every cleaned file from the original sources (downloads several tables; the hand-downloaded files described above must be in place first):
+
+```bash
+python pipeline/run_all.py --plan    # show what will run and what is missing
+python pipeline/run_all.py           # rebuild
 pytest
 ```
 

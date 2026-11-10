@@ -85,10 +85,15 @@ def test_termination_table(term):
     assert (term.query("age < 60")["per_1000"] > 0).all()
 
 
-def test_eligibility_2025(elig):
-    """Table 73: 71.7% of men and 65.7% of women aged 20-64 eligible in 2025."""
-    e = elig[elig["year"] == 2025].set_index("sex")["eligible_pct"]
-    assert e["M"] == pytest.approx(71.7) and e["F"] == pytest.approx(65.7)
+def test_eligibility_table(elig):
+    """Table 73: every year 2025-2035 and 2040-2100 by 5; 71.7% of men and 65.7% of women
+    aged 20-64 eligible in 2025, 80.6% and 76.1% in 2100 (first and last rows)."""
+    expected = set(range(2025, 2036)) | set(range(2040, 2101, 5))
+    assert set(elig["year"]) == expected
+    assert len(elig) == 2 * len(expected)
+    e = elig.set_index(["year", "sex"])["eligible_pct"]
+    assert e[(2025, "M")] == pytest.approx(71.7) and e[(2025, "F")] == pytest.approx(65.7)
+    assert e[(2100, "M")] == pytest.approx(80.6) and e[(2100, "F")] == pytest.approx(76.1)
 
 
 def test_rates_rebuild_report_projection(inc, elig):

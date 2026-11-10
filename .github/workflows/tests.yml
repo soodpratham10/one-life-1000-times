@@ -1,0 +1,21 @@
+# Runs the full test suite on GitHub for every push and pull request.
+# The CIA MI-2024 tests skip here (that file is never committed); everything else runs
+# against the cleaned data in data/clean/.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install packages
+        run: pip install "numpy>=2.0" "pandas>=2.2" "openpyxl>=3.1" "pytest>=8.0" "pypdf>=6.0"
+      - name: Run tests
+        run: pytest -v

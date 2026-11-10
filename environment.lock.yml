@@ -1,0 +1,49 @@
+name: onelife
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - _openmp_mutex=4.5
+  - bzip2=1.0.8
+  - ca-certificates=2026.10.23
+  - colorama=0.4.6
+  - et_xmlfile=2.0.0
+  - exceptiongroup=1.3.1
+  - iniconfig=2.3.1
+  - libblas=3.11.0
+  - libcblas=3.11.0
+  - libcxx=23.1.5
+  - libexpat=2.9.0
+  - libffi=3.7.0
+  - libgcc=16.2.0
+  - libgfortran=16.2.0
+  - libgfortran5=16.2.0
+  - liblapack=3.11.0
+  - liblzma=5.8.3
+  - libmpdec=4.0.0
+  - libopenblas=0.3.34
+  - libpython=3.13.18
+  - libsqlite=3.54.1
+  - libzlib=1.3.2
+  - llvm-openmp=23.1.5
+  - ncurses=6.6
+  - numpy=2.5.4
+  - openpyxl=3.1.5
+  - openssl=3.6.5
+  - packaging=26.3
+  - pandas=3.1.1
+  - pip=26.2.2
+  - pluggy=1.7.0
+  - pygments=2.21.0
+  - pypdf=7.0.0
+  - pytest=9.2.0
+  - python=3.13.18
+  - python-dateutil=4.0.0
+  - python-tzdata=2026.6
+  - python_abi=3.13
+  - readline=8.3
+  - tk=8.6.13
+  - tomli=2.5.0
+  - typing_extensions=4.16.0
+  - tzdata=2026e
+prefix: /opt/miniconda3/envs/onelife
