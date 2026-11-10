@@ -1,0 +1,114 @@
+Already downloaded: data/raw/statcan_13100392/13100392.csv
+
+=== SIZE ===
+458,700 rows x 18 columns (118.7 MB)
+
+=== COLUMNS ===
+['REF_DATE', 'GEO', 'DGUID', 'Age at time of death', 'Sex', 'Cause of death (ICD-10)', 'Characteristics', 'UOM', 'UOM_ID', 'SCALAR_FACTOR', 'SCALAR_ID', 'VECTOR', 'COORDINATE', 'VALUE', 'STATUS', 'SYMBOL', 'TERMINATED', 'DECIMALS']
+
+=== FIRST 5 ROWS ===
+   REF_DATE                         GEO           DGUID            Age at time of death         Sex                Cause of death (ICD-10)                                     Characteristics     UOM  UOM_ID SCALAR_FACTOR  SCALAR_ID     VECTOR COORDINATE     VALUE STATUS  SYMBOL  TERMINATED  DECIMALS
+0      2000  Canada, place of residence  2021A000011124  Age at time of death, all ages  Both sexes   Total, all causes of death [A00-Y89]                                    Number of deaths  Number     223         units          0  v29850604  1.1.1.1.1  218082.0    NaN     NaN         NaN         0
+1      2000  Canada, place of residence  2021A000011124  Age at time of death, all ages  Both sexes   Total, all causes of death [A00-Y89]  Age-specific mortality rate per 100,000 population  Number     223         units          0  v29981284  1.1.1.1.2     710.7    NaN     NaN         NaN         1
+2      2000  Canada, place of residence  2021A000011124  Age at time of death, all ages  Both sexes        Salmonella infections [A01-A02]                                    Number of deaths  Number     223         units          0  v29850605  1.1.1.2.1       3.0    NaN     NaN         NaN         0
+3      2000  Canada, place of residence  2021A000011124  Age at time of death, all ages  Both sexes        Salmonella infections [A01-A02]  Age-specific mortality rate per 100,000 population  Number     223         units          0  v29981285  1.1.1.2.2       0.0    NaN     NaN         NaN         1
+4      2000  Canada, place of residence  2021A000011124  Age at time of death, all ages  Both sexes  Shigellosis and amoebiasis [A03, A06]                                    Number of deaths  Number     223         units          0  v30111964  1.1.1.3.1       0.0    NaN     NaN         NaN         0
+
+=== VALUES IN EACH COLUMN ===
+
+REF_DATE (25 values):
+   2000
+   2001
+   2002
+   2003
+   2004
+   2005
+   2006
+   2007
+   2008
+   2009
+   2010
+   2011
+   2012
+   2013
+   2014
+   2015
+   2016
+   2017
+   2018
+   2019
+   2020
+   2021
+   2022
+   2023
+   2024
+
+GEO (1 values):
+   Canada, place of residence
+
+DGUID (1 values):
+   2021A000011124
+
+Age at time of death (22 values):
+   Age at time of death, all ages
+   Age at time of death, under 1 year
+   Age at time of death, 1 to 4 years
+   Age at time of death, 5 to 9 years
+   Age at time of death, 10 to 14 years
+   Age at time of death, 15 to 19 years
+   Age at time of death, 20 to 24 years
+   Age at time of death, 25 to 29 years
+   Age at time of death, 30 to 34 years
+   Age at time of death, 35 to 39 years
+   Age at time of death, 40 to 44 years
+   Age at time of death, 45 to 49 years
+   Age at time of death, 50 to 54 years
+   Age at time of death, 55 to 59 years
+   Age at time of death, 60 to 64 years
+   Age at time of death, 65 to 69 years
+   Age at time of death, 70 to 74 years
+   Age at time of death, 75 to 79 years
+   Age at time of death, 80 to 84 years
+   Age at time of death, 85 to 89 years
+   Age at time of death, 90 years and over
+   Age at time of death, not stated
+
+Sex (3 values):
+   Both sexes
+   Males
+   Females
+
+Cause of death (ICD-10): 142 distinct values, e.g. ['Total, all causes of death [A00-Y89]', 'Salmonella infections [A01-A02]', 'Shigellosis and amoebiasis [A03, A06]']
+
+Characteristics (2 values):
+   Number of deaths
+   Age-specific mortality rate per 100,000 population
+
+UOM (1 values):
+   Number
+
+UOM_ID (1 values):
+   223
+
+SCALAR_FACTOR (1 values):
+   units
+
+SCALAR_ID (1 values):
+   0
+
+VECTOR: 18348 distinct values, e.g. ['v29850604', 'v29981284', 'v29850605']
+
+COORDINATE: 18348 distinct values, e.g. ['1.1.1.1.1', '1.1.1.1.2', '1.1.1.2.1']
+
+VALUE: 13897 distinct values, e.g. [np.float64(218082.0), np.float64(710.7), np.float64(3.0)]
+
+STATUS (1 values):
+   ..
+
+SYMBOL (0 values):
+
+TERMINATED (0 values):
+
+DECIMALS (2 values):
+   0
+   1

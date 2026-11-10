@@ -2,7 +2,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development (Phase 1 — data).** Two data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
+**Status: in development (Phase 1 — data).** Three data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
 
 ## What this is
 
@@ -43,6 +43,7 @@ All inputs come from official or peer-reviewed public sources. Loaded so far:
 | Source | What it gives | In this repo? |
 | --- | --- | --- |
 | Statistics Canada, Table 13-10-0114-01 (complete life tables, three-year estimates) | Death probabilities by single age 0–110+, sex, Canada and 9 provinces, 1980–1982 to 2022–2024 | Cleaned copy yes (`data/clean/life_tables.csv`); raw file is re-downloaded by `pipeline/01_download_life_tables.py` |
+| Statistics Canada, Table 13-10-0392-01 (deaths by selected grouped causes) | Deaths by 12 cause groups, sex and 5-year age group, Canada, 2000–2024 | Cleaned copy yes (`data/clean/causes_of_death.csv`); raw file via `python pipeline/download_statcan.py 13100392` |
 | Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
 
 ### Getting the CIA MI-2024 file

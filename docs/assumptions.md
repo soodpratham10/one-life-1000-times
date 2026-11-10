@@ -11,7 +11,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A03 | Time step | 1 year | Design decision | — | Matches annual source tables | Events inside a year are not ordered | Decided |
 | A04 | Base mortality by age, sex, province | qx by single age 0–110+, Canada and 9 provinces, 3 sexes, periods 1980–1982 to 2022–2024 | Statistics Canada, Table 13-10-0114-01 (complete life tables, three-year estimates) | 2026-11-10 | Official population rates; three-year tables are more stable than single-year ones | Population, not insured lives; PEI not included (needs Table 13-10-0140); latest data ends 2024; StatCan marks 2021–2023 and 2022–2024 as preliminary, so they may be revised | Loaded (release of 2026-01-13; which period to use: A09) |
 | A05 | Mortality improvement scale | CIA MI-2024: two-dimensional rates by sex, age 20–120, calendar year 1981–2119; long-term rate about 1.29% a year at ages 40–80 from 2060, grading to 0 at 115+. Applied as q(x, t) = q(x, t−1)(1 − MI(x, t)). Ages 18–19 use the age-20 rate | Canadian Institute of Actuaries, Mortality Improvements Research – Tables (2024), file 224043te.xlsx | 2026-11-10 | Profession's current scale; proposed for Canadian commuted-value standards from Feb 2027 | Built from data to 2019; future improvement is uncertain; ages under 20 not covered | Loaded (not in public repo: CIA copyright) |
-| A06 | Cause-of-death split | To set | Statistics Canada cause-of-death tables | — | Official cause shares by age and sex | Cause coding changes over time | To set (Phase 1) |
+| A06 | Cause-of-death split | 12 non-overlapping groups: lung cancer, other cancers, heart, stroke, chronic lung disease, diabetes, dementia, motor vehicle, other accidents, other injury, COVID-19, all other (remainder). Deaths by year 2000–2024, sex, 20 age groups. Same cause mix assumed for every province | Statistics Canada, Table 13-10-0392-01 (deaths by selected grouped causes) | 2026-11-10 | Groups match what the survey can change (smoking, activity, driving) | Canada only, not by province; 5-year age groups; cause coding and reporting lags (StatCan notes younger deaths are reported later) | Loaded (years to use: A09) |
 | A07 | Lifestyle hazard ratios | To set | Published peer-reviewed studies | — | Measured effects of smoking, alcohol, activity, diet | Self-reported answers; studies overlap | To set (Phase 2) |
 | A08 | Cap on combined multipliers | To set | Design decision, tested | — | Stops stacked risks compounding | Cap level is a judgement | To set (Phase 2) |
 | A09 | Base data period | To set | Design decision | — | Choice of whether COVID-era years are included | Any choice shifts the base rates | To set (Phase 1) |
@@ -38,10 +38,23 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 - rates constant from 2060; zero at ages 115+
 - spot cells read straight from the workbook match the tidy table
 
+## Data checks on A06
+
+`tests/test_causes_of_death.py` (5 tests, all passing on 2026-11-10):
+
+- complete grid: every year x sex x age group has all 12 groups, once each
+- age groups run 0–110 with no gaps or overlaps
+- groups sum exactly to StatCan's total deaths in every cell
+- males + females = both sexes, cause by cause
+- "all other" (the remainder) is never negative, so no deaths are counted twice (written by Pratham)
+- external check: 2024 shares (heart 17.7%, stroke 4.2%, chronic lung disease 4.0%, diabetes 2.1%, accidents 6.3%) match StatCan's published 2024 leading causes
+- only missing counts in the source: COVID-19 before 2020 (cause did not exist), set to 0; any other gap stops the pipeline
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A06 | Cause-of-death groups loaded and tested |
 | 2026-11-10 | A04 | Noted preliminary status of latest periods and StatCan release date; added external e(0) check |
 | 2026-11-10 | A05 | MI-2024 loaded and tested |
 | 2026-11-10 | A04 | Life tables loaded and tested (StatCan 13-10-0114-01) |
