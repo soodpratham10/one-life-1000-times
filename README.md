@@ -6,7 +6,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0).** All data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
+**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is in progress.** Personal death rates (base table, mortality improvement and survey risk multipliers) are built and tested; the year-by-year simulation of events is not built yet. This README is updated as each step is finished.
 
 ## What this is
 
@@ -61,7 +61,7 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 | --- | --- | --- |
 | 0. Setup | Environment, repository, licence | Done |
 | 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | Done (v0.1.0) |
-| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | Next |
+| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | In progress (2 of 4 steps done) |
 | 3. Links between events | Disability recovery vs death, higher mortality after cancer or a heart attack, marriage effects | Planned |
 | 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | Planned |
 | 5. Website | Survey and interactive visuals | Planned |

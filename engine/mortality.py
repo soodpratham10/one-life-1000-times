@@ -23,7 +23,6 @@ from engine.data import MI_FILE, load
 BASE_PERIOD = 2017            # default base table: 2017-2019 (A09)
 MAX_AGE = 110                 # open age group, q = 1 (A02)
 MIN_AGE = 18                  # youngest person simulated (A01)
-MI_LAST_YEAR = 2119           # last year in MI-2024
 MI_MIN_AGE = 20               # youngest age in MI-2024
 
 REGIONS = ("CA", "NL", "PE", "NS", "NB", "QC", "ON", "MB", "SK", "AB", "BC")

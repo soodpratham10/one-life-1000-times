@@ -2,7 +2,7 @@
 
 Every assumption the model makes is listed here: what it is, its value, where it comes from and its known weakness. Nothing enters the engine without a row in this file.
 
-**Status key:** Decided = fixed by design · Loaded = source data in the repo and tested · To set = value comes from data in a later phase · Changed = revised (old value kept in the notes)
+**Status key:** Decided = fixed by design · Loaded = source data in the repo and tested · Set = value chosen and tested in the engine · To set = value comes from data in a later phase · Changed = revised (old value kept in the notes)
 
 | ID | Assumption | Value | Source | Accessed | Rationale | Known weakness | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
