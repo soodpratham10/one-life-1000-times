@@ -16,6 +16,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A08 | Cap on combined multipliers | To set | Design decision, tested | — | Stops stacked risks compounding | Cap level is a judgement | To set (Phase 2) |
 | A09 | Base data period | To set | Design decision | — | Choice of whether COVID-era years are included | Any choice shifts the base rates | To set (Phase 1) |
 | A10 | PEI single-age mortality | Derived: within each PEI age group, the single-age force of mortality is the NS–NB average scaled by one factor; ages 0–89 match PEI's published group survival exactly; ages 90–109 match PEI's published e(90+); q = 1 at 110+ | Statistics Canada, Table 13-10-0140-01 (abridged life tables, PEI and territories), with NS and NB from 13-10-0114-01 | 2026-11-10 | StatCan publishes only 5-year groups for PEI; borrowing the shape of similar Atlantic provinces keeps PEI's own level | The within-group shape is assumed, not observed; territories excluded from v1 (tiny populations, recent Yukon tables not published); PEI's small population makes some published rates noisy (e.g. 2022–2024 infant death rate higher for girls than boys), which does not affect the model since it starts at 18 | Loaded (derived) |
+| A11 | Car crash event | Event = injured in a police-reported motor vehicle collision (any road user: driver, passenger, pedestrian, cyclist, motorcyclist). Counts by sex and single age; base year 2019. Unknown age or sex (about 2%) spread in proportion. Annual probability = count ÷ population (population: to set) | Transport Canada, National Collision Database open data, 2019 and 2020 files | 2026-11-10 | Only national source of injury counts by age and sex | Open data does not separate minor from serious injuries; police-reported only (some injuries never reported); national only, no province; 2020 distorted by COVID (kept as comparison only) | Counts loaded (rates: next step) |
 
 ## Data checks on A04
 
@@ -47,7 +48,7 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 - age groups run 0–110 with no gaps or overlaps
 - groups sum exactly to StatCan's total deaths in every cell
 - males + females = both sexes, cause by cause
-- "all other" (the remainder) is never negative, so no deaths are counted twice (written by Pratham)
+- "all other" (the remainder) is never negative, so no deaths are counted twice
 - external check: 2024 shares (heart 17.7%, stroke 4.2%, chronic lung disease 4.0%, diabetes 2.1%, accidents 6.3%) match StatCan's published 2024 leading causes
 - external check: 2024 total deaths in the cleaned file (326,779) equal StatCan's published 2024 count
 - only missing counts in the source: COVID-19 before 2020 (cause did not exist), set to 0; any other gap stops the pipeline
@@ -64,10 +65,21 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 - StatCan's published PEI values are kept in `data/clean/life_tables_pei_abridged.csv`, so these checks run on any copy of the repo
 - method check on test data: with PEI set to exactly 1.15 x the reference force, the build recovered 1.148–1.154 at every age (differences from 5-decimal rounding)
 
+## Data checks on A11
+
+`tests/test_crash_casualties.py` (5 tests):
+
+- complete grid: 2 years x 2 sexes x ages 1–99
+- no negative counts
+- totals after spreading unknowns equal the source files exactly (2019: 140,801 injured, 1,762 killed; 2020: 104,265 injured, 1,746 killed)
+- 2020 injuries at least 15% below 2019 (COVID): actual drop 26%
+- 2020 deaths equal Transport Canada's published 1,746
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A11 | Crash injury and death counts loaded and tested |
 | 2026-11-10 | A04, A06, A10 | Review fixes: PEI checks run without raw file; outdated A04 note; PEI noise note; external death-count check |
 | 2026-11-10 | A10 | PEI single-age table derived and tested |
 | 2026-11-10 | A06 | Cause-of-death groups loaded and tested |

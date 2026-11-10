@@ -57,7 +57,6 @@ def test_males_plus_females_equals_both(cod):
 
 
 def test_no_cause_groups_overlap(cod):
-    """'Other' (the remainder) is never negative, so no deaths are counted twice.
-    Written by Pratham."""
+    """'Other' (the remainder) is never negative, so no deaths are counted twice."""
     other = cod[cod["cause"] == "other"]
     assert (other["deaths"] >= 0).all()
