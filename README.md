@@ -1,18 +1,20 @@
 # One Life, 1,000 Times
 
 [![tests](https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml/badge.svg)](https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml)
+[![release](https://img.shields.io/github/v/release/soodpratham10/one-life-1000-times)](https://github.com/soodpratham10/one-life-1000-times/releases)
+[![licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development (Phase 1 — data, complete).** All Phase 1 data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
+**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0).** All data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
 
 ## What this is
 
-A life simulator built on real Canadian data. You answer a short survey; the model lives your life forward year by year — health, accidents, family, work, and how it ends — then does it again, 1,000 times, so you can see the realistic range of how things could go and which of your choices move the odds.
+A life simulator built on real Canadian data. You answer a short survey; the model lives your life forward year by year (health, accidents, family, work, and how it ends), then does it again, 1,000 times, so you can see the realistic range of how things could go and which of your choices move the odds.
 
 **Aim (draft):** show someone the realistic range of how their life could unfold, using the data and methods actuaries use, and show which of their choices actually change the odds.
 
-## What this is not
+### What this is not
 
 - Not a prediction of when or how you will die. No model can do that for one person; this shows probabilities.
 - Not medical, financial or insurance advice.
@@ -23,24 +25,52 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 | Event | Notes |
 | --- | --- |
 | Death, by cause | 11 cause groups plus "all other causes" (see A06) |
-| Disability spell | Can recover or become permanent |
+| Disability | CPP-style severe and prolonged disability; can end |
 | Injured in a car crash | Police-reported injury of any severity; can happen more than once |
 | Cancer diagnosis | Raises later mortality |
 | Heart attack or stroke | Raises later mortality |
-| Marriage or common-law union | Affects later mortality |
+| Marriage | Legal marriage; affects later mortality |
+| Divorce | Only after a marriage |
+| Remarriage | Only after a divorce |
 | First child | |
-| Divorce or separation | Only after a union |
-| Retirement | |
+| Retirement | Starting the CPP retirement pension, ages 60–70 |
 
 Widowhood, job loss and home purchase are planned for version 2.
 
 ## Method (planned)
 
-The structure follows how life insurers underwrite: a base mortality table, personal risk multipliers, future mortality improvement, competing risks between events, and an actual-to-expected check against official data. Published data is used where insurers use proprietary underwriting manuals. Every assumption is listed in [`docs/assumptions.md`](docs/assumptions.md).
+The structure follows how life insurers underwrite: a base mortality table, personal risk multipliers, future mortality improvement, competing risks between events, and an actual-to-expected check against official data. Published data is used where insurers use proprietary underwriting manuals. Every assumption, its source and its weakness is listed in [`docs/assumptions.md`](docs/assumptions.md).
+
+## Roadmap
+
+| Phase | What it covers | Status |
+| --- | --- | --- |
+| 0. Setup | Environment, repository, licence | Done |
+| 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | Done (v0.1.0) |
+| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | Next |
+| 3. Links between events | Disability recovery vs death, higher mortality after cancer or a heart attack, marriage effects | Planned |
+| 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | Planned |
+| 5. Website | Survey and interactive visuals | Planned |
+| 6. Launch | Write-up and release | Planned |
 
 ## Data
 
-All inputs come from official or peer-reviewed public sources. Every cleaned file and column is described in [`docs/data_dictionary.md`](docs/data_dictionary.md). Sources:
+All inputs come from official public sources. Every cleaned file and column is described in [`docs/data_dictionary.md`](docs/data_dictionary.md).
+
+| Source | Used for |
+| --- | --- |
+| Statistics Canada life tables (13-10-0114-01; PEI abridged 13-10-0140-01) | Base death rates by age, sex and province |
+| Canadian Institute of Actuaries, MI-2024 | Future mortality improvement (not committed; see below) |
+| Statistics Canada causes of death (13-10-0392-01) | Splitting deaths into 12 cause groups |
+| Transport Canada, National Collision Database | Car crash injuries |
+| Statistics Canada cancer incidence (13-10-0111-01) | Cancer diagnoses |
+| Public Health Agency of Canada, CCDSS | Heart attacks and strokes |
+| Office of the Chief Actuary, 32nd CPP Actuarial Report | Disability and retirement |
+| Statistics Canada marriages, divorces, births (39-10-0057-01, 39-10-0053-01, 13-10-0421-01) | Marriage, divorce, remarriage, first child |
+| Statistics Canada population (17-10-0005-01) | Denominators for event rates |
+
+<details>
+<summary><b>Full source details, and how to get the hand-downloaded files</b></summary>
 
 | Source | What it gives | In this repo? |
 | --- | --- | --- |
@@ -78,21 +108,7 @@ The download contains every year, whatever year the tool shows on screen.
 2. Save it as `data/raw/oca/cpp32-rev-ed-en.pdf`.
 3. Run `python pipeline/12_cpp_disability.py` and `python pipeline/13_cpp_retirement.py` (they read the tables straight from the PDF).
 
-## Repository layout
-
-```
-.github/workflows/   automatic test run on every push
-data/raw/            source files as published (not committed; rebuilt by the pipeline)
-data/clean/          cleaned tables used by the model (see docs/data_dictionary.md)
-pipeline/            numbered scripts 01–14 that build data/clean, run in order by run_all.py
-  download_statcan.py   helper: download and summarise any Statistics Canada table
-  inspect_excel.py      helper: show what is inside an Excel workbook
-tests/               pytest suite: one file per data source, plus the data dictionary check
-docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
-engine/              simulation engine (Phase 2, not built yet)
-web/                 survey and visuals (Phase 5, not built yet)
-crosscheck/          independent R and Excel checks (Phase 4, not built yet)
-```
+</details>
 
 ## Run it locally
 
@@ -112,6 +128,22 @@ python pipeline/run_all.py           # rebuild
 pytest
 ```
 
+## Repository layout
+
+```
+.github/workflows/   automatic test run on every push
+data/raw/            source files as published (not committed; rebuilt by the pipeline)
+data/clean/          cleaned tables used by the model (see docs/data_dictionary.md)
+pipeline/            numbered scripts 01–14 that build data/clean, run in order by run_all.py
+  download_statcan.py   helper: download and summarise any Statistics Canada table
+  inspect_excel.py      helper: show what is inside an Excel workbook
+tests/               pytest suite: one file per data source, plus the data dictionary check
+docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
+engine/              simulation engine (Phases 2–3, not built yet)
+crosscheck/          independent R and Excel checks (Phase 4, not built yet)
+web/                 survey and visuals (Phase 5, not built yet)
+```
+
 ## Known limits
 
 Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumptions.md). The main ones so far:
@@ -127,9 +159,9 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 
 ## Licence
 
-- **Code:** MIT (see `LICENSE`).
-- **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CPP disability tables are taken from the Office of the Chief Actuary's 32nd Actuarial Report on the Canada Pension Plan (Office of the Superintendent of Financial Institutions), reproduced for non-commercial use with attribution. The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
+- **Code:** MIT (see [`LICENSE`](LICENSE)).
+- **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CPP disability and retirement tables are taken from the Office of the Chief Actuary's 32nd Actuarial Report on the Canada Pension Plan (Office of the Superintendent of Financial Institutions), reproduced for non-commercial use with attribution. The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
 
 ## Author
 
-Pratham Sood — Actuarial Mathematics & Statistics, University of Manitoba.
+Pratham Sood, Actuarial Mathematics & Statistics, University of Manitoba.
