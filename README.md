@@ -49,7 +49,7 @@ Each answer moves your death rates by a hazard ratio from a large published stud
 | Drinks a week | Zhao et al., *JAMA Network Open* 2023 |
 | Servings of fruit and vegetables a day | Wang et al., *Circulation* 2021 |
 
-Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study (Manuel et al., *PLOS Medicine* 2016).
+Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. Smoking also changes what people die of (lung cancer and COPD far more than other causes), using cause-specific ratios from Thun et al., *NEJM* 2013. A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study (Manuel et al., *PLOS Medicine* 2016).
 
 ## Method (planned)
 
@@ -158,7 +158,7 @@ pipeline/            numbered scripts 01–15 that build data/clean, run in orde
   inspect_excel.py      helper: show what is inside an Excel workbook
 tests/               pytest suite: one file per data source, plus the data dictionary check
 docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
-engine/              simulation engine (Phases 2–3, in progress: mortality.py, risk.py done)
+engine/              simulation engine (Phases 2–3, in progress: mortality.py, risk.py, causes.py done)
 crosscheck/          independent R and Excel checks (Phase 4, not built yet)
 web/                 survey and visuals (Phase 5, not built yet)
 ```

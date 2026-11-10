@@ -276,6 +276,16 @@ Share of adults who are former smokers, by sex and CCHS age group, mapped from t
 | `ctns_group` | The survey age group the figure is taken from (25-44 or 45+) |
 | `source` | Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1 |
 
+### `assumptions/smoking_cause_ratios.csv`
+Current smokers' death-rate ratio against never smokers for each cause of death. Read by `engine/causes.py`. Tests: `tests/test_causes.py`. Assumption A20.
+
+| Column | Meaning |
+| --- | --- |
+| `cause` | Cause group as in `causes_of_death.csv`; `other` is used for every cause not listed |
+| `sex` | M, F, or B where the same ratio is used for both |
+| `hr_current` | Ratio for current smokers (former smokers are derived from it, see A20) |
+| `source` | Study the number comes from |
+
 ---
 
 ### Not in the public repo

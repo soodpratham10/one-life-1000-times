@@ -1,0 +1,10 @@
+cause,sex,hr_current,source
+lung_cancer,M,24.97,"Thun et al., NEJM 2013: current vs never smokers, contemporary cohorts 2000-2010, men"
+lung_cancer,F,25.66,"Thun et al., NEJM 2013: current vs never smokers, contemporary cohorts 2000-2010, women"
+copd,M,25.61,"Thun et al., NEJM 2013: chronic obstructive pulmonary disease, men"
+copd,F,22.35,"Thun et al., NEJM 2013: chronic obstructive pulmonary disease, women"
+heart,M,2.50,"Thun et al., NEJM 2013: ischemic heart disease, men (used for all heart disease)"
+heart,F,2.86,"Thun et al., NEJM 2013: ischemic heart disease, women (used for all heart disease)"
+stroke,M,1.92,"Thun et al., NEJM 2013: any type of stroke, men"
+stroke,F,2.10,"Thun et al., NEJM 2013: any type of stroke, women"
+other,B,2.00,"Jha et al., NEJM 2013: other causes, about 2 for both sexes; used for every cause not listed above"
