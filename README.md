@@ -49,7 +49,7 @@ All inputs come from official or peer-reviewed public sources. Loaded so far:
 | Statistics Canada, Table 17-10-0005-01 (population on July 1, by age and gender) | Population by province, sex and single age, 2000–2026: the denominator for event rates | Cleaned copy yes (`data/clean/population.csv`); raw file via `python pipeline/download_statcan.py 17100005` |
 | Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer) | New cancer cases (all, and lung) by sex and 5-year age group, Canada, Quebec and Canada excluding Quebec, 1992–2023 | Cleaned extract yes (`data/clean/cancer_incidence.csv`); raw file (about 1.8 GB) via `python pipeline/download_statcan.py 13100111` |
 | Public Health Agency of Canada, Canadian Chronic Disease Surveillance System (Health Infobase data tool) | Newly identified heart attacks and strokes by sex and 5-year age group, Canada and provinces, 2000–01 to 2023–24 | Cleaned copy yes (`data/clean/heart_stroke_incidence.csv`); raw files downloaded by hand (below) |
-| Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan (Tables 73, 85, 88) | CPP disability: chance per year of a severe and prolonged disability by age and sex, how long it lasts, and the share of adults eligible | Extracted tables yes (`data/clean/cpp_disability_*.csv`); report PDF downloaded by hand (below) |
+| Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan (Tables 73, 76, 85, 88) | CPP disability: chance per year of a severe and prolonged disability by age and sex, how long it lasts, and the share of adults eligible. Retirement: share starting the CPP pension at each age 60–70 | Extracted tables yes (`data/clean/cpp_disability_*.csv`, `data/clean/cpp_retirement.csv`); report PDF downloaded by hand (below) |
 | Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
 
 ### Getting the CIA MI-2024 file
@@ -73,7 +73,7 @@ The download contains every year, whatever year the tool shows on screen.
 
 1. Download the 32nd Actuarial Report on the Canada Pension Plan (revised version) PDF, `cpp32-rev-ed-en.pdf`, from osfi-bsif.gc.ca (Office of the Chief Actuary).
 2. Save it as `data/raw/oca/cpp32-rev-ed-en.pdf`.
-3. Run `python pipeline/12_cpp_disability.py` (it reads the tables straight from the PDF).
+3. Run `python pipeline/12_cpp_disability.py` and `python pipeline/13_cpp_retirement.py` (they read the tables straight from the PDF).
 
 ## Repository layout
 
@@ -108,6 +108,7 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 - Causes of death, crashes, cancer, heart attack and stroke use national rates for every province.
 - Crash data cannot separate minor from serious injuries; cancer counts are counts of cancers, not people.
 - Disability means CPP disability (severe and prolonged, people with enough CPP contributions; outside Quebec).
+- Retirement means starting the CPP retirement pension, which is not always the same as stopping work.
 - Territories are not modelled.
 
 ## Licence
