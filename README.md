@@ -6,7 +6,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is in progress.** Personal death rates (base table, mortality improvement and survey risk multipliers) are built and tested; the year-by-year simulation of events is not built yet. This README is updated as each step is finished.
+**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is in progress.** Personal death rates (base table, mortality improvement and survey risk multipliers) are built and tested; causes of death and the yearly chances of every life event are built; running whole lives (one, then 1,000) is next. This README is updated as each step is finished.
 
 ## What this is
 
@@ -61,7 +61,7 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 | --- | --- | --- |
 | 0. Setup | Environment, repository, licence | Done |
 | 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | Done (v0.1.0) |
-| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | In progress (2 of 4 steps done) |
+| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | In progress (3 of 4 steps done) |
 | 3. Links between events | Disability recovery vs death, higher mortality after cancer or a heart attack, marriage effects | Planned |
 | 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | Planned |
 | 5. Website | Survey and interactive visuals | Planned |
@@ -158,7 +158,7 @@ pipeline/            numbered scripts 01–15 that build data/clean, run in orde
   inspect_excel.py      helper: show what is inside an Excel workbook
 tests/               pytest suite: one file per data source, plus the data dictionary check
 docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
-engine/              simulation engine (Phases 2–3, in progress: mortality.py, risk.py, causes.py done)
+engine/              simulation engine (Phases 2–3, in progress: mortality.py, risk.py, causes.py, events.py done)
 crosscheck/          independent R and Excel checks (Phase 4, not built yet)
 web/                 survey and visuals (Phase 5, not built yet)
 ```
