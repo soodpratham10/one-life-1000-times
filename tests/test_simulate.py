@@ -21,7 +21,7 @@ from engine.causes import CAUSES
 from engine.events import State, event_probabilities
 from engine.mortality import life_expectancy
 from engine.risk import Person
-from engine.simulate import build_schedule, live, probabilities, simulate, story, summary
+from engine.simulate import build_schedule, exact, live, probabilities, simulate, story, summary
 
 PERSON = Person("F", 40, smoking="current", activity_minutes=100, height_cm=165, weight_kg=80,
                 drinks_per_week=7, fruit_veg_per_day=3)
@@ -37,11 +37,6 @@ def sch():
 def lives(sch):
     rng = np.random.default_rng(2026)
     return [live(sch, rng) for _ in range(N)]
-
-
-def survival_to_start(q: np.ndarray) -> np.ndarray:
-    """Chance of being alive at the start of each year."""
-    return np.concatenate([[1.0], np.cumprod(1 - q[:-1])])
 
 
 # ---------------------------------------------------------------- reproducible
@@ -99,7 +94,8 @@ def test_fast_probabilities_match_events_module(sch, state):
     for i in range(0, len(sch.ages), 7):
         age, year = int(sch.ages[i]), int(sch.years[i])
         fast = probabilities(sch, state, i)
-        slow = event_probabilities(PERSON, state, age, year)
+        cancer = (sch.fixed["cancer_lung"][i], sch.fixed["cancer_other"][i])
+        slow = event_probabilities(PERSON, state, age, year, cancer=cancer)
         assert fast.keys() == slow.keys(), age
         for k in fast:
             assert fast[k] == pytest.approx(slow[k], rel=1e-12), (age, k)
@@ -107,35 +103,59 @@ def test_fast_probabilities_match_events_module(sch, state):
 
 # ---------------------------------------------------------------- averages vs exact values
 
-def test_mean_age_at_death_matches_life_expectancy(sch, lives):
+def test_exact_follow_up_accounts_for_everyone(sch):
+    ex = exact(sch)
+    assert ex["die"].sum() == pytest.approx(1.0, abs=1e-12)
+    assert ex["cause"].sum() == pytest.approx(1.0, abs=1e-12)
+
+
+def test_mean_age_at_death_matches_exact(sch, lives):
     ages = np.array([lf.death_age for lf in lives])
-    expected = PERSON.age + life_expectancy(sch.q)
-    assert abs(ages.mean() - expected) < 4 * ages.std() / np.sqrt(N)
+    assert abs(ages.mean() - exact(sch)["mean_death_age"]) < 4 * ages.std() / np.sqrt(N)
+
+
+def test_life_expectancy_close_to_risk_model(sch):
+    """
+    The cancer link (A22) moves cancer deaths onto diagnosed people but keeps
+    each person's own cancer death ratio, so life expectancy stays within half
+    a year of engine/risk.py (this person is cancer-free at 40, so slightly longer).
+    """
+    assert abs(exact(sch)["mean_death_age"] - PERSON.age - life_expectancy(sch.q)) < 0.5
 
 
 def test_cause_mix_matches_exact_expectation(sch, lives):
-    s = survival_to_start(sch.q)
-    p_die = s * sch.q                                   # chance of dying in each year
-    expected = p_die @ sch.causes
+    expected = exact(sch)["cause"]
     observed = np.array([np.mean([lf.cause == c for lf in lives]) for c in CAUSES])
     se = np.sqrt(expected * (1 - expected) / N)
     assert (np.abs(observed - expected) < 4 * se + 1e-9).all()
 
 
 def test_crash_injuries_match_exact_expectation(sch, lives):
-    """Expected injuries = sum over years of (alive at start) x (chance of an injury that year)."""
-    expected = float(survival_to_start(sch.q) @ sch.fixed["crash_injury"])
+    expected = exact(sch)["crashes"]
     counts = np.array([sum(e == "crash_injury" for _, _, e in lf.events) for lf in lives])
     assert abs(counts.mean() - expected) < 4 * counts.std() / np.sqrt(N)
 
 
 def test_first_cancer_matches_exact_expectation(sch, lives):
-    """P(cancer) = sum of (alive) x (no cancer yet) x (chance this year)."""
-    p = 1 - (1 - sch.fixed["cancer_lung"]) * (1 - sch.fixed["cancer_other"])
-    no_cancer_yet = np.concatenate([[1.0], np.cumprod(1 - p[:-1])])
-    expected = float(np.sum(survival_to_start(sch.q) * no_cancer_yet * p))
+    expected = exact(sch)["ever_cancer"]
     observed = np.mean([any(e.startswith("cancer") for _, _, e in lf.events) for lf in lives])
     assert abs(observed - expected) < 4 * np.sqrt(expected * (1 - expected) / N)
+
+
+def test_cancer_deaths_follow_a_diagnosis(lives):
+    """
+    A22: a cancer death without a diagnosis of that cancer happens only at ages where
+    the calibration needs undiagnosed cancer deaths (r > 0: very young or very old).
+    """
+    from engine.links import calibration
+    cal = calibration(PERSON.sex)
+    for lf in lives:
+        names = {e for _, _, e in lf.events}
+        age = int(lf.death_age)
+        if lf.cause == "lung_cancer" and "cancer_lung" not in names:
+            assert cal["r_lung"][age] > 0
+        if lf.cause == "other_cancer" and "cancer_other" not in names:
+            assert cal["r_other"][age] > 0
 
 
 # ---------------------------------------------------------------- outputs

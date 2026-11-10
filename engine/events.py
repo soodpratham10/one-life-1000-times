@@ -44,6 +44,8 @@ class State:
     disability_onset_age: int | None = None
     disability_years: int = 0       # completed years in the current spell
     had_cancer: bool = False
+    cancer_site: str | None = None  # lung or other, once diagnosed (A22)
+    cancer_years: int = 0           # completed years since the diagnosis
     had_heart_attack: bool = False
     had_stroke: bool = False
     crashes: int = 0
@@ -167,14 +169,20 @@ def smoking_incidence_multiplier(p: Person, cause: str, age: int) -> float:
 
 # ---------------------------------------------------------------- one year
 
-def event_probabilities(p: Person, s: State, age: int, year: int) -> dict[str, float]:
-    """Chance of each event this year that can happen in this state."""
+def event_probabilities(p: Person, s: State, age: int, year: int,
+                        cancer: tuple[float, float] | None = None) -> dict[str, float]:
+    """
+    Chance of each event this year that can happen in this state. The simulation
+    passes the person's own cancer diagnosis chances (engine/links.py, A22) as
+    `cancer`; without them, lung cancer is the population rate scaled for smoking.
+    """
     out = {"crash_injury": crash_probability(p.sex, age)}
 
     if not s.had_cancer:
-        lung, other = cancer_probabilities(p.sex, age)
-        out["cancer_lung"] = min(1.0, lung * smoking_incidence_multiplier(p, "lung_cancer", age))
-        out["cancer_other"] = other
+        if cancer is None:
+            lung, other = cancer_probabilities(p.sex, age)
+            cancer = (min(1.0, lung * smoking_incidence_multiplier(p, "lung_cancer", age)), other)
+        out["cancer_lung"], out["cancer_other"] = cancer
     heart_attack, stroke = heart_stroke_probabilities(p.sex, age)
     if not s.had_heart_attack:
         out["heart_attack"] = min(1.0, heart_attack * smoking_incidence_multiplier(p, "heart", age))

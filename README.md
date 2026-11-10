@@ -6,7 +6,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is complete.** The engine lives a person's life forward year by year and does it 1,000 times; the survey and visuals are not built yet. This README is updated as each step is finished.
+**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is complete and Phase 3 (links between events) is in progress.** The engine lives a person's life forward year by year and does it 1,000 times, and cancer deaths now follow a cancer diagnosis; the survey and visuals are not built yet. This README is updated as each step is finished.
 
 ## What this is
 
@@ -62,7 +62,7 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 | 0. Setup | Environment, repository, licence | Done |
 | 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | Done (v0.1.0) |
 | 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | Done |
-| 3. Links between events | Disability recovery vs death, higher mortality after cancer or a heart attack, marriage effects | Next |
+| 3. Links between events | Cancer deaths after a diagnosis (done); higher mortality after a heart attack or stroke, disability recovery vs death, marriage effects | In progress |
 | 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | Planned |
 | 5. Website | Survey and interactive visuals | Planned |
 | 6. Launch | Write-up and release | Planned |
@@ -165,8 +165,8 @@ pipeline/            numbered scripts 01–15 that build data/clean, run in orde
 tests/               pytest suite: one file per data source, plus the data dictionary check
 docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
 engine/              simulation engine: mortality.py (base rates and improvement), risk.py (survey
-                     answers), causes.py (cause of death), events.py (life events), simulate.py
-                     (whole lives), demo.py (try it)
+                     answers), causes.py (cause of death), events.py (life events), links.py
+                     (cancer deaths after a diagnosis), simulate.py (whole lives), demo.py (try it)
 crosscheck/          independent R and Excel checks (Phase 4, not built yet)
 web/                 survey and visuals (Phase 5, not built yet)
 ```
