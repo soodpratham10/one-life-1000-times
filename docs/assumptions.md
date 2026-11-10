@@ -14,7 +14,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A06 | Cause-of-death split | 12 non-overlapping groups: lung cancer, other cancers, heart, stroke, chronic lung disease, diabetes, dementia, motor vehicle, other accidents, other injury, COVID-19, all other (remainder). Deaths by year 2000–2024, sex, 20 age groups. Same cause mix assumed for every province | Statistics Canada, Table 13-10-0392-01 (deaths by selected grouped causes) | 2026-11-10 | Groups match what the survey can change (smoking, activity, driving) | Canada only, not by province; 5-year age groups; cause coding and reporting lags (StatCan notes younger deaths are reported later) | Loaded (years to use: A09) |
 | A07 | Lifestyle hazard ratios | To set | Published peer-reviewed studies | — | Measured effects of smoking, alcohol, activity, diet | Self-reported answers; studies overlap | To set (Phase 2) |
 | A08 | Cap on combined multipliers | To set | Design decision, tested | — | Stops stacked risks compounding | Cap level is a judgement | To set (Phase 2) |
-| A09 | Base data period | Event rates: calendar 2019 (crashes, cancer) and fiscal 2018–19 (heart attack, stroke), the last full years before COVID-19. Mortality base period (life tables and cause split): to set in Phase 2 | Design decision | 2026-11-10 | COVID-19 distorted 2020–2022: crash injuries fell 26%, cancer diagnoses fell (Quebec 2020: −8%), PHAC flags 2020–21 to 2022–23 | Pre-COVID rates may not reflect post-COVID behaviour; mortality period still open | Decided for events; mortality to set (Phase 2) |
+| A09 | Base data period | Event rates: calendar 2019 (crashes, cancer) and fiscal 2018–19 (heart attack, stroke), the last full years before COVID-19. Mortality: life table 2017–2019, treated as calendar 2018 (its middle year) and projected forward with MI-2024 (A05). The engine can also use another period (e.g. 2022–2024) for comparison | Design decision | 2026-11-10 | COVID-19 distorted 2020–2022: crash injuries fell 26%, cancer diagnoses fell (Quebec 2020: −8%), PHAC flags 2020–21 to 2022–23. A pre-COVID mortality base matches the event base year and the data MI-2024 was built on, and avoids StatCan's preliminary 2021–2023 and 2022–2024 tables | Optimistic against recent experience: the base projected to 2023 gives Canadian men e(65) = 20.1 and e(18) = 63.1, while the actual 2022–2024 table gives 19.4 and 62.1 (women 22.8 vs 22.2 at 65, 67.3 vs 66.4 at 18). Part of the gap is COVID-19, part is ongoing (e.g. overdose deaths at young ages), so this choice may overstate future lifetimes by about a year | Decided (2017–2019); to revisit in Phase 4 validation |
 | A10 | PEI single-age mortality | Derived: within each PEI age group, the single-age force of mortality is the NS–NB average scaled by one factor; ages 0–89 match PEI's published group survival exactly; ages 90–109 match PEI's published e(90+); q = 1 at 110+ | Statistics Canada, Table 13-10-0140-01 (abridged life tables, PEI and territories), with NS and NB from 13-10-0114-01 | 2026-11-10 | StatCan publishes only 5-year groups for PEI; borrowing the shape of similar Atlantic provinces keeps PEI's own level | The within-group shape is assumed, not observed; territories excluded from v1 (tiny populations, recent Yukon tables not published); PEI's small population makes some published rates noisy (e.g. 2022–2024 infant death rate higher for girls than boys), which does not affect the model since it starts at 18 | Loaded (derived) |
 | A11 | Car crash event | Event = injured in a police-reported motor vehicle collision (any road user: driver, passenger, pedestrian, cyclist, motorcyclist). Counts by sex and single age; base year 2019. Unknown age or sex (about 2%) spread in proportion. Annual probability = count ÷ Canada's July 1 population of the same sex, age and year (A12); ages 99 and 100+ combined | Transport Canada, National Collision Database open data, 2019 and 2020 files | 2026-11-10 | Only national source of injury counts by age and sex | Open data does not separate minor from serious injuries; police-reported only (some injuries never reported); national only, no province; 2020 distorted by COVID (kept as comparison only) | Loaded (rates by sex and age, 2019 and 2020) |
 | A12 | Population (denominator for event rates) | July 1 population by year 2000–2026, Canada and 10 provinces, single age 0–100+. StatCan's gender categories mapped to sex: Men+ → M, Women+ → F | Statistics Canada, Table 17-10-0005-01 (population estimates on July 1, by age and gender) | 2026-11-10 | Official population estimates, same source family as the life tables | Reported by gender, while the life tables are by sex: non-binary people (a very small share) are distributed between Men+ and Women+; territories not used; years before 2000 not used because StatCan does not publish every single age up to 100+ for them (before 1991 the oldest group is 90+; in 1991–1999 ages 90–100 are blank) | Loaded |
@@ -154,12 +154,22 @@ What the source showed: national totals in this table run to 2019 only, while Qu
 
 What the source showed: the marriage table is split by gender only up to 2002 and the divorce table by sex only up to 2017; from then on only totals are published.
 
+## Engine checks: mortality basis (A04, A05, A09)
+
+`tests/test_mortality.py` (39 tests; the 8 that need MI-2024 skip where the CIA file is absent), checking `engine/mortality.py`:
+
+- life expectancy formula checked on small hand-worked cases (e.g. q = 0.2, 0.5, 1 gives 1.7 years)
+- base table for all 11 regions and both sexes: ages 0–110, rates in [0, 1], q = 1 at 110
+- with no improvement, the engine's e(18) reproduces the published table (Canada, Manitoba, PEI) within 0.01 years
+- one cell of improvement worked by hand: Canada, male, 65, 2020 = 0.01108 × (1 − MI 2019) × (1 − MI 2020)
+- ages 18–19 use the age-20 rate; years after 2119 keep the 2119 rate; age 110 never improved; nothing improved before 2018
+- improvement adds 3–12 years to e(18) for someone aged 18 in 2026 (engine: men 62.4 → 70.8, women 66.6 → 74.3)
+
 ## Open items for later phases
 
 | Item | Why it matters | Plan |
 | --- | --- | --- |
 | Split CPP disability termination (A15) into recovery and death | Termination includes deaths; the engine models deaths separately, so using termination as recovery would count some deaths twice | Phase 3: the 32nd CPP report does not publish disabled-beneficiary mortality; candidate source is the Office of the Chief Actuary's beneficiary mortality study (Actuarial Study No. 16, 2015), to be checked |
-| Mortality base period (A09) | Whether COVID-era life tables (2020–2022) enter the base mortality | Phase 2 |
 | Lifestyle hazard ratios and cap (A07, A08) | Personalises mortality from survey answers | Phase 2 |
 | Disability rates are per eligible person (A15) | Applying them to everyone overstates disability | Engine: survey asks about work history; apply eligibility |
 | First-child rate is per woman, not per childless woman (A17) | Understates the chance for a childless woman | Engine: convert using the share of women still childless by age |
@@ -168,6 +178,7 @@ What the source showed: the marriage table is split by gender only up to 2002 an
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A09 | Mortality base period set to 2017–2019 (base year 2018); gap against the 2022–2024 table recorded |
 | 2026-11-10 | A15 | Eligibility table now read to 2100 (year pattern fixed); open items listed |
 | 2026-11-10 | A17 | Marriage, remarriage, divorce and first child loaded and tested |
 | 2026-11-10 | A16 | CPP retirement take-up loaded and tested |
