@@ -14,7 +14,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A06 | Cause-of-death split | 12 non-overlapping groups: lung cancer, other cancers, heart, stroke, chronic lung disease, diabetes, dementia, motor vehicle, other accidents, other injury, COVID-19, all other (remainder). Deaths by year 2000–2024, sex, 20 age groups. Same cause mix assumed for every province | Statistics Canada, Table 13-10-0392-01 (deaths by selected grouped causes) | 2026-11-10 | Groups match what the survey can change (smoking, activity, driving) | Canada only, not by province; 5-year age groups; cause coding and reporting lags (StatCan notes younger deaths are reported later) | Loaded (years to use: A09) |
 | A07 | Lifestyle hazard ratios | To set | Published peer-reviewed studies | — | Measured effects of smoking, alcohol, activity, diet | Self-reported answers; studies overlap | To set (Phase 2) |
 | A08 | Cap on combined multipliers | To set | Design decision, tested | — | Stops stacked risks compounding | Cap level is a judgement | To set (Phase 2) |
-| A09 | Base data period | To set | Design decision | — | Choice of whether COVID-era years are included | Any choice shifts the base rates | To set (Phase 1) |
+| A09 | Base data period | Event rates: calendar 2019 (crashes, cancer) and fiscal 2018–19 (heart attack, stroke), the last full years before COVID-19. Mortality base period (life tables and cause split): to set in Phase 2 | Design decision | 2026-11-10 | COVID-19 distorted 2020–2022: crash injuries fell 26%, cancer diagnoses fell (Quebec 2020: −8%), PHAC flags 2020–21 to 2022–23 | Pre-COVID rates may not reflect post-COVID behaviour; mortality period still open | Decided for events; mortality to set (Phase 2) |
 | A10 | PEI single-age mortality | Derived: within each PEI age group, the single-age force of mortality is the NS–NB average scaled by one factor; ages 0–89 match PEI's published group survival exactly; ages 90–109 match PEI's published e(90+); q = 1 at 110+ | Statistics Canada, Table 13-10-0140-01 (abridged life tables, PEI and territories), with NS and NB from 13-10-0114-01 | 2026-11-10 | StatCan publishes only 5-year groups for PEI; borrowing the shape of similar Atlantic provinces keeps PEI's own level | The within-group shape is assumed, not observed; territories excluded from v1 (tiny populations, recent Yukon tables not published); PEI's small population makes some published rates noisy (e.g. 2022–2024 infant death rate higher for girls than boys), which does not affect the model since it starts at 18 | Loaded (derived) |
 | A11 | Car crash event | Event = injured in a police-reported motor vehicle collision (any road user: driver, passenger, pedestrian, cyclist, motorcyclist). Counts by sex and single age; base year 2019. Unknown age or sex (about 2%) spread in proportion. Annual probability = count ÷ Canada's July 1 population of the same sex, age and year (A12); ages 99 and 100+ combined | Transport Canada, National Collision Database open data, 2019 and 2020 files | 2026-11-10 | Only national source of injury counts by age and sex | Open data does not separate minor from serious injuries; police-reported only (some injuries never reported); national only, no province; 2020 distorted by COVID (kept as comparison only) | Loaded (rates by sex and age, 2019 and 2020) |
 | A12 | Population (denominator for event rates) | July 1 population by year 2000–2026, Canada and 10 provinces, single age 0–100+. StatCan's gender categories mapped to sex: Men+ → M, Women+ → F | Statistics Canada, Table 17-10-0005-01 (population estimates on July 1, by age and gender) | 2026-11-10 | Official population estimates, same source family as the life tables | Reported by gender, while the life tables are by sex: non-binary people (a very small share) are distributed between Men+ and Women+; territories not used; years before 2000 not used because StatCan does not publish every single age up to 100+ for them (before 1991 the oldest group is 90+; in 1991–1999 ages 90–100 are blank) | Loaded |
@@ -45,11 +45,12 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 
 ## Data checks on A06
 
-`tests/test_causes_of_death.py` (5 tests, all passing on 2026-11-10):
+`tests/test_causes_of_death.py` (6 tests, all passing on 2026-11-10):
 
 - complete grid: every year x sex x age group has all 12 groups, once each
 - age groups run 0–110 with no gaps or overlaps
-- groups sum exactly to StatCan's total deaths in every cell
+- groups sum exactly to StatCan's total deaths in every cell (a guard against code changes: 'all other' is defined as the remainder)
+- 2024 total deaths equal StatCan's published 326,779 (outside source)
 - males + females = both sexes, cause by cause
 - "all other" (the remainder) is never negative, so no deaths are counted twice
 - external check: 2024 shares (heart 17.7%, stroke 4.2%, chronic lung disease 4.0%, diabetes 2.1%, accidents 6.3%) match StatCan's published 2024 leading causes
@@ -118,6 +119,7 @@ What the source showed: national totals in this table run to 2019 only, while Qu
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A09 | Event base years recorded; mortality base period left open |
 | 2026-11-10 | A14 | Heart attack and stroke incidence loaded and tested |
 | 2026-11-10 | A13 | Cancer incidence loaded; diagnosis probabilities built and tested |
 | 2026-11-10 | A11, A12 | Population loaded; crash probabilities built and tested |

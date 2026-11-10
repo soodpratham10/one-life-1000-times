@@ -4,8 +4,8 @@ Step 9 of the data pipeline: new cancer cases by year, geography, sex and age gr
 The source table is very large (about 1.8 GB), so it is read in chunks and only
 what the model needs is kept:
   - geographies: Canada, Canada (excluding Quebec), Quebec
-    (Quebec has not sent recent years to the national registry, so recent
-     national figures may exist only without Quebec)
+    (in the 2026 download, national totals run to 2019 while Quebec runs to 2023;
+     both breakdowns are kept so Canada = rest of Canada + Quebec can be checked)
   - cancer types: all primary sites, and lung and bronchus (tied to smoking)
   - measures: number of new cases, and StatCan's incidence rate per 100,000
 

@@ -45,9 +45,17 @@ def test_age_groups_cover_0_to_110(cod):
 
 
 def test_groups_add_up_to_total(cod):
-    """In every cell, the cause groups sum exactly to StatCan's total deaths."""
+    """In every cell, the cause groups sum exactly to StatCan's total deaths.
+    ('other' is the remainder, so this holds by construction; it guards against
+    future code changes. The test below is the outside check.)"""
     sums = cod.groupby(CELL).agg(deaths=("deaths", "sum"), total=("total_deaths", "first"))
     assert (sums["deaths"] == sums["total"]).all()
+
+
+def test_2024_total_matches_statcan_published(cod):
+    """StatCan's The Daily (13 January 2026) reported 326,779 deaths in Canada in 2024."""
+    total = cod.query("year == 2024 and sex == 'B'")["deaths"].sum()
+    assert total == 326_779
 
 
 def test_males_plus_females_equals_both(cod):

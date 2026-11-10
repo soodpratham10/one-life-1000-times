@@ -20,9 +20,9 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 
 | Event | Notes |
 | --- | --- |
-| Death, by cause | About 8 cause groups plus "all other causes" |
+| Death, by cause | 11 cause groups plus "all other causes" (see A06) |
 | Disability spell | Can recover or become permanent |
-| Serious car crash | Can happen more than once |
+| Injured in a car crash | Police-reported injury of any severity; can happen more than once |
 | Cancer diagnosis | Raises later mortality |
 | Heart attack or stroke | Raises later mortality |
 | Marriage or common-law union | Affects later mortality |
@@ -94,7 +94,18 @@ pytest
 
 ## Known limits
 
-To be written as the model is built. Planned: adults 18+ only; no existing serious diagnoses; official tables are by sex only; self-reported answers.
+Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumptions.md). The main ones so far:
+
+- Adults 18+ only; people with an existing serious diagnosis are out of scope.
+- Official tables are by sex; the population table is by gender (a very small difference, see A12).
+- Causes of death, crashes, cancer, heart attack and stroke use national rates for every province.
+- Crash data cannot separate minor from serious injuries; cancer counts are counts of cancers, not people.
+- Territories are not modelled.
+
+## Licence
+
+- **Code:** MIT (see `LICENSE`).
+- **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
 
 ## Author
 

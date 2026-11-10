@@ -6,7 +6,9 @@ Source: Transport Canada, National Collision Database (NCDB), open data
         (Open Government Licence - Canada). One row per person involved.
 Years : 2019 (last year before COVID; used by the model) and 2020 (COVID comparison).
 
-Codes used (NCDB data dictionary):
+Codes used (NCDB coding; checked against the data, not read from the data dictionary:
+the 2019 and 2020 death totals equal Transport Canada's published figures, and the
+motorcycle and bicycle codes match across the vehicle and person fields):
     P_ISEV  person's injury: 1 = no injury, 2 = injury, 3 = fatality,
             N = not applicable (e.g. parked vehicle record), U = unknown
     P_SEX   M, F, U = unknown, N = not applicable
