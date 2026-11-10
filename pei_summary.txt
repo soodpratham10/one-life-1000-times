@@ -1,0 +1,143 @@
+Downloading https://www150.statcan.gc.ca/n1/tbl/csv/13100140-eng.zip ...
+Extracted to data/raw/statcan_13100140
+
+=== SIZE ===
+92,880 rows x 17 columns (18.0 MB)
+
+=== COLUMNS ===
+['REF_DATE', 'GEO', 'DGUID', 'Age interval', 'Sex', 'Element', 'UOM', 'UOM_ID', 'SCALAR_FACTOR', 'SCALAR_ID', 'VECTOR', 'COORDINATE', 'VALUE', 'STATUS', 'SYMBOL', 'TERMINATED', 'DECIMALS']
+
+=== FIRST 5 ROWS ===
+    REF_DATE                   GEO        DGUID Age interval         Sex                                              Element     UOM  UOM_ID SCALAR_FACTOR  SCALAR_ID      VECTOR COORDINATE         VALUE STATUS  SYMBOL  TERMINATED  DECIMALS
+0  1980/1982  Prince Edward Island  2021A000211      0 years  Both sexes              Number surviving to age interval i (li)  Number     223         units          0  v123332068    1.1.1.1  100000.00000    NaN     NaN         NaN         0
+1  1980/1982  Prince Edward Island  2021A000211      0 years  Both sexes          Number of deaths during age interval i (di)  Number     223         units          0  v123332308    1.1.1.2    1084.00000    NaN     NaN         NaN         0
+2  1980/1982  Prince Edward Island  2021A000211      0 years  Both sexes             Death probability in age interval i (qi)  Number     223         units          0  v123332548    1.1.1.3       0.01084    NaN     NaN         NaN         5
+3  1980/1982  Prince Edward Island  2021A000211      0 years  Both sexes  Margin of error of the death probability (m.e.(qi))  Number     223         units          0  v123332789    1.1.1.4       0.00268    NaN     NaN         NaN         5
+4  1980/1982  Prince Edward Island  2021A000211      0 years  Both sexes       Probability of survival in age interval i (pi)  Number     223         units          0  v123333029    1.1.1.5       0.98916    NaN     NaN         NaN         5
+
+=== VALUES IN EACH COLUMN ===
+
+REF_DATE (43 values):
+   1980/1982
+   1981/1983
+   1982/1984
+   1983/1985
+   1984/1986
+   1985/1987
+   1986/1988
+   1987/1989
+   1988/1990
+   1989/1991
+   1990/1992
+   1991/1993
+   1992/1994
+   1993/1995
+   1994/1996
+   1995/1997
+   1996/1998
+   1997/1999
+   1998/2000
+   1999/2001
+   2000/2002
+   2001/2003
+   2002/2004
+   2003/2005
+   2004/2006
+   2005/2007
+   2006/2008
+   2007/2009
+   2008/2010
+   2009/2011
+   2010/2012
+   2011/2013
+   2012/2014
+   2013/2015
+   2014/2016
+   2015/2017
+   2016/2018
+   2017/2019
+   2018/2020
+   2019/2021
+   2020/2022
+   2021/2023
+   2022/2024
+
+GEO (4 values):
+   Prince Edward Island
+   Yukon
+   Northwest Territories
+   Nunavut
+
+DGUID (4 values):
+   2021A000211
+   2021A000260
+   2021A000261
+   2021A000262
+
+Age interval (20 values):
+   0 years
+   1 to 4 years
+   5 to 9 years
+   10 to 14 years
+   15 to 19 years
+   20 to 24 years
+   25 to 29 years
+   30 to 34 years
+   35 to 39 years
+   40 to 44 years
+   45 to 49 years
+   50 to 54 years
+   55 to 59 years
+   60 to 64 years
+   65 to 69 years
+   70 to 74 years
+   75 to 79 years
+   80 to 84 years
+   85 to 89 years
+   90 years and over
+
+Sex (3 values):
+   Both sexes
+   Males
+   Females
+
+Element (9 values):
+   Number surviving to age interval i (li)
+   Number of deaths during age interval i (di)
+   Death probability in age interval i (qi)
+   Margin of error of the death probability (m.e.(qi))
+   Probability of survival in age interval i (pi)
+   Number of life years lived in age interval i (Li)
+   Cumulative number of life years lived beyond the start of age interval i (Ti)
+   Life expectancy (in years) from age interval i (ei)
+   Margin of error of the life expectancy (m.e.(ei))
+
+UOM (1 values):
+   Number
+
+UOM_ID (1 values):
+   223
+
+SCALAR_FACTOR (1 values):
+   units
+
+SCALAR_ID (1 values):
+   0
+
+VECTOR: 2160 distinct values, e.g. ['v123332068', 'v123332308', 'v123332548']
+
+COORDINATE: 2160 distinct values, e.g. ['1.1.1.1', '1.1.1.2', '1.1.1.3']
+
+VALUE: 44932 distinct values, e.g. [np.float64(100000.0), np.float64(1084.0), np.float64(0.01084)]
+
+STATUS (1 values):
+   ..
+
+SYMBOL (0 values):
+
+TERMINATED (0 values):
+
+DECIMALS (3 values):
+   0
+   5
+   2

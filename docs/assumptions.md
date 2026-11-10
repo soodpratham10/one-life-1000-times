@@ -15,6 +15,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A07 | Lifestyle hazard ratios | To set | Published peer-reviewed studies | — | Measured effects of smoking, alcohol, activity, diet | Self-reported answers; studies overlap | To set (Phase 2) |
 | A08 | Cap on combined multipliers | To set | Design decision, tested | — | Stops stacked risks compounding | Cap level is a judgement | To set (Phase 2) |
 | A09 | Base data period | To set | Design decision | — | Choice of whether COVID-era years are included | Any choice shifts the base rates | To set (Phase 1) |
+| A10 | PEI single-age mortality | Derived: within each PEI age group, the single-age force of mortality is the NS–NB average scaled by one factor; ages 0–89 match PEI's published group survival exactly; ages 90–109 match PEI's published e(90+); q = 1 at 110+ | Statistics Canada, Table 13-10-0140-01 (abridged life tables, PEI and territories), with NS and NB from 13-10-0114-01 | 2026-11-10 | StatCan publishes only 5-year groups for PEI; borrowing the shape of similar Atlantic provinces keeps PEI's own level | The within-group shape is assumed, not observed; territories excluded from v1 (tiny populations, recent Yukon tables not published) | Loaded (derived) |
 
 ## Data checks on A04
 
@@ -50,10 +51,22 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 - external check: 2024 shares (heart 17.7%, stroke 4.2%, chronic lung disease 4.0%, diabetes 2.1%, accidents 6.3%) match StatCan's published 2024 leading causes
 - only missing counts in the source: COVID-19 before 2020 (cause did not exist), set to 0; any other gap stops the pipeline
 
+## Data checks on A10
+
+`tests/test_pei.py` (5 tests, all passing on 2026-11-10):
+
+- complete grid: every period x sex x ages 0–110, no duplicates
+- 0 ≤ qx < 1 below 110; qx = 1 at 110+
+- survival over every PEI age group below 90 equals the published group survival (within 1e-6)
+- e(90) equals PEI's published e(90+) within rounding
+- e(0) within 0.1 years of PEI's published e(0)
+- method check on test data: with PEI set to exactly 1.15 x the reference force, the build recovered 1.148–1.154 at every age (differences from 5-decimal rounding)
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A10 | PEI single-age table derived and tested |
 | 2026-11-10 | A06 | Cause-of-death groups loaded and tested |
 | 2026-11-10 | A04 | Noted preliminary status of latest periods and StatCan release date; added external e(0) check |
 | 2026-11-10 | A05 | MI-2024 loaded and tested |
