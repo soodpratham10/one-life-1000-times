@@ -19,6 +19,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A11 | Car crash event | Event = injured in a police-reported motor vehicle collision (any road user: driver, passenger, pedestrian, cyclist, motorcyclist). Counts by sex and single age; base year 2019. Unknown age or sex (about 2%) spread in proportion. Annual probability = count ÷ Canada's July 1 population of the same sex, age and year (A12); ages 99 and 100+ combined | Transport Canada, National Collision Database open data, 2019 and 2020 files | 2026-11-10 | Only national source of injury counts by age and sex | Open data does not separate minor from serious injuries; police-reported only (some injuries never reported); national only, no province; 2020 distorted by COVID (kept as comparison only) | Loaded (rates by sex and age, 2019 and 2020) |
 | A12 | Population (denominator for event rates) | July 1 population by year 2000–2026, Canada and 10 provinces, single age 0–100+. StatCan's gender categories mapped to sex: Men+ → M, Women+ → F | Statistics Canada, Table 17-10-0005-01 (population estimates on July 1, by age and gender) | 2026-11-10 | Official population estimates, same source family as the life tables | Reported by gender, while the life tables are by sex: non-binary people (a very small share) are distributed between Men+ and Women+; territories not used; years before 2000 not used because StatCan does not publish every single age up to 100+ for them (before 1991 the oldest group is 90+; in 1991–1999 ages 90–100 are blank) | Loaded |
 | A13 | Cancer diagnosis event | Yearly probability of a new primary cancer = new cases ÷ population, by sex and 5-year age group (90+ = 90–100+), Canada, 2019. Split into lung (lung and bronchus) and other cancers, matching the cause-of-death groups (A06) | Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer, Canadian Cancer Registry), with population from A12 | 2026-11-10 | 2019 is the latest year with complete national data in this table and the last before COVID-19 disrupted screening and diagnosis | Counts primary cancers, not people (a second primary cancer counts again), so the chance of a first diagnosis is slightly overstated; 5-year age groups; national rates used for every province; StatCan rounds counts to the nearest 5; lung cancer counts under age 30 are suppressed for privacy and set to 0 (flagged), a negligible effect since even 4 cases would be a chance below 1 in a million | Loaded |
+| A14 | Heart attack and stroke events | Yearly probability = newly identified cases ÷ CCDSS population, by sex and 5-year age group (20–24 … 90+), Canada, fiscal year 2018–19 (April 2018 – March 2019). Ages 18–19 use the 20–24 rate | Public Health Agency of Canada, Canadian Chronic Disease Surveillance System (CCDSS), Health Infobase data tool, crude incidence rate of acute myocardial infarction and of stroke (data as of April 2025) | 2026-11-10 | National data from provincial health-insurance records, covering nearly everyone; 2018–19 is the last full fiscal year before COVID-19 | Case definitions are PHAC's (from hospital and physician claims; whether repeat events are counted is set by those definitions and not checked here); registry population runs about 2–3% above StatCan's estimates; Quebec diagnostic coding may slightly undercount from 2016–17; national rates used for every province | Loaded |
 
 ## Data checks on A04
 
@@ -101,10 +102,23 @@ Only gap in the source: margin of error of e(x) not published for one cell per p
 
 What the source showed: national totals in this table run to 2019 only, while Quebec's run to 2023; Quebec's 2020 count fell about 8% below 2019 (screening disruption).
 
+## Data checks on A14
+
+`tests/test_heart_stroke.py` (7 tests, all passing on real data on 2026-11-10):
+
+- complete grid for Canada 2018–19: 2 sexes x 15 age groups, no blanks
+- 5-year groups sum to the published 20+ totals within rounding (largest gap 15 cases of 41,560)
+- males + females = both sexes
+- cases ÷ population reproduce PHAC's published rates
+- risk rises steeply with age (90+ more than 20 times 20–24)
+- men's heart-attack rate more than twice women's at every age 35–64 (PHAC reports about four times at 25–44); measured 3–4 times at 35–49
+- CCDSS registry population within 5% of StatCan's July 1 estimates (29.98M adults vs 28.99M–29.48M)
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A14 | Heart attack and stroke incidence loaded and tested |
 | 2026-11-10 | A13 | Cancer incidence loaded; diagnosis probabilities built and tested |
 | 2026-11-10 | A11, A12 | Population loaded; crash probabilities built and tested |
 | 2026-11-10 | A11 | Crash injury and death counts loaded and tested |
