@@ -81,10 +81,13 @@ def heart_stroke_probabilities(sex: str, age: int) -> tuple[float, float]:
 
 
 def eligible_share(sex: str, year: int) -> float:
-    """Share of adults 20-64 eligible for CPP disability; held flat outside 2025-2100."""
+    """
+    Share of adults 20-64 eligible for CPP disability. Published yearly to 2035 and
+    every 5 years to 2100: years in between are interpolated; held flat outside 2025-2100.
+    """
     t = load("cpp_disability_eligibility.csv")
-    y = min(max(year, int(t["year"].min())), int(t["year"].max()))
-    return float(t.loc[(t["sex"] == sex) & (t["year"] == y), "eligible_pct"].iloc[0]) / 100
+    rows = t[t["sex"] == sex].sort_values("year")
+    return float(np.interp(year, rows["year"], rows["eligible_pct"])) / 100
 
 
 def disability_start_probability(sex: str, age: int, year: int) -> float:

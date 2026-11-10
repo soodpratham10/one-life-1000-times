@@ -55,6 +55,15 @@ def test_disability_start_by_hand():
     assert eligible_share("M", 2150) == eligible_share("M", 2100) == pytest.approx(0.806)
 
 
+def test_eligibility_between_published_years():
+    """Published every 5 years after 2035: 2037 is 2/5 of the way from 2035 to 2040."""
+    t = load("cpp_disability_eligibility.csv").set_index(["sex", "year"])["eligible_pct"]
+    expected = t[("F", 2035)] + (t[("F", 2040)] - t[("F", 2035)]) * 2 / 5
+    assert eligible_share("F", 2037) == pytest.approx(expected / 100)
+    for year in range(2020, 2111):
+        assert 0.5 < eligible_share("M", year) < 0.9
+
+
 def test_disability_end_by_hand():
     """
     Men, onset 40, in the 2nd year (1 year completed): 59 per 1,000 in 2025.

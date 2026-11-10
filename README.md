@@ -6,7 +6,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is in progress.** Personal death rates (base table, mortality improvement and survey risk multipliers) are built and tested; causes of death and the yearly chances of every life event are built; running whole lives (one, then 1,000) is next. This README is updated as each step is finished.
+**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is complete.** The engine lives a person's life forward year by year and does it 1,000 times; the survey and visuals are not built yet. This README is updated as each step is finished.
 
 ## What this is
 
@@ -51,7 +51,7 @@ Each answer moves your death rates by a hazard ratio from a large published stud
 
 Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. Smoking also changes what people die of (lung cancer and COPD far more than other causes), using cause-specific ratios from Thun et al., *NEJM* 2013. A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study (Manuel et al., *PLOS Medicine* 2016).
 
-## Method (planned)
+## Method
 
 The structure follows how life insurers underwrite: a base mortality table, personal risk multipliers, future mortality improvement, competing risks between events, and an actual-to-expected check against official data. Published data is used where insurers use proprietary underwriting manuals. Every assumption, its source and its weakness is listed in [`docs/assumptions.md`](docs/assumptions.md).
 
@@ -61,8 +61,8 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 | --- | --- | --- |
 | 0. Setup | Environment, repository, licence | Done |
 | 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | Done (v0.1.0) |
-| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | In progress (3 of 4 steps done) |
-| 3. Links between events | Disability recovery vs death, higher mortality after cancer or a heart attack, marriage effects | Planned |
+| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | Done |
+| 3. Links between events | Disability recovery vs death, higher mortality after cancer or a heart attack, marriage effects | Next |
 | 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | Planned |
 | 5. Website | Survey and interactive visuals | Planned |
 | 6. Launch | Write-up and release | Planned |
@@ -138,6 +138,12 @@ conda activate onelife
 pytest                          # checks the cleaned data already in data/clean/
 ```
 
+To see the engine work (one life story, then a summary of 1,000 lives for an example person; change the answers in `engine/demo.py`):
+
+```bash
+python -m engine.demo
+```
+
 To rebuild every cleaned file from the original sources (downloads several tables; the hand-downloaded files described above must be in place first):
 
 ```bash
@@ -158,7 +164,9 @@ pipeline/            numbered scripts 01–15 that build data/clean, run in orde
   inspect_excel.py      helper: show what is inside an Excel workbook
 tests/               pytest suite: one file per data source, plus the data dictionary check
 docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
-engine/              simulation engine (Phases 2–3, in progress: mortality.py, risk.py, causes.py, events.py done)
+engine/              simulation engine: mortality.py (base rates and improvement), risk.py (survey
+                     answers), causes.py (cause of death), events.py (life events), simulate.py
+                     (whole lives), demo.py (try it)
 crosscheck/          independent R and Excel checks (Phase 4, not built yet)
 web/                 survey and visuals (Phase 5, not built yet)
 ```

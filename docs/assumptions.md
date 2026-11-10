@@ -8,7 +8,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | A01 | Minimum age simulated | 18 | Design decision | — | Survey and risk data are for adults | Excludes minors entirely | Decided |
 | A02 | Ultimate age | 110 | Design decision | — | Every life must end; StatCan's open age group is 110+, where qx = 1 | Rates above about 100 rest on few deaths | Decided |
-| A03 | Time step | 1 year | Design decision | — | Matches annual source tables | Events inside a year are not ordered | Decided |
+| A03 | Time step | 1 year. Each year all possible events are drawn first, then death; exact age at death = age + a uniform fraction of the year. Same-year ties: lung over other-site cancer, retirement over a new disability | Design decision | — | Matches annual source tables; drawing death last means a person can be diagnosed and die in the same year | Events inside a year are not ordered; a death and an event in the same year both count | Decided |
 | A04 | Base mortality by age, sex, province | qx by single age 0–110+, Canada and 9 provinces, 3 sexes, periods 1980–1982 to 2022–2024 | Statistics Canada, Table 13-10-0114-01 (complete life tables, three-year estimates) | 2026-11-10 | Official population rates; three-year tables are more stable than single-year ones | Population, not insured lives; PEI not in this table (built separately: A10); latest data ends 2024; StatCan marks 2021–2023 and 2022–2024 as preliminary, so they may be revised | Loaded (release of 2026-01-13; which period to use: A09) |
 | A05 | Mortality improvement scale | CIA MI-2024: two-dimensional rates by sex, age 20–120, calendar year 1981–2119; long-term rate about 1.29% a year at ages 40–80 from 2060, grading to 0 at 115+. Applied as q(x, t) = q(x, t−1)(1 − MI(x, t)). Ages 18–19 use the age-20 rate | Canadian Institute of Actuaries, Mortality Improvements Research – Tables (2024), file 224043te.xlsx | 2026-11-10 | Profession's current scale; proposed for Canadian commuted-value standards from Feb 2027 | Built from data to 2019; future improvement is uncertain; ages under 20 not covered | Loaded (not in public repo: CIA copyright) |
 | A06 | Cause-of-death split | 12 non-overlapping groups: lung cancer, other cancers, heart, stroke, chronic lung disease, diabetes, dementia, motor vehicle, other accidents, other injury, COVID-19, all other (remainder). Deaths by year 2000–2024, sex, 20 age groups. Same cause mix assumed for every province | Statistics Canada, Table 13-10-0392-01 (deaths by selected grouped causes) | 2026-11-10 | Groups match what the survey can change (smoking, activity, driving) | Canada only, not by province; 5-year age groups; cause coding and reporting lags (StatCan notes younger deaths are reported later) | Loaded; used by the engine (2017–2019 combined, A09) |
@@ -209,6 +209,16 @@ What the source showed: the marriage table is split by gender only up to 2002 an
 - smoking adjustment for lung cancer, heart attack and stroke averages exactly to 1 over the population's smoking mix; smokers > population > never smokers for lung cancer
 - only possible events are offered: no divorce before marriage, one first cancer, heart attack and stroke, no disability after retirement, disability becomes retirement at 65; every chance is between 0 and 1
 
+## Engine checks: whole lives (A03, all of the above)
+
+`tests/test_simulate.py` (13 tests), checking `engine/simulate.py` on 4,000 lives of one example person:
+
+- the same seed gives the same lives; a different seed gives different ones
+- every life obeys the rules: one death between today's age and 110, events in order and never after death, at most one first cancer, heart attack, stroke, marriage, child and retirement, marriage → divorce → remarriage in order, disability only before retirement and ending only if it started
+- the simulation's fast precomputed chances equal `engine/events.py` in every state tested
+- averages match exact values within four standard errors: mean age at death = age + life expectancy; the cause-of-death mix; expected crash injuries; the chance of a first cancer
+- changing one answer (never smoked) with the same seed gives a later median death and less lung cancer
+
 ## Open items for later phases
 
 | Item | Why it matters | Plan |
@@ -216,12 +226,14 @@ What the source showed: the marriage table is split by gender only up to 2002 an
 | Split CPP disability termination (A15) into recovery and death | Termination includes deaths; the engine models deaths separately, so using termination as recovery would count some deaths twice | Phase 3: the 32nd CPP report does not publish disabled-beneficiary mortality; candidate source is the Office of the Chief Actuary's beneficiary mortality study (Actuarial Study No. 16, 2015), to be checked |
 | Driving distance and crash risk (A07, A11, A21) | Crash risk should rise with distance driven; the engine uses the population rate | Later step: needs Canadian distance-driven figures by age and sex |
 | Cause-specific effects of BMI, activity and diet (A20) | These change only total mortality; their effects differ by cause (e.g. BMI on heart disease) | Later version: cause-specific ratios from the same studies |
+| Starting state from the survey | Lives start never married, childless and not retired (retired if over 70); the survey should ask | Phase 5: survey questions on marital status, children and retirement |
 | Disability eligibility from the survey (A15, A21) | The engine uses the average share eligible; a person's own work history would be better | Phase 5: survey question on CPP contributions |
 
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A03 | Simulation order within a year and tie rules recorded; engine runs whole lives |
 | 2026-11-10 | A21 | Life events: rules for each event, smoking adjustment, first child per childless woman, disability to retirement at 65 |
 | 2026-11-10 | A06, A20 | Cause of death: 2017–2019 mix, smoking-specific ratios by cause, calibrated to official shares |
 | 2026-11-10 | A07, A08, A19 | Hazard ratios, combining rule, taper and cap set; former smokers typed in from CTNS 2019; A18 now used by the engine |
