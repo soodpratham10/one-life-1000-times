@@ -36,6 +36,9 @@ web/dist/
 # ----- Editor settings (personal to each machine) -----
 .vscode/
 
+# ----- Scratch output saved in the project folder (e.g. python ... > summary.txt) -----
+/*.txt
+
 # ----- Mac and secrets -----
 .DS_Store
 .env
