@@ -12,3 +12,4 @@ dependencies:
   - pandas       # cleaning source tables
   - openpyxl     # reading/writing Excel cross-check files
   - pytest       # tests
+  - pypdf        # reading tables from the CPP actuarial report PDF

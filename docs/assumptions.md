@@ -20,6 +20,7 @@ Every assumption the model makes is listed here: what it is, its value, where it
 | A12 | Population (denominator for event rates) | July 1 population by year 2000–2026, Canada and 10 provinces, single age 0–100+. StatCan's gender categories mapped to sex: Men+ → M, Women+ → F | Statistics Canada, Table 17-10-0005-01 (population estimates on July 1, by age and gender) | 2026-11-10 | Official population estimates, same source family as the life tables | Reported by gender, while the life tables are by sex: non-binary people (a very small share) are distributed between Men+ and Women+; territories not used; years before 2000 not used because StatCan does not publish every single age up to 100+ for them (before 1991 the oldest group is 90+; in 1991–1999 ages 90–100 are blank) | Loaded |
 | A13 | Cancer diagnosis event | Yearly probability of a new primary cancer = new cases ÷ population, by sex and 5-year age group (90+ = 90–100+), Canada, 2019. Split into lung (lung and bronchus) and other cancers, matching the cause-of-death groups (A06) | Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer, Canadian Cancer Registry), with population from A12 | 2026-11-10 | 2019 is the latest year with complete national data in this table and the last before COVID-19 disrupted screening and diagnosis | Counts primary cancers, not people (a second primary cancer counts again), so the chance of a first diagnosis is slightly overstated; 5-year age groups; national rates used for every province; StatCan rounds counts to the nearest 5; lung cancer counts under age 30 are suppressed for privacy and set to 0 (flagged), a negligible effect since even 4 cases would be a chance below 1 in a million | Loaded |
 | A14 | Heart attack and stroke events | Yearly probability = newly identified cases ÷ CCDSS population, by sex and 5-year age group (20–24 … 90+), Canada, fiscal year 2018–19 (April 2018 – March 2019). Ages 18–19 use the 20–24 rate | Public Health Agency of Canada, Canadian Chronic Disease Surveillance System (CCDSS), Health Infobase data tool, crude incidence rate of acute myocardial infarction and of stroke (data as of April 2025) | 2026-11-10 | National data from provincial health-insurance records, covering nearly everyone; 2018–19 is the last full fiscal year before COVID-19 | Case definitions are PHAC's (from hospital and physician claims; whether repeat events are counted is set by those definitions and not checked here); registry population runs about 2–3% above StatCan's estimates; Quebec diagnostic coding may slightly undercount from 2016–17; national rates used for every province | Loaded |
+| A15 | Disability event | Event = becoming entitled to a CPP disability pension (a "severe and prolonged" disability). Yearly rate per 1,000 eligible, ultimate (2029+), by sex and age: published at ages 25, 30, …, 55 and 60–64; other ages log-linear interpolation; ages 18–24 held at the age-25 rate. Ends (termination) per 1,000 by sex, age (read as age at onset) and duration 1–6+ years, 2025 and 2035. Share of adults 20–64 eligible kept by year (2025: men 71.7%, women 65.7%) | Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan as at 31 December 2024 (revised version): Tables 73, 85 and 88, read from the PDF | 2026-11-10 | The actuarial assumptions used to value the CPP; the report found incidence not significantly affected by COVID-19; termination rates allow a disability to end | Covers only people eligible for CPP disability (enough contributions) and only severe and prolonged disability; CPP excludes Quebec (QPP); termination includes recovery and death, so using it as recovery would double-count deaths the engine models separately (to handle in Phase 3); rates are projections for 2029+, not one observed year; ages under 25 not published | Loaded |
 
 ## Data checks on A04
 
@@ -115,10 +116,23 @@ What the source showed: national totals in this table run to 2019 only, while Qu
 - men's heart-attack rate more than twice women's at every age 35–64 (PHAC reports about four times at 25–44); measured 3–4 times at 35–49
 - CCDSS registry population within 5% of StatCan's July 1 estimates (29.98M adults vs 28.99M–29.48M)
 
+## Data checks on A15
+
+`tests/test_cpp_disability.py` (8 tests, all passing on the real report on 2026-11-10):
+
+- incidence grid complete: 2 sexes x ages 18–64, all positive
+- published values read correctly (spot values agree between the report's web page and PDF)
+- filled-in ages lie between the published ages on either side; risk rises with age to 61
+- women's rates at least men's at every age (the report: consistently higher since 1996)
+- termination table complete (96 values); onset at 60 has no 6th year (benefits stop at 65)
+- eligibility 2025 read correctly (71.7% men, 65.7% women)
+- rebuild check: rates x eligible population (Canada less Quebec, 2026) give about 20,300 new male and 23,300 new female beneficiaries, within 15% of the report's 2029 projection (19,000 and 21,900); one eligibility rate is used for all ages, which overstates the young
+
 ## Change log
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-10 | A15 | CPP disability incidence, termination and eligibility loaded and tested |
 | 2026-11-10 | A09 | Event base years recorded; mortality base period left open |
 | 2026-11-10 | A14 | Heart attack and stroke incidence loaded and tested |
 | 2026-11-10 | A13 | Cancer incidence loaded; diagnosis probabilities built and tested |

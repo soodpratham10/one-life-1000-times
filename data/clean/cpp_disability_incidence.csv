@@ -1,0 +1,95 @@
+sex,age,per_1000,method
+F,18,0.4,held at age 25
+F,19,0.4,held at age 25
+F,20,0.4,held at age 25
+F,21,0.4,held at age 25
+F,22,0.4,held at age 25
+F,23,0.4,held at age 25
+F,24,0.4,held at age 25
+F,25,0.4,published
+F,26,0.459479,interpolated
+F,27,0.527803,interpolated
+F,28,0.606287,interpolated
+F,29,0.69644,interpolated
+F,30,0.8,published
+F,31,0.867577,interpolated
+F,32,0.940863,interpolated
+F,33,1.02034,interpolated
+F,34,1.10653,interpolated
+F,35,1.2,published
+F,36,1.31551,interpolated
+F,37,1.44215,interpolated
+F,38,1.58097,interpolated
+F,39,1.73316,interpolated
+F,40,1.9,published
+F,41,2.08174,interpolated
+F,42,2.28087,interpolated
+F,43,2.49905,interpolated
+F,44,2.73809,interpolated
+F,45,3,published
+F,46,3.25342,interpolated
+F,47,3.52824,interpolated
+F,48,3.82627,interpolated
+F,49,4.14949,interpolated
+F,50,4.5,published
+F,51,4.97069,interpolated
+F,52,5.4906,interpolated
+F,53,6.06491,interpolated
+F,54,6.69928,interpolated
+F,55,7.4,published
+F,56,7.87498,interpolated
+F,57,8.38045,interpolated
+F,58,8.91837,interpolated
+F,59,9.49081,interpolated
+F,60,10.1,published
+F,61,10.1,published
+F,62,10.1,published
+F,63,10,published
+F,64,10,published
+M,18,0.3,held at age 25
+M,19,0.3,held at age 25
+M,20,0.3,held at age 25
+M,21,0.3,held at age 25
+M,22,0.3,held at age 25
+M,23,0.3,held at age 25
+M,24,0.3,held at age 25
+M,25,0.3,published
+M,26,0.34461,interpolated
+M,27,0.395852,interpolated
+M,28,0.454715,interpolated
+M,29,0.52233,interpolated
+M,30,0.6,published
+M,31,0.635534,interpolated
+M,32,0.673173,interpolated
+M,33,0.713041,interpolated
+M,34,0.75527,interpolated
+M,35,0.8,published
+M,36,0.881578,interpolated
+M,37,0.971474,interpolated
+M,38,1.07054,interpolated
+M,39,1.1797,interpolated
+M,40,1.3,published
+M,41,1.43086,interpolated
+M,42,1.5749,interpolated
+M,43,1.73344,interpolated
+M,44,1.90794,interpolated
+M,45,2.1,published
+M,46,2.29868,interpolated
+M,47,2.51615,interpolated
+M,48,2.7542,interpolated
+M,49,3.01478,interpolated
+M,50,3.3,published
+M,51,3.71913,interpolated
+M,52,4.19149,interpolated
+M,53,4.72385,interpolated
+M,54,5.32383,interpolated
+M,55,6,published
+M,56,6.56367,interpolated
+M,57,7.18029,interpolated
+M,58,7.85484,interpolated
+M,59,8.59276,interpolated
+M,60,9.4,published
+M,61,9.6,published
+M,62,9.6,published
+M,63,9.6,published
+M,64,9.6,published

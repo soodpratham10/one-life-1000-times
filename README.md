@@ -2,7 +2,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development (Phase 1 — data).** Eight data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
+**Status: in development (Phase 1 — data).** Nine data sources are loaded and tested; the simulation engine is not built yet. This README is updated as each phase is finished.
 
 ## What this is
 
@@ -49,6 +49,7 @@ All inputs come from official or peer-reviewed public sources. Loaded so far:
 | Statistics Canada, Table 17-10-0005-01 (population on July 1, by age and gender) | Population by province, sex and single age, 2000–2026: the denominator for event rates | Cleaned copy yes (`data/clean/population.csv`); raw file via `python pipeline/download_statcan.py 17100005` |
 | Statistics Canada, Table 13-10-0111-01 (new cases of primary cancer) | New cancer cases (all, and lung) by sex and 5-year age group, Canada, Quebec and Canada excluding Quebec, 1992–2023 | Cleaned extract yes (`data/clean/cancer_incidence.csv`); raw file (about 1.8 GB) via `python pipeline/download_statcan.py 13100111` |
 | Public Health Agency of Canada, Canadian Chronic Disease Surveillance System (Health Infobase data tool) | Newly identified heart attacks and strokes by sex and 5-year age group, Canada and provinces, 2000–01 to 2023–24 | Cleaned copy yes (`data/clean/heart_stroke_incidence.csv`); raw files downloaded by hand (below) |
+| Office of the Chief Actuary (OSFI), 32nd Actuarial Report on the Canada Pension Plan (Tables 73, 85, 88) | CPP disability: chance per year of a severe and prolonged disability by age and sex, how long it lasts, and the share of adults eligible | Extracted tables yes (`data/clean/cpp_disability_*.csv`); report PDF downloaded by hand (below) |
 | Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
 
 ### Getting the CIA MI-2024 file
@@ -67,6 +68,12 @@ Without it, the MI-2024 tests are skipped rather than failed.
 4. Run `python pipeline/11_heart_stroke.py`.
 
 The download contains every year, whatever year the tool shows on screen.
+
+### Getting the CPP actuarial report
+
+1. Download the 32nd Actuarial Report on the Canada Pension Plan (revised version) PDF, `cpp32-rev-ed-en.pdf`, from osfi-bsif.gc.ca (Office of the Chief Actuary).
+2. Save it as `data/raw/oca/cpp32-rev-ed-en.pdf`.
+3. Run `python pipeline/12_cpp_disability.py` (it reads the tables straight from the PDF).
 
 ## Repository layout
 
@@ -100,12 +107,13 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 - Official tables are by sex; the population table is by gender (a very small difference, see A12).
 - Causes of death, crashes, cancer, heart attack and stroke use national rates for every province.
 - Crash data cannot separate minor from serious injuries; cancer counts are counts of cancers, not people.
+- Disability means CPP disability (severe and prolonged, people with enough CPP contributions; outside Quebec).
 - Territories are not modelled.
 
 ## Licence
 
 - **Code:** MIT (see `LICENSE`).
-- **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
+- **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CPP disability tables are taken from the Office of the Chief Actuary's 32nd Actuarial Report on the Canada Pension Plan (Office of the Superintendent of Financial Institutions), reproduced for non-commercial use with attribution. The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
 
 ## Author
 
