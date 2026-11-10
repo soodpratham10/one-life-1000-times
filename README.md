@@ -6,7 +6,7 @@
 
 > Nobody can tell you how your life will go. Here are 1,000 ways it could.
 
-**Status: in development. Phase 1 of 6 (data) is complete and released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0); Phase 2 (engine) is complete and Phase 3 (links between events) is in progress.** The engine lives a person's life forward year by year and does it 1,000 times, and cancer deaths now follow a cancer diagnosis; the survey and visuals are not built yet. This README is updated as each step is finished.
+**Status: in development. Phases 1 (data) and 2 (engine) are complete, released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) and [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0); Phase 3 (links between events) is in progress.** The engine lives a person's life forward year by year and does it 1,000 times, and cancer deaths now follow a cancer diagnosis; the survey and visuals are not built yet. This README is updated as each step is finished.
 
 ## What this is
 
@@ -27,9 +27,9 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 | Death, by cause | 11 cause groups plus "all other causes" (see A06) |
 | Disability | CPP-style severe and prolonged disability; can end |
 | Injured in a car crash | Police-reported injury of any severity; can happen more than once |
-| Cancer diagnosis | Raises later mortality |
-| Heart attack or stroke | Raises later mortality |
-| Marriage | Legal marriage; affects later mortality |
+| Cancer diagnosis | Lung or other site; cancer deaths come only after a diagnosis |
+| Heart attack or stroke | First one only; effect on later mortality still to come (Phase 3) |
+| Marriage | Legal marriage; effect on mortality still to come (Phase 3) |
 | Divorce | Only after a marriage |
 | Remarriage | Only after a divorce |
 | First child | |
@@ -61,7 +61,7 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 | --- | --- | --- |
 | 0. Setup | Environment, repository, licence | Done |
 | 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | Done (v0.1.0) |
-| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | Done |
+| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | Done (v0.2.0) |
 | 3. Links between events | Cancer deaths after a diagnosis (done); higher mortality after a heart attack or stroke, disability recovery vs death, marriage effects | In progress |
 | 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | Planned |
 | 5. Website | Survey and interactive visuals | Planned |
