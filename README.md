@@ -266,7 +266,7 @@ python -m http.server 8000
 ## Repository layout
 
 ```
-.github/workflows/   automatic test run on every push
+.github/workflows/   tests.yml runs every test on each push; pages.yml publishes web/ to GitHub Pages
 data/raw/            source files as published (not committed; rebuilt by the pipeline)
 data/clean/          cleaned tables used by the model (see docs/data_dictionary.md)
 data/assumptions/    small tables typed in from published studies (hazard ratios, smoking ratios by cause,

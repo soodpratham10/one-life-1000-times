@@ -1,0 +1,53 @@
+name: Website
+
+# Publishes web/ to GitHub Pages whenever the site or its engine changes on main.
+# The browser engine's tests run first; if they fail, nothing is published.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run the browser engine's tests (Node, already on the runner)
+        run: node --test web/tests/engine.test.mjs
+
+      - name: Gather the files the site needs (the page, the engine, its data, the font)
+        run: |
+          mkdir -p _site
+          cp web/index.html web/styles.css web/app.js web/worker.js _site/
+          cp -r web/engine web/data web/fonts _site/
+          touch _site/.nojekyll
+          ls -R _site
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+          include-hidden-files: true
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
