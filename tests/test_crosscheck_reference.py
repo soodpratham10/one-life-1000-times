@@ -32,11 +32,13 @@ def test_reference_file_matches_the_engine(tmp_path, monkeypatch):
     monkeypatch.setattr(mod, "CIA_OUT", tmp_path / "cia_reference.csv")
     monkeypatch.setattr(mod, "ROOT", tmp_path)       # only used to print the path
     mod.main()
-    for committed, rebuilt, key in ((REF, fresh, "case"), (CANCER_REF, fresh_cancer, "sex")):
+    # The cancer link is solved by iteration to a relative accuracy of 1e-12, so a
+    # Mac and a Linux computer can differ in about the 12th digit: allow 1e-9 there.
+    for committed, rebuilt, key, rel in ((REF, fresh, "case", 1e-12), (CANCER_REF, fresh_cancer, "sex", 1e-9)):
         old, new = pd.read_csv(committed), pd.read_csv(rebuilt)
         assert len(old) == len(new)
         assert (old[key] == new[key]).all() and (old["measure"] == new["measure"]).all()
-        assert old["value"].to_numpy() == pytest.approx(new["value"].to_numpy(), rel=1e-12, abs=1e-15)
+        assert old["value"].to_numpy() == pytest.approx(new["value"].to_numpy(), rel=rel, abs=1e-15)
 
 
 def test_reference_covers_every_level():
