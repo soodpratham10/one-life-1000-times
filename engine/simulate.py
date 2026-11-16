@@ -74,7 +74,7 @@ class Schedule:
         return self.q_state[key + (MARITAL_STATES.index(marital), int(disabled))], self.c_state[key]
 
 
-def build_schedule(p: Person, start_year: int = START_YEAR, improve: bool = True,
+def build_schedule(p: Person, start_year: int = START_YEAR, improve: bool | str = True,
                    start_marital: str = "never") -> Schedule:
     ages = np.arange(p.age, MAX_AGE + 1)
     years = start_year + (ages - p.age)
@@ -281,7 +281,7 @@ def exact(sch: Schedule) -> dict:
 
 
 def simulate(p: Person, n: int = 1000, seed: int = 0, start_year: int = START_YEAR,
-             start: State | None = None, improve: bool = True) -> list[Life]:
+             start: State | None = None, improve: bool | str = True) -> list[Life]:
     """n lives for this person, reproducible from the seed."""
     sch = build_schedule(p, start_year, improve, start_marital=start.marital if start else "never")
     rng = np.random.default_rng(seed)

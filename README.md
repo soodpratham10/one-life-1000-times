@@ -11,7 +11,7 @@
   <a href="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml"><img src="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
   <a href="https://github.com/soodpratham10/one-life-1000-times/releases"><img src="https://img.shields.io/github/v/release/soodpratham10/one-life-1000-times" alt="release"></a>
   <img src="https://img.shields.io/badge/python-3.13-3776ab" alt="Python 3.13">
-  <img src="https://img.shields.io/badge/data-Statistics%20Canada%20%C2%B7%20CIA%20%C2%B7%20OCA-c8102e" alt="data: Statistics Canada, CIA, OCA">
+  <img src="https://img.shields.io/badge/data-Statistics%20Canada%20%C2%B7%20Chief%20Actuary%20(CPP)-c8102e" alt="data: Statistics Canada, Office of the Chief Actuary (CPP)">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue" alt="licence: MIT"></a>
 </p>
 
@@ -46,7 +46,7 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/figures/how-dark.svg">
-    <img src="docs/figures/how-light.svg" width="900" alt="How one life is lived: 1, your survey answers; 2, your death rates (StatCan life table times your habits, improved with CIA MI-2024); 3, live one year (crash, cancer, heart attack, stroke, disability, marriage, child, retirement); 4, the chance of death this year depends on everything that has happened so far, and if you survive, go back to step 3 for the next year; 5, repeat 1,000 times for the range of ages and causes.">
+    <img src="docs/figures/how-light.svg" width="900" alt="How one life is lived: 1, your survey answers; 2, your death rates (StatCan life table times your habits, improved with the CPP actuarial report's mortality improvement rates); 3, live one year (crash, cancer, heart attack, stroke, disability, marriage, child, retirement); 4, the chance of death this year depends on everything that has happened so far, and if you survive, go back to step 3 for the next year; 5, repeat 1,000 times for the range of ages and causes.">
   </picture>
 </p>
 
@@ -115,12 +115,12 @@ All inputs come from official public sources, and every source below links strai
 | Source | Used for |
 | --- | --- |
 | Statistics Canada, life tables: [13-10-0114-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401); PEI abridged table [13-10-0140-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310014001) | Base death rates by age, sex and province |
-| Canadian Institute of Actuaries, [Mortality Improvements Research – Tables (MI-2024)](https://www.cia-ica.ca/?p=333613) and [report](https://www.cia-ica.ca/publications/224043e/) | Future mortality improvement (not committed; see below) |
+| Canadian Institute of Actuaries, [Mortality Improvements Research – Tables (MI-2024)](https://www.cia-ica.ca/?p=333613) and [report](https://www.cia-ica.ca/publications/224043e/) | Optional alternative improvement scale (not committed; see below) |
 | Statistics Canada, deaths by cause: [13-10-0392-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310039201) | Splitting deaths by cause (12 groups in the table; 11 used, as 2017–2019 has no COVID-19 deaths) |
 | Transport Canada, [National Collision Database (open data)](https://open.canada.ca/data/en/dataset/1eb9eba7-71d1-4b30-9fb1-30cbdab7e63a) | Car crash injuries |
 | Statistics Canada, new cancer cases: [13-10-0111-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011101) | Cancer diagnoses |
 | Public Health Agency of Canada, [Canadian Chronic Disease Surveillance System data tool](https://health-infobase.canada.ca/ccdss/data-tool/) | Heart attacks and strokes |
-| Office of the Chief Actuary, [32nd Actuarial Report on the Canada Pension Plan (revised)](https://www.osfi-bsif.gc.ca/en/oca/actuarial-reports/actuarial-report-32nd-canada-pension-plan-revised-version) | Disability and retirement |
+| Office of the Chief Actuary, [32nd Actuarial Report on the Canada Pension Plan (revised)](https://www.osfi-bsif.gc.ca/en/oca/actuarial-reports/actuarial-report-32nd-canada-pension-plan-revised-version) | Future mortality improvement (Table 41, the default) and its checks (Tables 43, 44); disability and retirement |
 | Office of the Chief Actuary, [Actuarial Study No. 16: CPP beneficiaries mortality study (2015)](https://publications.gc.ca/site/eng/9.804327/publication.html) | Death rates of CPP disability beneficiaries |
 | Statistics Canada, marriages [39-10-0057-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3910005701), divorces [39-10-0053-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3910005301), births by parity [13-10-0421-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310042101) | Marriage, divorce, remarriage, first child |
 | Statistics Canada, population: [17-10-0005-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710000501) | Denominators for event rates |
@@ -179,15 +179,18 @@ Every hazard ratio and published figure the engine uses, with a link to the pape
 | Statistics Canada, Table 17-10-0060-01 (population by legal marital status, age and sex) | Share of Canadians single, married, separated, widowed or divorced, by sex and single age 15–100, Canada and provinces, 2015–2022 | Cleaned copy yes (`data/clean/marital_status.csv`); raw file (about 420 MB) via `python pipeline/download_statcan.py 17100060` |
 | Office of the Chief Actuary, Actuarial Study No. 16 (2015), Table 40 | Death rates of CPP disability beneficiaries by sex and age 20–64, and their ratio to the population, 2011 | Typed in (`data/assumptions/disabled_mortality.csv`) |
 | Health Canada, Canadian Tobacco and Nicotine Survey 2019, Table 1 | Percent of former smokers by sex and age group (25–44, 45+) | Typed in (`data/assumptions/former_smokers.csv`) |
-| Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** The scale is the CIA's copyrighted material. Download it yourself (below) |
+| Office of the Chief Actuary, 32nd Actuarial Report on the Canada Pension Plan (Tables 41, 43, 44) | Assumed mortality improvement rates for Canada by sex and age band (2025, 2026–2038 average, 2039+), and the report's life expectancies for 2025, 2050 and 2075 | Typed in (`data/assumptions/cpp32_improvement.csv`, `data/assumptions/cpp32_life_expectancy.csv`) |
+| Canadian Institute of Actuaries, MI-2024 mortality improvement scale ("Mortality Improvements Research – Tables", 2024) | Annual improvement rates by sex, age 20–120 and calendar year 1981–2119 | **No.** Optional: the scale is the CIA's copyrighted material. Download it yourself (below) to use `improve="cia"` |
 
-### Getting the CIA MI-2024 file
+### Getting the CIA MI-2024 file (optional)
+
+The engine uses the CPP report's improvement rates by default (A28). To compare with the CIA's scale:
 
 1. Download "Mortality Improvements Research – Tables" from the [CIA website](https://www.cia-ica.ca/?p=333613) (publication 224043).
 2. Save it as `data/raw/cia_mi2024/224043te.xlsx`.
 3. Run `python pipeline/03_clean_mi2024.py`.
 
-Without it, the MI-2024 tests are skipped rather than failed.
+Without it, the MI-2024 tests are skipped rather than failed, and everything else uses the CPP rates.
 
 ### Getting the CCDSS heart attack and stroke files
 
@@ -216,7 +219,7 @@ conda activate onelife
 pytest                          # checks the cleaned data already in data/clean/
 ```
 
-To redraw the README figures (with the CIA file in place, so the lives include future improvement):
+To redraw the README figures:
 
 ```bash
 python docs/figures/make_figures.py
@@ -290,7 +293,7 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 - Retirement means starting the CPP retirement pension, which is not always the same as stopping work.
 - Marriage means legal marriage; common-law unions are not covered by the marriage and divorce tables.
 - Territories are not modelled.
-- Lifetimes are long, mostly because of the CIA MI-2024 improvement scale, which projects strong future gains.
+- Future improvement follows the Chief Actuary's CPP assumptions (about 1% a year in the long term); it is a projection, and lifetimes shift by years under other scales (CIA MI-2024 adds about 2 years for an 18-year-old).
 - A simulated population with today's habits outlives the 2017–2019 life table by about 2 years from age 25, mainly because simulated smokers quit as Canadian smokers do while the table reflects older generations who smoked more (see the population check in `docs/assumptions.md`).
 - Survival after a lung cancer diagnosis comes out higher than published for women (about 35–45% at 5 years against 26%).
 - Habits are modelled independently of each other, and activity, weight and smoking follow typical Canadian paths rather than your own plans (A26, A27).
@@ -300,7 +303,7 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 ## Licence
 
 - **Code:** MIT (see [`LICENSE`](LICENSE)).
-- **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CPP disability and retirement tables are taken from the Office of the Chief Actuary's 32nd Actuarial Report on the Canada Pension Plan (Office of the Superintendent of Financial Institutions), reproduced for non-commercial use with attribution. The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
+- **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CPP mortality improvement, disability and retirement tables are taken from the Office of the Chief Actuary's 32nd Actuarial Report on the Canada Pension Plan (Office of the Superintendent of Financial Institutions), reproduced for non-commercial use with attribution. The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
 
 ---
 

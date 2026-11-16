@@ -11,7 +11,10 @@
 # Part 2, cancer link: runs the synthetic cohort in R with the engine's solved
 #   rates (cancer_reference.csv) and checks it reproduces the official deaths
 #   at every age; writes crosscheck/results/r_cancer_cohort.csv.
-# Part 3, future improvement (only with the CIA file on this computer):
+# Part 3, CPP improvement (A28, the default): re-solves the 2019-2025 scales with
+#   uniroot and compares scales, factors and improved death rates with cpp_reference.csv;
+#   writes crosscheck/results/r_cpp_vs_python.csv.
+# Part 4, CIA improvement (only with the CIA file on this computer):
 #   compares improvement factors and improved death rates with cia_reference.csv;
 #   writes crosscheck/results/cia_r_vs_python.csv (not committed).
 
@@ -117,9 +120,45 @@ cat(if (cancer_pass) "\nPASS: the cohort reproduces official total, lung and oth
     else "\nFAIL: see crosscheck/results/r_cancer_cohort.csv\n")
 all_pass <- all_pass && cancer_pass
 
-# ================================================================ part 3: improvement (A05)
+# ================================================================ part 3: CPP improvement (A28)
 
-cat("\n---- Part 3: CIA MI-2024 improvement ----\n")
+cat("\n---- Part 3: CPP report improvement (A28, the default) ----\n")
+cpp <- read.csv(file.path(ROOT, "crosscheck", "reference", "cpp_reference.csv"), stringsAsFactors = FALSE)
+cpp$r_value <- NA_real_
+for (i in seq_len(nrow(cpp))) {
+  m <- cpp$measure[i]
+  if (m == "scale_under_65") cpp$r_value[i] <- cpp_scale(cpp$sex[i])[1]
+  if (m == "scale_65_plus") cpp$r_value[i] <- cpp_scale(cpp$sex[i])[2]
+  if (m == "improvement_factor") cpp$r_value[i] <- cpp_factor(cpp$sex[i], cpp$at_age[i], cpp$year[i])
+}
+for (name in unique(cpp$case[grepl("improved", cpp$measure)])) {
+  f <- ref[ref$case == name, ][1, ]
+  p <- list(sex = f$sex, age = f$age, region = f$region, smoking = f$smoking, quit_age = f$quit_age,
+            keeps_smoking = isTRUE(f$keeps_smoking), activity_minutes = f$activity_minutes,
+            height_cm = f$height_cm, weight_kg = f$weight_kg, drinks_per_week = f$drinks_per_week,
+            fruit_veg_per_day = f$fruit_veg_per_day)
+  rows <- which(cpp$case == name)
+  q <- personal_q_cpp(p, cpp$year[rows[1]])
+  for (i in rows) {
+    cpp$r_value[i] <- if (cpp$measure[i] == "life_expectancy_improved") life_expectancy(q) else
+      q[cpp$at_age[i] - p$age + 1]
+  }
+}
+cpp$difference <- cpp$r_value - cpp$value
+write.csv(cpp, file.path(out_dir, "r_cpp_vs_python.csv"), row.names = FALSE)
+cpp_summary <- aggregate(abs(difference) ~ measure, data = cpp, FUN = max)
+names(cpp_summary) <- c("measure", "largest_difference")
+print(cpp_summary, row.names = FALSE)
+cat("\nScales on the 2019-2025 rates (Python vs R):\n")
+print(cpp[grepl("scale", cpp$measure), c("sex", "measure", "value", "r_value")], row.names = FALSE)
+cpp_pass <- all(cpp_summary$largest_difference < TOLERANCE)
+cat(if (cpp_pass) sprintf("\nPASS: every CPP improvement value agrees to within %g.\n", TOLERANCE) else
+  "\nFAIL: see crosscheck/results/r_cpp_vs_python.csv\n")
+all_pass <- all_pass && cpp_pass
+
+# ================================================================ part 4: CIA improvement (A05)
+
+cat("\n---- Part 4: CIA MI-2024 improvement ----\n")
 cia_ref_path <- file.path(ROOT, "crosscheck", "reference", "cia_reference.csv")
 if (!has_cia() || !file.exists(cia_ref_path)) {
   cat("Skipped: the CIA file or cia_reference.csv is not on this computer\n",

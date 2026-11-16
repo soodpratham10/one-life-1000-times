@@ -299,6 +299,31 @@ Current smokers' death-rate ratio against never smokers for each cause of death.
 | `hr_current` | Ratio for current smokers (former smokers are derived from it, see A20) |
 | `source` | Study the number comes from |
 
+### `assumptions/cpp32_improvement.csv`
+Assumed annual mortality improvement rates for Canada by sex and age band, typed in from the Office of the Chief Actuary's 32nd Actuarial Report on the Canada Pension Plan (revised), Table 41. The project's default improvement scale. Read by `engine/mortality.py`. Tests: `tests/test_cpp_improvement.py`. Assumption A28.
+
+| Column | Meaning |
+| --- | --- |
+| `sex` | M or F |
+| `age_lo` | First age of the band |
+| `age_hi` | Last age of the band (the 95+ band is written as 95–110) |
+| `mi_2025` | Improvement rate in 2025, percent a year |
+| `mi_2026_2038` | Average improvement rate over 2026–2038, percent a year |
+| `mi_2039_plus` | Ultimate improvement rate from 2039, percent a year |
+| `source` | Report and table |
+
+### `assumptions/cpp32_life_expectancy.csv`
+Life expectancies for Canada from the same report: Table 43 (period: no improvement after the year shown) and Table 44 (cohort: with improvement after the year shown), for 2025, 2050 and 2075 at ages 0–100. The 2025 period values at 0 and 65 fix the scale on 2019–2025 rates (A28); the rest are checks. Read by `engine/mortality.py`. Tests: `tests/test_cpp_improvement.py`.
+
+| Column | Meaning |
+| --- | --- |
+| `sex` | M or F |
+| `basis` | `period` (Table 43) or `cohort` (Table 44) |
+| `year` | 2025, 2050 or 2075 |
+| `age` | Age, 0–100 |
+| `e` | Life expectancy in years, as published (one decimal) |
+| `source` | Report and table |
+
 ### `assumptions/disabled_mortality.csv`
 Death rates of CPP disability beneficiaries by sex and single age 20–64, and their ratio to the general population, 2011. Typed in from the Office of the Chief Actuary, Actuarial Study No. 16 (2015), Table 40. Read by `engine/disability.py`. Tests: `tests/test_disability.py`. Assumption A25.
 
@@ -360,6 +385,18 @@ The engine's solved cancer link (A22) by sex and age, for the R check. Built by 
 | `sex` | M or F |
 | `measure` | `s_lung`, `s_other` (excess force after a diagnosis), `r_lung`, `r_other` (force on undiagnosed people), `eta` (scale on other causes), `five_year_survival_lung`, `five_year_survival_other` |
 | `at_age` | Age |
+| `value` | The engine's value |
+
+### `crosscheck/reference/cpp_reference.csv`
+The engine's default improvement scale (CPP report, A28), for the R check: the fitted scales, improvement factors, and each reference person's improved death rates and life expectancy from 2026. Built by `python crosscheck/make_reference.py`.
+
+| Column | Meaning |
+| --- | --- |
+| `case` | Reference person's name, or `improvement_M` / `improvement_F` |
+| `sex` | M or F |
+| `measure` | `scale_under_65`, `scale_65_plus` (the fitted 2019–2025 scales), `improvement_factor`, `personal_q_improved` or `life_expectancy_improved` |
+| `at_age` | Age (blank for the scales) |
+| `year` | Calendar year (blank for the scales) |
 | `value` | The engine's value |
 
 ### `crosscheck/results/r_vs_python.csv`

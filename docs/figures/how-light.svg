@@ -17,7 +17,7 @@
 <text x="250.0" y="95.0" font-size="14.5" font-weight="700" fill="#1f2328" text-anchor="start" >Your death rates</text>
 <text x="290.0" y="128.0" font-size="12" font-weight="400" fill="#59636e" text-anchor="middle" >StatCan life table</text>
 <text x="290.0" y="147.0" font-size="12" font-weight="400" fill="#59636e" text-anchor="middle" >× your habits, improved</text>
-<text x="290.0" y="166.0" font-size="12" font-weight="400" fill="#59636e" text-anchor="middle" >with CIA MI-2024</text>
+<text x="290.0" y="166.0" font-size="12" font-weight="400" fill="#59636e" text-anchor="middle" >with CPP report rates</text>
 <line x1="373.0" y1="130.0" x2="397.0" y2="130.0" stroke="#59636e" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="400.0" y="66" width="160" height="128" rx="10" fill="#f6f8fa" stroke="#2a78d6" stroke-width="2"/>
 <circle cx="422.0" cy="90" r="11" fill="#2a78d6"/>

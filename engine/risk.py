@@ -320,7 +320,7 @@ def relative_multiplier(p: Person, age: int) -> float:
 
 # ---------------------------------------------------------------- personal rates
 
-def personal_qx(p: Person, year: int, improve: bool = True) -> np.ndarray:
+def personal_qx(p: Person, year: int, improve: bool | str = True) -> np.ndarray:
     """
     This person's yearly death probabilities from their age now to 110:
     element k is the chance of dying at age (p.age + k) in year (year + k).

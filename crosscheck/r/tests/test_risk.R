@@ -141,3 +141,31 @@ test_that("improvement by hand from the CIA file (skipped without it)", {
   expect_equal(improvement_factor("M", 80, 2150),
                improvement_factor("M", 80, 2119) * (1 - rate("M", 80, 2119))^31)
 })
+
+test_that("CPP basis: the solved scales reproduce the report's 2025 life expectancies (A28)", {
+  for (sex in c("M", "F")) {
+    k <- cpp_scale(sex)
+    e <- function(age) CPP_LE$e[CPP_LE$sex == sex & CPP_LE$basis == "period" & CPP_LE$year == 2025 & CPP_LE$age == age]
+    expect_equal(cpp_period_e(sex, 2025, 65, k), e(65), tolerance = 1e-10)
+    expect_equal(cpp_period_e(sex, 2025, 0, k), e(0), tolerance = 1e-10)
+    expect_true(all(k > 0 & k < 1))
+  }
+})
+
+test_that("CPP basis by hand: man aged 40 in 2030, and the ultimate rate after 2038", {
+  k <- cpp_scale("M")[1]
+  expect_equal(cpp_factor("M", 40, 2030), (1 - k * 0.016)^7 * (1 - 0.024)^5, tolerance = 1e-12)
+  expect_equal(cpp_factor("F", 70, 2045) / cpp_factor("F", 70, 2040), 0.99^5, tolerance = 1e-12)
+  expect_equal(cpp_factor("M", 50, 2018), 1)
+  expect_equal(cpp_factor("F", 110, 2080), 1)
+})
+
+test_that("CPP basis: R agrees with the Python engine on every reference value", {
+  ref <- read.csv(file.path(ROOT, "crosscheck", "reference", "cpp_reference.csv"), stringsAsFactors = FALSE)
+  imp <- ref[ref$measure == "improvement_factor", ]
+  expect_equal(unname(mapply(cpp_factor, imp$sex, imp$at_age, imp$year)), imp$value, tolerance = 1e-10)
+  for (sex in c("M", "F")) {
+    expect_equal(cpp_scale(sex), c(ref$value[ref$sex == sex & ref$measure == "scale_under_65"],
+                                   ref$value[ref$sex == sex & ref$measure == "scale_65_plus"]), tolerance = 1e-10)
+  }
+})

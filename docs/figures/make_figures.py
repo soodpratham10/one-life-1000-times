@@ -10,9 +10,8 @@ Writes a light and a dark version of each figure into docs/figures/:
     how-light.svg, how-dark.svg           how one life is lived (a diagram, no data)
 
 The SVG is written by hand (no plotting library needed). Every number on the
-figures comes from engine.simulate; nothing is typed in. Run it with the CIA
-MI-2024 file in place (see README) so the lives include future mortality
-improvement; without it the figures say so in their subtitle.
+figures comes from engine.simulate; nothing is typed in. Future improvement is
+the project's default, the CPP report's rates (A28), so anyone can redraw them.
 """
 
 import sys
@@ -21,7 +20,6 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))   # the project folder, for engine/
-from engine.data import has_improvement_scale
 from engine.risk import Person
 from engine.simulate import simulate
 
@@ -176,7 +174,7 @@ def choices_figure(results, improve, t):
 
 HOW_CARDS = [
     ("1", "Your answers", ["smoking, activity,", "height and weight,", "drinks, fruit and veg"]),
-    ("2", "Your death rates", ["StatCan life table", "\u00d7 your habits, improved", "with CIA MI-2024"]),
+    ("2", "Your death rates", ["StatCan life table", "\u00d7 your habits, improved", "with CPP report rates"]),
     ("3", "Live one year", ["crash, cancer, heart attack,", "stroke, disability, marriage,", "child, retirement"]),
     ("4", "Death this year?", ["the chance depends on", "everything that has", "happened so far"]),
     ("5", "1,000 lives", ["repeat from today,", "1,000 times: the range", "of ages and causes"]),
@@ -219,9 +217,7 @@ def how_figure(t, c):
 
 
 def main() -> None:
-    improve = has_improvement_scale()
-    if not improve:
-        print("Note: CIA MI-2024 file not found, so these lives have no future mortality improvement.")
+    improve = True                                   # the default scale (CPP, A28)
     results = [(name, simulate(p, n=N, seed=SEED, improve=improve)) for name, p in PROFILES]
     for theme, t in THEMES.items():
         (OUT / f"lives-{theme}.svg").write_text(lives_figure(results[0][1], improve, t))

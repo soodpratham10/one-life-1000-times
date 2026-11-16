@@ -7,7 +7,6 @@ Change the answers below to see how the lives move.
 """
 
 from engine.causes import CAUSE_LABELS
-from engine.data import has_improvement_scale
 from engine.risk import Person
 from engine.simulate import simulate, story, summary
 
@@ -23,11 +22,9 @@ ME = Person(
 
 
 def main() -> None:
-    improve = has_improvement_scale()
-    if not improve:
-        print("Note: the CIA MI-2024 scale is not on this computer (see README), so these lives use\n"
-              "2017-2019 death rates with no future improvement; lifetimes come out several years shorter.\n")
-    lives = simulate(ME, n=1000, seed=1, improve=improve)
+    # Future improvement: the CPP report's rates (A28). Use improve="cia" for CIA MI-2024
+    # (needs the CIA file) or improve=False for 2017-2019 rates as they are.
+    lives = simulate(ME, n=1000, seed=1)
     print("One of your lives:")
     for line in story(lives[0]):
         print("  " + line)

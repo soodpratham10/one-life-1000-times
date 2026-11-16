@@ -16,7 +16,6 @@ import itertools
 import numpy as np
 import pytest
 
-from engine.data import has_improvement_scale
 from engine.mortality import cohort_qx, life_expectancy
 from engine.risk import (
     CAP_HIGH,
@@ -45,7 +44,6 @@ LEVELS = {
     "alcohol": ["under_25g", "25_44g", "45_64g", "65g_plus"],
     "fruit_veg": ["0_2", "3", "4", "5_plus"],
 }
-needs_mi = pytest.mark.skipif(not has_improvement_scale(), reason="CIA MI-2024 not built (copyrighted; see README)")
 TYPICAL = dict(activity_minutes=200, height_cm=175, weight_kg=79, drinks_per_week=3, fruit_veg_per_day=3)
 
 
@@ -218,9 +216,8 @@ def test_personal_rates_shape():
     assert (never[:-1] < q[:-1]).all()
 
 
-@needs_mi
 def test_personal_rates_with_improvement():
-    """With MI-2024 the same person's rates are lower in later years, and the rule is unchanged."""
+    """With improvement (CPP, the default) the same person's rates are lower in later years, and the rule is unchanged."""
     p = Person("F", 50, smoking="current", **TYPICAL)
     q_base = cohort_qx("CA", "F", 50, 2026)[0]
     assert personal_qx(p, 2026)[0] == pytest.approx(1 - (1 - q_base) ** relative_multiplier(p, 50), rel=1e-12)

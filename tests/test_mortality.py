@@ -86,7 +86,7 @@ def test_bad_inputs_rejected():
         cohort_qx("CA", "M", 17, 2026)  # adults only (A01)
 
 
-# ---------- mortality improvement (needs MI-2024) ----------
+# ---------- CIA MI-2024 improvement (needs the CIA file) ----------
 
 @needs_mi
 def test_improvement_by_hand():
@@ -96,47 +96,47 @@ def test_improvement_by_hand():
     q = 0.01108 x (1 - 0.0159330...) x (1 - 0.0112213...) = 0.0107811105...
     """
     expected = 0.01108 * (1 - 0.0159330335604066) * (1 - 0.011221342142326)
-    assert cohort_qx("CA", "M", 65, 2020)[0] == pytest.approx(expected, rel=1e-12)
+    assert cohort_qx("CA", "M", 65, 2020, improve="cia")[0] == pytest.approx(expected, rel=1e-12)
 
 
 @needs_mi
 def test_no_improvement_up_to_base_year():
-    assert improvement_factor("M", 50, 2018) == 1.0
-    assert improvement_factor("M", 50, 2000) == 1.0
+    assert improvement_factor("M", 50, 2018, basis="cia") == 1.0
+    assert improvement_factor("M", 50, 2000, basis="cia") == 1.0
 
 
 @needs_mi
 def test_ages_18_19_use_age_20_rate():
     for year in (2019, 2030, 2060):
-        f20 = improvement_factor("F", 20, year)
-        assert improvement_factor("F", 18, year) == f20
-        assert improvement_factor("F", 19, year) == f20
+        f20 = improvement_factor("F", 20, year, basis="cia")
+        assert improvement_factor("F", 18, year, basis="cia") == f20
+        assert improvement_factor("F", 19, year, basis="cia") == f20
 
 
 @needs_mi
 def test_years_after_2119_keep_2119_rate():
     """Two years past 2119 = two more years at the 2119 rate (male 90: 0.0123993753097154)."""
-    ratio = improvement_factor("M", 90, 2121) / improvement_factor("M", 90, 2119)
+    ratio = improvement_factor("M", 90, 2121, basis="cia") / improvement_factor("M", 90, 2119, basis="cia")
     assert ratio == pytest.approx((1 - 0.0123993753097154) ** 2, rel=1e-12)
 
 
 @needs_mi
 def test_age_110_never_improved():
-    assert cohort_qx("CA", "F", 100, 2026)[-1] == 1.0
-    assert improvement_factor("F", 110, 2080) == 1.0
+    assert cohort_qx("CA", "F", 100, 2026, improve="cia")[-1] == 1.0
+    assert improvement_factor("F", 110, 2080, basis="cia") == 1.0
 
 
 @needs_mi
 @pytest.mark.parametrize("sex", ["M", "F"])
 def test_improvement_adds_years(sex):
-    """An 18-year-old in 2026 lives longer with improvement than on 2018 rates, by a plausible 3-12 years."""
+    """An 18-year-old in 2026 lives longer with MI-2024 than on 2018 rates, by a plausible 3-12 years."""
     plain = life_expectancy(cohort_qx("CA", sex, 18, 2026, improve=False))
-    improved = life_expectancy(cohort_qx("CA", sex, 18, 2026))
+    improved = life_expectancy(cohort_qx("CA", sex, 18, 2026, improve="cia"))
     assert 3 < improved - plain < 12
 
 
 @needs_mi
 def test_other_base_period():
     """The 2022-2024 table works as a base; it starts from 2023, so 2023 rates are unimproved."""
-    q = cohort_qx("CA", "M", 65, 2023, period=2022)
+    q = cohort_qx("CA", "M", 65, 2023, improve="cia", period=2022)
     assert q[0] == pytest.approx(base_qx("CA", "M", period=2022)[65])

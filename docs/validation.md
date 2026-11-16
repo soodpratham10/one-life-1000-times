@@ -18,7 +18,8 @@ file in this repository; the commands to reproduce them are at the end.
 - **Where it is off:** a simulated population with today's habits outlives
   the 2017–2019 life table by about 2 years from age 25 (mostly because
   simulated smokers quit), lung cancer survival comes out too high for women,
-  and projected lifetimes are about a year longer than recent experience.
+  and near-term projected lifetimes are up to a year longer than recent
+  experience.
   None of these is a coding error; each is a modelling choice, explained
   below.
 
@@ -107,10 +108,22 @@ figures are expected. Source: [Statistics Canada, *Raising cancer awareness
 through data* (2024)](https://www.statcan.gc.ca/o1/en/plus/6019-raising-cancer-awareness-through-data).
 
 **Projection against recent experience** (A09): the 2017–2019 base projected
-to 2023 with MI-2024 gives men e(65) = 20.1 and e(18) = 63.1, while the actual
-2022–2024 table gives 19.4 and 62.1 (women 22.8 vs 22.2 at 65, 67.3 vs 66.4 at
-18). Part of that gap is COVID-19 and part is ongoing (e.g. overdose deaths at
-young ages), so projected lifetimes may be about a year too long.
+to 2023 gives men e(65) = 20.0 and e(18) = 63.0 on the CPP basis (20.1 and
+63.1 with MI-2024), while the actual 2022–2024 table gives 19.4 and 62.1
+(women 22.6 vs 22.2 at 65, 67.1 vs 66.4 at 18). Part of that gap is COVID-19
+and part is ongoing (e.g. overdose deaths at young ages), so projected
+lifetimes may be up to a year too long in the near term.
+
+**Future improvement against the Chief Actuary's own projection** (A28, the
+default since this report; see the update at the end): with the CPP report's
+improvement rates and one scale on 2019–2025 fitted to its 2025 life
+expectancies, the engine reproduces the report's other life expectancies,
+which were not fitted:
+
+| Report table | Values | Largest difference | Average difference |
+| --- | --- | --- | --- |
+| Table 43, period life expectancy 2025, 2050, 2075, ages 0–100 | 84 | 0.20 years | −0.03 |
+| Table 44, cohort life expectancy from 2025, 2050, 2075, ages 20–100 | 72 | 0.41 years | −0.13 |
 
 ## 3. Does the model agree with the studies?
 
@@ -132,7 +145,7 @@ about a year at every quit age.
 
 | Issue | Size | Why | Plan |
 | --- | --- | --- | --- |
-| Projected lifetimes long | about +1 year against 2022–2024; MI-2024 adds about 8 years at 18 | Pre-COVID base and the CIA's projected improvement | Kept as the actuarial standard; shown plainly on the website; the 2022–2024 base can be switched on for comparison |
+| Projected lifetimes long in the near term | +0.4 to +0.9 years against 2022–2024 | Pre-COVID base; the CPP scale reproduces the Chief Actuary's projection, which assumes recovery | Shown plainly on the website; the 2022–2024 base can be switched on for comparison |
 | Population outlives the period table | +1.7 to +2.0 years from 25 | Simulated smokers quit (A27) | Expected for a cohort; the survey will ask whether a smoker plans to quit |
 | Lung cancer survival, women | 32–39% against 26% | Survival is an output of the cancer link, not an input: the post-diagnosis rate is solved to match deaths, and women's 2017–2019 lung cancer deaths are low relative to 2019 diagnoses | Later: fit the post-diagnosis rate to published survival by sex |
 | Stroke survivors' extra risk | limited to about 1.1–1.3x from 60 | Acute stroke deaths already use most of the recorded stroke deaths at older ages | Later: Ontario stroke fatality by age (Joundi et al. 2021 supplement) |
@@ -150,6 +163,17 @@ about a year at every quit age.
   confidence intervals are not carried through the model.
 - Survey answers are self-reported, as in the studies.
 - The CIA MI-2024 scale is used as published; it is not re-derived.
+
+## Update, 16 November 2026: default improvement scale (A28)
+
+After v0.4.0 the default improvement scale changed from CIA MI-2024 to the
+Chief Actuary's CPP rates, so that every number in the repository and on the
+website can be reproduced from public sources (the CIA scale cannot be
+redistributed). Sections 1–3 above are unaffected except where they quote
+improved lifetimes: sections 2 and 3 use 2017–2019 rates with no improvement,
+and the R and VBA rebuilds were run on that basis. On the CPP basis lifetimes
+are about 2 years shorter than with MI-2024 for an 18-year-old in 2026 (men
+68.7 vs 70.8). MI-2024 remains available with `improve="cia"`.
 
 ## Reproduce it
 

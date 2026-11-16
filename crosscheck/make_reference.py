@@ -22,6 +22,10 @@ Also writes:
     crosscheck/reference/cancer_reference.csv
         the cancer link calibration (A22) by sex and age: s_lung, s_other,
         r_lung, r_other, eta, and 5-year survival after a diagnosis
+    crosscheck/reference/cpp_reference.csv
+        the default improvement scale (CPP report, A28): the fitted 2019-2025 scales,
+        improvement factors by sex, age and year, and each person's death rates and
+        life expectancy with improvement. Public, so it is committed.
     crosscheck/reference/cia_reference.csv   (only if the CIA file is on this computer)
         improvement factors by sex, age and year, and each person's death rates and
         life expectancy with improvement. Derived from the CIA's scale, so it is
@@ -39,12 +43,13 @@ sys.path.insert(0, str(ROOT))
 
 from engine.data import has_improvement_scale  # noqa: E402
 from engine.links import calibration, five_year_survival  # noqa: E402
-from engine.mortality import MAX_AGE, MIN_AGE, improvement_factor, life_expectancy  # noqa: E402
+from engine.mortality import MAX_AGE, MIN_AGE, cpp_scale, improvement_factor, life_expectancy  # noqa: E402
 from engine.risk import Person, average_multiplier, personal_qx, relative_multiplier  # noqa: E402
 
 OUT = ROOT / "crosscheck" / "reference" / "risk_reference.csv"
 CANCER_OUT = ROOT / "crosscheck" / "reference" / "cancer_reference.csv"
 CIA_OUT = ROOT / "crosscheck" / "reference" / "cia_reference.csv"
+CPP_OUT = ROOT / "crosscheck" / "reference" / "cpp_reference.csv"
 START_YEAR = 2026
 IMPROVEMENT_YEARS = (2018, 2019, 2026, 2040, 2075, 2119, 2120, 2150)
 
@@ -102,6 +107,7 @@ def main() -> None:
         e = df[(df["case"] == name) & (df["measure"] == "life_expectancy")]["value"].iloc[0]
         print(f"  {name:<22} life expectancy {e:6.2f}")
     cancer_reference()
+    improved_reference("cpp", CPP_OUT)
     if has_improvement_scale():
         cia_reference()
     else:
@@ -124,21 +130,30 @@ def cancer_reference() -> None:
 
 
 def cia_reference() -> None:
+    improved_reference("cia", CIA_OUT)
+
+
+def improved_reference(basis: str, out: Path) -> None:
     rows = []
     for sex in ("M", "F"):
+        if basis == "cpp":
+            for name, k in zip(("scale_under_65", "scale_65_plus"), cpp_scale(sex)):
+                rows.append({"case": f"improvement_{sex}", "sex": sex, "measure": name,
+                             "at_age": None, "year": None, "value": k})
         for a in range(MIN_AGE, MAX_AGE + 1):
             for y in IMPROVEMENT_YEARS:
                 rows.append({"case": f"improvement_{sex}", "sex": sex, "measure": "improvement_factor",
-                             "at_age": a, "year": y, "value": improvement_factor(sex, a, y)})
+                             "at_age": a, "year": y, "value": improvement_factor(sex, a, y, basis=basis)})
     for name, p in CASES.items():
-        q = personal_qx(p, START_YEAR, improve=True)
+        q = personal_qx(p, START_YEAR, improve=basis)
         for k, a in enumerate(range(p.age, MAX_AGE + 1)):
             rows.append({"case": name, "sex": p.sex, "measure": "personal_q_improved", "at_age": a,
                          "year": START_YEAR + k, "value": q[k]})
         rows.append({"case": name, "sex": p.sex, "measure": "life_expectancy_improved", "at_age": p.age,
                      "year": START_YEAR, "value": life_expectancy(q)})
-    pd.DataFrame(rows).to_csv(CIA_OUT, index=False, float_format="%.15g")
-    print(f"Wrote {len(rows):,} improvement values to {CIA_OUT.relative_to(ROOT)} (not committed)")
+    pd.DataFrame(rows).to_csv(out, index=False, float_format="%.15g")
+    note = " (not committed)" if basis == "cia" else ""
+    print(f"Wrote {len(rows):,} {basis.upper()} improvement values to {out.relative_to(ROOT)}{note}")
 
 
 if __name__ == "__main__":
