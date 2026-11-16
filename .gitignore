@@ -30,8 +30,8 @@ __pycache__/
 .RData
 .Rproj.user/
 
-# ----- Excel lock files -----
-~$*.xlsx
+# ----- Office lock files (Excel, Word) -----
+~$*
 
 # ----- Website tooling -----
 node_modules/
