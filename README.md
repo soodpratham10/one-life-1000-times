@@ -1,12 +1,31 @@
-# One Life, 1,000 Times
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/figures/lives-dark.svg">
+    <img src="docs/figures/lives-light.svg" width="900" alt="One Life, 1,000 Times: 1,000 simulated lives of one 25-year-old man in Manitoba, each drawn as a line from today to the age it ends, coloured by cause of death and sorted by length so that together they form a survival curve.">
+  </picture>
+</p>
 
-[![tests](https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml/badge.svg)](https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml)
-[![release](https://img.shields.io/github/v/release/soodpratham10/one-life-1000-times)](https://github.com/soodpratham10/one-life-1000-times/releases)
-[![licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
+<h3 align="center"><i>Nobody can tell you how your life will go. Here are 1,000 ways it could.</i></h3>
 
-> Nobody can tell you how your life will go. Here are 1,000 ways it could.
+<p align="center">
+  <a href="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml"><img src="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
+  <a href="https://github.com/soodpratham10/one-life-1000-times/releases"><img src="https://img.shields.io/github/v/release/soodpratham10/one-life-1000-times" alt="release"></a>
+  <img src="https://img.shields.io/badge/python-3.13-3776ab" alt="Python 3.13">
+  <img src="https://img.shields.io/badge/data-Statistics%20Canada%20%C2%B7%20CIA%20%C2%B7%20OCA-c8102e" alt="data: Statistics Canada, CIA, OCA">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue" alt="licence: MIT"></a>
+</p>
 
-**Status: in development. Phases 1 (data) and 2 (engine) are complete, released as [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) and [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0); Phase 3 (links between events) is complete.** The engine lives a person's life forward year by year and does it 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk; the survey and visuals are not built yet. This README is updated as each step is finished.
+<p align="center">
+  <a href="#what-this-is">What this is</a> ·
+  <a href="#how-a-life-is-lived">How a life is lived</a> ·
+  <a href="#which-choices-move-the-odds">Choices</a> ·
+  <a href="#roadmap">Roadmap</a> ·
+  <a href="#data">Data and sources</a> ·
+  <a href="#run-it-locally">Run it</a>
+</p>
+
+> [!NOTE]
+> **In development.** The engine is built and tested: it lives a person's life forward year by year, 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk. The survey and website are not built yet. Releases: [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) (data), [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0) (engine), [v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0) (links between events).
 
 ## What this is
 
@@ -14,58 +33,77 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 
 **Aim (draft):** show someone the realistic range of how their life could unfold, using the data and methods actuaries use, and show which of their choices actually change the odds.
 
-### What this is not
+> [!IMPORTANT]
+> **What this is not**
+> - Not a prediction of when or how you will die. No model can do that for one person; this shows probabilities.
+> - Not medical, financial or insurance advice.
+> - Not an insurance price. There are no premiums or reserves in this project.
 
-- Not a prediction of when or how you will die. No model can do that for one person; this shows probabilities.
-- Not medical, financial or insurance advice.
-- Not an insurance price. There are no premiums or reserves in this project.
-
-## Planned events (version 1)
-
-| Event | Notes |
-| --- | --- |
-| Death, by cause | 11 cause groups plus "all other causes" (see A06) |
-| Disability | CPP-style severe and prolonged disability; disabled people die at several times the usual rate, and a spell can end in recovery |
-| Injured in a car crash | Police-reported injury of any severity; can happen more than once |
-| Cancer diagnosis | Lung or other site; cancer deaths come only after a diagnosis |
-| Heart attack or stroke | First one only; can be fatal within the year, and survivors carry more risk |
-| Marriage | Legal marriage; married people have lower death rates (divorced and never married higher) |
-| Divorce | Only after a marriage |
-| Remarriage | Only after a divorce |
-| First child | |
-| Retirement | Starting the CPP retirement pension, ages 60–70 |
-
-Widowhood, job loss and home purchase are planned for version 2.
-
-## Survey questions (version 1)
-
-Each answer moves your death rates by a hazard ratio from a large published study. All ratios, with their sources, are in [`data/assumptions/hazard_ratios.csv`](data/assumptions/hazard_ratios.csv).
-
-| Question | Study |
-| --- | --- |
-| Smoking: never, former (and the age you quit), current | Jha et al., *NEJM* 2013; Pirie et al., *Lancet* 2013 |
-| Minutes of moderate or vigorous activity a week | Arem et al., *JAMA Internal Medicine* 2015 |
-| Height and weight (BMI) | Global BMI Mortality Collaboration, *Lancet* 2016 |
-| Drinks a week | Zhao et al., *JAMA Network Open* 2023 |
-| Servings of fruit and vegetables a day | Wang et al., *Circulation* 2021 |
-
-Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. Smoking also changes what people die of (lung cancer and COPD far more than other causes), using cause-specific ratios from Thun et al., *NEJM* 2013. A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study (Manuel et al., *PLOS Medicine* 2016).
-
-## Method
+## How a life is lived
 
 The structure follows how life insurers underwrite: a base mortality table, personal risk multipliers, future mortality improvement, competing risks between events, and an actual-to-expected check against official data. Published data is used where insurers use proprietary underwriting manuals. Every assumption, its source and its weakness is listed in [`docs/assumptions.md`](docs/assumptions.md).
 
+```mermaid
+flowchart LR
+    A["Your answers<br/>smoking, activity, BMI,<br/>drinks, fruit and veg"] --> B["Your death rates<br/>by age and cause"]
+    C["StatCan life table<br/>+ CIA MI-2024 improvement"] --> B
+    B --> D(["One year of life"])
+    D --> E["Events this year<br/>crash, cancer, heart attack, stroke,<br/>disability, marriage, child, retirement"]
+    E --> F{"Death this year?<br/>uses everything<br/>that has happened"}
+    F -- "survives" --> D
+    F -- "dies" --> G["Age and cause of death"]
+    G --> H["Repeat 1,000 times"]
+```
+
+| Event | How it works in the model |
+| --- | --- |
+| 🕯️ Death, by cause | 11 cause groups plus "all other causes" (see A06) |
+| ♿ Disability | CPP-style severe and prolonged disability; disabled people die at several times the usual rate, and a spell can end in recovery |
+| 🚗 Injured in a car crash | Police-reported injury of any severity; can happen more than once |
+| 🎗️ Cancer diagnosis | Lung or other site; cancer deaths come only after a diagnosis |
+| ❤️ Heart attack or stroke | First one only; can be fatal within the year, and survivors carry more risk |
+| 💍 Marriage, divorce, remarriage | Legal marriage; married people have lower death rates (divorced and never married higher) |
+| 👶 First child | |
+| 🏖️ Retirement | Starting the CPP retirement pension, ages 60–70 |
+
+Widowhood, job loss and home purchase are planned for version 2.
+
+## Which choices move the odds
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/figures/choices-dark.svg">
+    <img src="docs/figures/choices-light.svg" width="900" alt="Age at death across 1,000 simulated lives for the same 25-year-old man with three sets of habits: current smoker with little exercise, the same man quitting smoking today, and a never-smoker with healthy habits. The median age at death rises with each.">
+  </picture>
+</p>
+
+Each survey answer moves your death rates by a hazard ratio from a large published study. All ratios, with their sources, are in [`data/assumptions/hazard_ratios.csv`](data/assumptions/hazard_ratios.csv).
+
+| Question | Study |
+| --- | --- |
+| 🚬 Smoking: never, former (and the age you quit), current | [Jha et al., *NEJM* 2013](https://doi.org/10.1056/NEJMsa1211128); [Pirie et al., *Lancet* 2013](https://doi.org/10.1016/S0140-6736(12)61720-6) |
+| 🏃 Minutes of moderate or vigorous activity a week | [Arem et al., *JAMA Internal Medicine* 2015](https://doi.org/10.1001/jamainternmed.2015.0533) |
+| ⚖️ Height and weight (BMI) | [Global BMI Mortality Collaboration, *Lancet* 2016](https://doi.org/10.1016/S0140-6736(16)30175-1) |
+| 🍺 Drinks a week | [Zhao et al., *JAMA Network Open* 2023](https://doi.org/10.1001/jamanetworkopen.2023.6185) |
+| 🥦 Servings of fruit and vegetables a day | [Wang et al., *Circulation* 2021](https://doi.org/10.1161/CIRCULATIONAHA.120.048996) |
+
+Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. Smoking also changes what people die of (lung cancer and COPD far more than other causes), using cause-specific ratios from [Thun et al., *NEJM* 2013](https://doi.org/10.1056/NEJMsa1211127). A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study ([Manuel et al., *PLOS Medicine* 2016](https://doi.org/10.1371/journal.pmed.1002082)).
+
+Both figures are drawn from the engine's own simulated lives by [`docs/figures/make_figures.py`](docs/figures/make_figures.py); no number on them is typed in.
+
 ## Roadmap
+
+**▰▰▰▰▱▱▱ 4 of 7 phases done**
 
 | Phase | What it covers | Status |
 | --- | --- | --- |
-| 0. Setup | Environment, repository, licence | Done |
-| 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | Done (v0.1.0) |
-| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | Done (v0.2.0) |
-| 3. Links between events | Cancer deaths after a diagnosis, deaths after a heart attack or stroke, marriage effects, disability recovery vs death | Done |
-| 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | Next |
-| 5. Website | Survey and interactive visuals | Planned |
-| 6. Launch | Write-up and release | Planned |
+| 0. Setup | Environment, repository, licence | ✅ Done |
+| 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | ✅ Done ([v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0)) |
+| 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | ✅ Done ([v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0)) |
+| 3. Links between events | Cancer deaths after a diagnosis, deaths after a heart attack or stroke, marriage effects, disability recovery vs death | ✅ Done ([v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0)) |
+| 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | 🔜 Next |
+| 5. Website | Survey and interactive visuals | ⬜ Planned |
+| 6. Launch | Write-up and release | ⬜ Planned |
 
 ## Data
 
@@ -167,6 +205,12 @@ conda activate onelife
 pytest                          # checks the cleaned data already in data/clean/
 ```
 
+To redraw the README figures (with the CIA file in place, so the lives include future improvement):
+
+```bash
+python docs/figures/make_figures.py
+```
+
 To see the engine work (one life story, then a summary of 1,000 lives for an example person; change the answers in `engine/demo.py`):
 
 ```bash
@@ -191,6 +235,7 @@ data/assumptions/    small tables typed in from published studies (hazard ratios
 pipeline/            numbered scripts 01–16 that build data/clean, run in order by run_all.py
   download_statcan.py   helper: download and summarise any Statistics Canada table
   inspect_excel.py      helper: show what is inside an Excel workbook
+docs/figures/        README figures and the script that draws them from simulated lives
 tests/               pytest suite: one file per data source, plus the data dictionary check
 docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
 engine/              simulation engine: mortality.py (base rates and improvement), risk.py (survey
@@ -204,6 +249,9 @@ web/                 survey and visuals (Phase 5, not built yet)
 
 ## Known limits
 
+<details>
+<summary>The main limits so far (each assumption's weaknesses are in <code>docs/assumptions.md</code>)</summary>
+
 Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumptions.md). The main ones so far:
 
 - Adults 18+ only; people with an existing serious diagnosis are out of scope.
@@ -215,11 +263,13 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 - Marriage means legal marriage; common-law unions are not covered by the marriage and divorce tables.
 - Territories are not modelled.
 
+</details>
+
 ## Licence
 
 - **Code:** MIT (see [`LICENSE`](LICENSE)).
 - **Data:** contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) (Statistics Canada, Transport Canada, Public Health Agency of Canada). The CPP disability and retirement tables are taken from the Office of the Chief Actuary's 32nd Actuarial Report on the Canada Pension Plan (Office of the Superintendent of Financial Institutions), reproduced for non-commercial use with attribution. The CIA MI-2024 scale is not included and remains the Canadian Institute of Actuaries' copyright.
 
-## Author
+---
 
-Pratham Sood, Actuarial Mathematics & Statistics, University of Manitoba.
+<p align="center"><b>Pratham Sood</b> · Actuarial Mathematics &amp; Statistics, University of Manitoba</p>
