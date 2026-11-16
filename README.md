@@ -25,7 +25,7 @@
 </p>
 
 > [!NOTE]
-> **In development.** The engine is built and tested: it lives a person's life forward year by year, 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk. The survey and website are not built yet. Releases: [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) (data), [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0) (engine), [v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0) (links between events).
+> **In development.** The engine is built and tested: it lives a person's life forward year by year, 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk. The survey and website are not built yet. Releases: [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) (data), [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0) (engine), [v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0) (links between events), [v0.4.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.4.0) (validation: see the [validation report](docs/validation.md)).
 
 ## What this is
 
@@ -90,7 +90,7 @@ Both figures are drawn from the engine's own simulated lives by [`docs/figures/m
 
 ## Roadmap
 
-![progress: 4 of 7 phases done](https://img.shields.io/badge/progress-4%20of%207%20phases%20done-2ea44f)
+![progress: 5 of 7 phases done](https://img.shields.io/badge/progress-5%20of%207%20phases%20done-2ea44f)
 
 | Phase | What it covers | Status |
 | --- | --- | --- |
@@ -98,8 +98,8 @@ Both figures are drawn from the engine's own simulated lives by [`docs/figures/m
 | 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | ✅ Done ([v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0)) |
 | 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | ✅ Done ([v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0)) |
 | 3. Links between events | Cancer deaths after a diagnosis, deaths after a heart attack or stroke, marriage effects, disability recovery vs death | ✅ Done ([v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0)) |
-| 4. Validation | Actual-to-expected checks against official figures; independent R and Excel VBA cross-checks | 🔨 In progress |
-| 5. Website | Survey and interactive visuals | ⬜ Planned |
+| 4. Validation | Actual-to-expected checks against official figures; independent R and Excel VBA cross-checks ([report](docs/validation.md)) | ✅ Done ([v0.4.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.4.0)) |
+| 5. Website | Survey and interactive visuals | 🔜 Next |
 | 6. Launch | Write-up and release | ⬜ Planned |
 
 ## Data
@@ -260,8 +260,8 @@ pipeline/            numbered scripts 01–16 that build data/clean, run in orde
   inspect_excel.py      helper: show what is inside an Excel workbook
 tests/               pytest suite: one file per data source and per engine module, plus the data dictionary
                      and cross-check reference checks
-docs/                assumptions.md (every assumption, its weakness and the validation results),
-                     data_dictionary.md
+docs/                assumptions.md (every assumption, its weakness and the check results),
+                     validation.md (the Phase 4 report), data_dictionary.md
 docs/figures/        README figures and the script that draws them (from simulated lives)
 engine/              simulation engine: mortality.py (base rates and improvement), risk.py (survey
                      answers), causes.py (cause of death), events.py (life events), links.py
