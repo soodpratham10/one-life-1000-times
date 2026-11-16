@@ -1,4 +1,4 @@
-# Tests for the R rebuild (crosscheck/r/risk.R).
+# Tests for the R rebuild (crosscheck/r/risk.R, improvement.R, cancer_link.R).
 #
 # Run from the project folder:
 #     Rscript -e 'testthat::test_file("crosscheck/r/tests/test_risk.R")'
@@ -13,6 +13,8 @@ local({
     d <- dirname(d)
   }
   source(file.path(d, "crosscheck", "r", "risk.R"))
+  source(file.path(d, "crosscheck", "r", "improvement.R"))
+  source(file.path(d, "crosscheck", "r", "cancer_link.R"))
 })
 
 test_that("taper is 1 to 79, then falls in a straight line to 0 at 110", {
@@ -102,4 +104,40 @@ test_that("R agrees with the Python engine on every reference value", {
     expect_equal(life_expectancy(q), rows$value[rows$measure == "life_expectancy"],
                  tolerance = 1e-10, info = name)
   }
+})
+
+test_that("cancer link: the R cohort with the solved rates reproduces official deaths (A22)", {
+  ref <- read.csv(file.path(ROOT, "crosscheck", "reference", "cancer_reference.csv"), stringsAsFactors = FALSE)
+  for (sex in c("M", "F")) {
+    cohort <- check_cancer_cohort(sex, ref[ref$sex == sex, ])
+    expect_equal(nrow(cohort), 92)                              # ages 18-109
+    expect_equal(cohort$model_other_causes, cohort$official_other_causes, tolerance = 1e-9)
+    expect_equal(cohort$model_lung, cohort$official_lung, tolerance = 1e-9)
+    expect_equal(cohort$model_other_cancer, cohort$official_other_cancer, tolerance = 1e-9)
+    expect_true(all(cohort$s_lung <= S_MAX + 1e-12 & cohort$s_other <= S_MAX + 1e-12))
+  }
+})
+
+test_that("cancer link: shares and the cohort step by hand", {
+  sh <- cancer_shares("M", 62)
+  expect_true(sh[["lung"]] > 0 && sh[["other"]] > sh[["lung"]] && sum(sh) < 1)
+  expect_equal(age_shift(c(1, 2, 3, 4, 5, 6), 9), c(9, 1, 2, 3, 4, 11))
+  out <- compete(2, c(0.1, 0.3, 0))
+  expect_equal(sum(out$deaths), 2 * (1 - exp(-0.4)))
+  expect_equal(out$deaths[2] / out$deaths[1], 3)
+  expect_equal(five_year_survival(rep(0.1, 20), 20), exp(-0.5))
+})
+
+test_that("improvement by hand from the CIA file (skipped without it)", {
+  skip_if_not(has_cia(), "CIA MI-2024 file not on this computer")
+  mi <- read.csv(MI_PATH)
+  rate <- function(sex, age, year) mi$mi[mi$sex == sex & mi$age == age & mi$year == year]
+  expect_equal(improvement_factor("M", 60, 2018), 1)
+  expect_equal(improvement_factor("M", 60, 2019), 1 - rate("M", 60, 2019))
+  expect_equal(improvement_factor("F", 75, 2021),
+               (1 - rate("F", 75, 2019)) * (1 - rate("F", 75, 2020)) * (1 - rate("F", 75, 2021)))
+  expect_equal(improvement_factor("F", 18, 2030), improvement_factor("F", 20, 2030))   # under 20: age 20 rate
+  expect_equal(improvement_factor("M", 110, 2060), 1)
+  expect_equal(improvement_factor("M", 80, 2150),
+               improvement_factor("M", 80, 2119) * (1 - rate("M", 80, 2119))^31)
 })

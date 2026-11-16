@@ -1,5 +1,5 @@
 # ----- Course files: reference only, never published -----
-reference/
+/reference/
 
 # ----- Raw source files -----
 # Never committed: StatCan files are re-downloaded by the pipeline scripts, and
@@ -10,6 +10,8 @@ data/raw/*
 
 # ----- Cleaned data derived from CIA publications (rebuilt locally) -----
 data/clean/cia_*
+crosscheck/reference/cia_*
+crosscheck/results/cia_*
 
 # ----- Built outputs (re-created by the pipeline) -----
 data/clean/*.db
