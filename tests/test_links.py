@@ -9,7 +9,7 @@ Run from the project folder:
 import numpy as np
 import pytest
 
-from engine.causes import CAUSES, base_shares
+from engine.causes import base_shares
 from engine.events import cancer_probabilities
 from engine.links import LUNG, OTHER, S_MAX, W, calibration, five_year_survival, shift
 from engine.mortality import base_qx

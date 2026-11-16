@@ -36,7 +36,7 @@ from engine.events import (
     first_child_probability,
     retire_probability,
 )
-from engine.links import MARITAL_STATES, N_CANCER, death_tables, person_incidence, shift
+from engine.links import MARITAL_STATES, N_CANCER, death_tables, person_incidence
 from engine.mortality import MAX_AGE
 from engine.risk import Person, personal_qx
 

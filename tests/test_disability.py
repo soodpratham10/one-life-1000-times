@@ -6,7 +6,6 @@ Run from the project folder:
 """
 
 import numpy as np
-import pandas as pd
 import pytest
 
 from engine.data import load

@@ -1,6 +1,6 @@
 # Data dictionary
 
-Every cleaned file in `data/clean/`, and every hand-entered assumption table in `data/assumptions/`: what one row is, what each column means, where it comes from, which script builds it and which tests check it. `tests/test_data_dictionary.py` fails if a file or column here does not match the real files.
+Every cleaned file in `data/clean/`, every hand-entered assumption table in `data/assumptions/`, and the committed outputs of the Phase 4 checks (at the end): what one row is, what each column means, where it comes from, which script builds it and which tests check it. `tests/test_data_dictionary.py` fails if a file or column here does not match the real files.
 
 Codes used throughout: **sex** `M` men, `F` women, `B` both · **region** `CA` Canada, `NL` `PE` `NS` `NB` `QC` `ON` `MB` `SK` `AB` `BC` provinces (`YT` `NT` `NU` territories, where present) · **age_lo / age_hi** first and last age of a group (`110` = open top group) · probabilities are per year unless stated.
 
@@ -312,6 +312,85 @@ Death rates of CPP disability beneficiaries by sex and single age 20–64, and t
 | `source` | Study and table |
 
 ---
+
+## Validation outputs (Phase 4)
+
+Written by the checks, not used by the engine. Rebuild them with the commands in the README.
+
+### `validation/results/population_check.csv`
+The population check: a population of simulated Canadians against the 2017–2019 life table. One row per sex x starting age x measure. Built by `python -m validation.population`.
+
+| Column | Meaning |
+| --- | --- |
+| `sex` | M or F |
+| `start_age` | Age the population starts at: 25, 45 or 65 |
+| `measure` | `life_expectancy`; `deaths_<from>_<to>` (share of the starting population dying in that 10-year band); `cause_<group>` (share of deaths from that cause group); `ever_<event>` (chance of a first cancer, heart attack or stroke) |
+| `unit` | Years, share of cohort, share of deaths, or chance |
+| `model` | The engine's exact value, weighted over the Canadian habit and marital mix |
+| `official` | StatCan 2017–2019 (blank where there is no benchmark yet) |
+| `model_over_official` | Actual-to-expected ratio |
+| `combinations` | Number of habit combinations weighted together |
+
+### `crosscheck/reference/risk_reference.csv`
+The engine's answers for 12 reference people and the population, for the R and Excel VBA rebuilds to reproduce. Built by `python crosscheck/make_reference.py`; `tests/test_crosscheck_reference.py` fails if it is out of date.
+
+| Column | Meaning |
+| --- | --- |
+| `case` | Reference person's name (e.g. `smoker_may_quit_M25`), or `population_M` / `population_F` |
+| `sex` | M or F |
+| `age` | The person's age when they answer |
+| `region` | Province or CA |
+| `smoking` | never, former or current |
+| `quit_age` | Age a former smoker quit (blank otherwise) |
+| `keeps_smoking` | True if a current smoker never quits (A27) |
+| `activity_minutes` | Moderate or vigorous activity, minutes a week |
+| `height_cm` | Height |
+| `weight_kg` | Weight |
+| `drinks_per_week` | Standard drinks a week |
+| `fruit_veg_per_day` | Servings of fruit and vegetables a day |
+| `measure` | `average_multiplier`, `relative_multiplier`, `personal_q` or `life_expectancy` (2017–2019 rates, no improvement) |
+| `at_age` | Age the value applies to |
+| `value` | The engine's value |
+
+### `crosscheck/reference/cancer_reference.csv`
+The engine's solved cancer link (A22) by sex and age, for the R check. Built by `python crosscheck/make_reference.py`.
+
+| Column | Meaning |
+| --- | --- |
+| `sex` | M or F |
+| `measure` | `s_lung`, `s_other` (excess force after a diagnosis), `r_lung`, `r_other` (force on undiagnosed people), `eta` (scale on other causes), `five_year_survival_lung`, `five_year_survival_other` |
+| `at_age` | Age |
+| `value` | The engine's value |
+
+### `crosscheck/results/r_vs_python.csv`
+The R rebuild against the engine, one row per reference value. Built by `Rscript crosscheck/r/run_crosscheck.R`.
+
+| Column | Meaning |
+| --- | --- |
+| `case` | As in `risk_reference.csv` |
+| `measure` | As in `risk_reference.csv` |
+| `at_age` | Age |
+| `value` | The engine's value |
+| `r_value` | R's value |
+| `difference` | R minus the engine |
+
+### `crosscheck/results/r_cancer_cohort.csv`
+The synthetic cohort run in R with the engine's solved cancer rates, against the official deaths, ages 18–109. Built by `Rscript crosscheck/r/run_crosscheck.R`.
+
+| Column | Meaning |
+| --- | --- |
+| `sex` | M or F |
+| `age` | Age |
+| `model_other_causes` | Cohort deaths from causes other than cancer that year (share of the starting cohort) |
+| `official_other_causes` | The same from the 2017–2019 life table and cause mix |
+| `model_lung` | Cohort lung cancer deaths |
+| `official_lung` | Official lung cancer deaths |
+| `model_other_cancer` | Cohort other-cancer deaths |
+| `official_other_cancer` | Official other-cancer deaths |
+| `s_lung` | Excess lung cancer force after a diagnosis |
+| `s_other` | Excess other-cancer force after a diagnosis |
+| `r_lung` | Lung cancer force on undiagnosed people |
+| `r_other` | Other-cancer force on undiagnosed people |
 
 ### Not in the public repo
 

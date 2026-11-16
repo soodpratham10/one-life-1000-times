@@ -7,6 +7,7 @@ Run from the project folder:
 Writes a light and a dark version of each figure into docs/figures/:
     lives-light.svg, lives-dark.svg       1,000 lives of one person, stacked
     choices-light.svg, choices-dark.svg   the same person with three sets of habits
+    how-light.svg, how-dark.svg           how one life is lived (a diagram, no data)
 
 The SVG is written by hand (no plotting library needed). Every number on the
 figures comes from engine.simulate; nothing is typed in. Run it with the CIA
@@ -173,6 +174,50 @@ def choices_figure(results, improve, t):
     return svg(W, H, t["bg"], body, "Age at death for one person with three sets of habits")
 
 
+HOW_CARDS = [
+    ("1", "Your answers", ["smoking, activity,", "height and weight,", "drinks, fruit and veg"]),
+    ("2", "Your death rates", ["StatCan life table", "\u00d7 your habits, improved", "with CIA MI-2024"]),
+    ("3", "Live one year", ["crash, cancer, heart attack,", "stroke, disability, marriage,", "child, retirement"]),
+    ("4", "Death this year?", ["the chance depends on", "everything that has", "happened so far"]),
+    ("5", "1,000 lives", ["repeat from today,", "1,000 times: the range", "of ages and causes"]),
+]
+HOW_COLOURS = {
+    "light": dict(card="#f6f8fa", edge="#d1d9e0", accent="#2a78d6"),
+    "dark": dict(card="#161b22", edge="#30363d", accent="#3987e5"),
+}
+
+
+def how_figure(t, c):
+    """The five-step diagram of one life (no data)."""
+    W, H = 960, 250
+    CW, CH, GAP, TOP = 160, 128, 30, 66
+    left = (W - (5 * CW + 4 * GAP)) / 2
+    xs = [left + i * (CW + GAP) for i in range(5)]
+    body = [f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" '
+            f'orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="{t["ink2"]}"/></marker></defs>',
+            text(left, 40, "How one life is lived", 22, t["ink"], 700)]
+    for i, (num, head, lines) in enumerate(HOW_CARDS):
+        x = xs[i]
+        loop = i in (2, 3)
+        body.append(f'<rect x="{x:.1f}" y="{TOP}" width="{CW}" height="{CH}" rx="10" fill="{c["card"]}" '
+                    f'stroke="{c["accent"] if loop else c["edge"]}" stroke-width="{2 if loop else 1}"/>')
+        body.append(f'<circle cx="{x + 22:.1f}" cy="{TOP + 24}" r="11" fill="{c["accent"]}"/>')
+        body.append(text(x + 22, TOP + 28.5, num, 12, "#ffffff", 700, "middle"))
+        body.append(text(x + 40, TOP + 29, head, 14.5, t["ink"], 700))
+        for k, line in enumerate(lines):
+            body.append(text(x + CW / 2, TOP + 62 + 19 * k, line, 12, t["ink2"], anchor="middle"))
+        if i < 4:
+            body.append(f'<line x1="{x + CW + 3:.1f}" y1="{TOP + CH / 2}" x2="{x + CW + GAP - 3:.1f}" '
+                        f'y2="{TOP + CH / 2}" stroke="{t["ink2"]}" stroke-width="1.5" marker-end="url(#a)"/>')
+    x3, x4, y = xs[2] + CW / 2, xs[3] + CW / 2, TOP + CH
+    body.append(f'<path d="M{x4:.1f} {y + 2}V{y + 26}H{x3:.1f}V{y + 6}" fill="none" stroke="{c["accent"]}" '
+                f'stroke-width="2" marker-end="url(#a)"/>')
+    body.append(text((x3 + x4) / 2, y + 44, "survives: next year", 12.5, c["accent"], 600, "middle"))
+    body.append(text(xs[3] + CW + GAP / 2, TOP + CH / 2 - 10, "dies", 11.5, t["ink2"], 600, "middle"))
+    return svg(W, H, t["bg"], body, "How one life is lived: answers, death rates, then each year events "
+               "and a death check, repeated 1,000 times")
+
+
 def main() -> None:
     improve = has_improvement_scale()
     if not improve:
@@ -181,11 +226,12 @@ def main() -> None:
     for theme, t in THEMES.items():
         (OUT / f"lives-{theme}.svg").write_text(lives_figure(results[0][1], improve, t))
         (OUT / f"choices-{theme}.svg").write_text(choices_figure(results, improve, t))
+        (OUT / f"how-{theme}.svg").write_text(how_figure(t, HOW_COLOURS[theme]))
     for name, lives in results:
         ages = np.array([lf.death_age for lf in lives])
         print(f"{name}: median {np.median(ages):.1f}, 10th {np.percentile(ages, 10):.1f}, "
               f"90th {np.percentile(ages, 90):.1f}")
-    print(f"Wrote 4 figures to {OUT}")
+    print(f"Wrote 6 figures to {OUT}")
 
 
 if __name__ == "__main__":

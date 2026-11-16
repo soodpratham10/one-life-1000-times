@@ -246,7 +246,7 @@ def test_best_vs_worst_habits_gap_close_to_mport(sex):
 def test_smokers_lose_about_a_decade(sex):
     """
     Jha et al. 2013: current smokers lose more than 10 years against never smokers
-    (US rates; people who kept smoking, so keeps_smoking=True here). Engine: about 9 years at 25 (men 9.2, women 8.8); the smaller loss
+    (US rates; people who kept smoking, so keeps_smoking=True here). Engine: about 9 years at 25 (men 9.5, women 9.2); the smaller loss
     comes mostly from tapering the ratio after age 79.
     """
     gap = e_unimproved(Person(sex, 25, **TYPICAL)) - e_unimproved(Person(sex, 25, smoking="current", keeps_smoking=True, **TYPICAL))
@@ -255,7 +255,7 @@ def test_smokers_lose_about_a_decade(sex):
 
 @pytest.mark.parametrize("sex", ["M", "F"])
 def test_quitting_earlier_gains_more(sex):
-    """Jha et al. 2013: quitting at 25-34, 35-44, 45-54 gains about 10, 9 and 6 years. Engine: 8.6, 7.2, 4.5."""
+    """Jha et al. 2013: quitting at 25-34, 35-44, 45-54 gains about 10, 9 and 6 years. Engine (men): 8.9, 7.2, 4.5."""
     gains = []
     for age in (30, 40, 50, 60):
         quit = Person(sex, age, smoking="former", quit_age=age, **TYPICAL)

@@ -52,7 +52,7 @@ The structure follows how life insurers underwrite: a base mortality table, pers
 
 | Event | How it works in the model |
 | --- | --- |
-| 🕯️ Death, by cause | 11 cause groups plus "all other causes" (see A06) |
+| 🕯️ Death, by cause | 11 cause groups, the last being "all other causes" (A06, A20) |
 | ♿ Disability | CPP-style severe and prolonged disability; disabled people die at several times the usual rate, and a spell can end in recovery |
 | 🚗 Injured in a car crash | Police-reported injury of any severity; can happen more than once |
 | 🎗️ Cancer diagnosis | Lung or other site; cancer deaths come only after a diagnosis |
@@ -68,7 +68,7 @@ Widowhood, job loss and home purchase are planned for version 2.
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/figures/choices-dark.svg">
-    <img src="docs/figures/choices-light.svg" width="900" alt="Age at death across 1,000 simulated lives for the same 25-year-old man with three sets of habits: current smoker with little exercise, the same man quitting smoking today, and a never-smoker with healthy habits. The median age at death rises with each.">
+    <img src="docs/figures/choices-light.svg" width="900" alt="Age at death across 1,000 simulated lives for the same 25-year-old man with three sets of habits: a man who keeps smoking and exercises little, the same man quitting smoking today, and a never-smoker with healthy habits. The median age at death rises with each.">
   </picture>
 </p>
 
@@ -116,7 +116,7 @@ All inputs come from official public sources, and every source below links strai
 | --- | --- |
 | Statistics Canada, life tables: [13-10-0114-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401); PEI abridged table [13-10-0140-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310014001) | Base death rates by age, sex and province |
 | Canadian Institute of Actuaries, [Mortality Improvements Research – Tables (MI-2024)](https://www.cia-ica.ca/?p=333613) and [report](https://www.cia-ica.ca/publications/224043e/) | Future mortality improvement (not committed; see below) |
-| Statistics Canada, deaths by cause: [13-10-0392-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310039201) | Splitting deaths into 12 cause groups |
+| Statistics Canada, deaths by cause: [13-10-0392-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310039201) | Splitting deaths by cause (12 groups in the table; 11 used, as 2017–2019 has no COVID-19 deaths) |
 | Transport Canada, [National Collision Database (open data)](https://open.canada.ca/data/en/dataset/1eb9eba7-71d1-4b30-9fb1-30cbdab7e63a) | Car crash injuries |
 | Statistics Canada, new cancer cases: [13-10-0111-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011101) | Cancer diagnoses |
 | Public Health Agency of Canada, [Canadian Chronic Disease Surveillance System data tool](https://health-infobase.canada.ca/ccdss/data-tool/) | Heart attacks and strokes |
@@ -132,7 +132,7 @@ All inputs come from official public sources, and every source below links strai
 </details>
 
 <details>
-<summary><h3>📚 Studies behind the hazard ratios and checks (17) <sub><i>· click to open</i></sub></h3></summary>
+<summary><h3>📚 Studies behind the hazard ratios and checks (20) <sub><i>· click to open</i></sub></h3></summary>
 
 Every hazard ratio and published figure the engine uses, with a link to the paper. The exact numbers taken from each are in [`data/assumptions/`](data/assumptions/) and [`docs/assumptions.md`](docs/assumptions.md).
 
@@ -155,6 +155,9 @@ Every hazard ratio and published figure the engine uses, with a link to the pape
 | Shor et al. (2012), [Meta-analysis of marital dissolution and mortality](https://pubmed.ncbi.nlm.nih.gov/22534377/), *Social Science & Medicine* | Divorced and separated |
 | Shor et al. (2012), [Widowhood and mortality: a meta-analysis and meta-regression](https://academiccommons.columbia.edu/doi/10.7916/D8DR2VR9), *Demography* | Widowed |
 | Statistics Canada, [Health Fact Sheet: Smoking, 2019](https://www150.statcan.gc.ca/n1/pub/82-625-x/2020001/article/00003-eng.htm) | Check on the smoking figures |
+| Health Canada, [Canadian Tobacco and Nicotine Survey 2022, summary](https://www.canada.ca/en/health-canada/services/canadian-tobacco-nicotine-survey/2022-summary) | How many smokers quit for good each year (A27) |
+| Pelekanakis et al. (2021), [Initiation or cessation: what keeps the prevalence of smoking higher in Quebec than in the rest of Canada?](https://www.canada.ca/content/dam/phac-aspc/documents/services/reports-publications/health-promotion-chronic-disease-prevention-canada-research-policy-practice/vol-41-no-10-2021/hpcdp-41-10-05-eng.pdf), *Health Promotion and Chronic Disease Prevention in Canada* | Check on the quit rate: about 8% of smokers 25+ quit each year before relapse (A27) |
+| University of Waterloo, [Tobacco Use in Canada: quitter percentage by age](https://uwaterloo.ca/tobacco-use-canada/quitting-smoking/quitting-behaviours-and-outcomes/quitter-percentage/quitter-percentage-age) | Check on the quit rate: share of ever smokers who have quit, by age (A27) |
 
 </details>
 
@@ -233,19 +236,33 @@ python pipeline/run_all.py           # rebuild
 pytest
 ```
 
+To rerun the Phase 4 checks (the population check takes a few minutes; the R checks need [R](https://www.r-project.org/) and the `testthat` package):
+
+```bash
+python -m validation.population                       # simulated population vs StatCan
+python crosscheck/make_reference.py                   # the engine's answers for the rebuilds
+Rscript crosscheck/r/run_crosscheck.R                 # R rebuild vs the engine
+Rscript -e 'testthat::test_file("crosscheck/r/tests/test_risk.R")'
+```
+
+The Excel VBA check: open `crosscheck/excel/one_life_crosscheck.xlsm`, enable macros, and run `CheckAllCases` (Developer → Macros).
+
 ## Repository layout
 
 ```
 .github/workflows/   automatic test run on every push
 data/raw/            source files as published (not committed; rebuilt by the pipeline)
 data/clean/          cleaned tables used by the model (see docs/data_dictionary.md)
-data/assumptions/    small tables typed in from published studies (hazard ratios, former smokers, disabled mortality)
+data/assumptions/    small tables typed in from published studies (hazard ratios, smoking ratios by cause,
+                     former smokers, disabled mortality)
 pipeline/            numbered scripts 01–16 that build data/clean, run in order by run_all.py
   download_statcan.py   helper: download and summarise any Statistics Canada table
   inspect_excel.py      helper: show what is inside an Excel workbook
-docs/figures/        README figures and the script that draws them from simulated lives
-tests/               pytest suite: one file per data source, plus the data dictionary check
-docs/                assumptions.md (every assumption and its weakness), data_dictionary.md
+tests/               pytest suite: one file per data source and per engine module, plus the data dictionary
+                     and cross-check reference checks
+docs/                assumptions.md (every assumption, its weakness and the validation results),
+                     data_dictionary.md
+docs/figures/        README figures and the script that draws them (from simulated lives)
 engine/              simulation engine: mortality.py (base rates and improvement), risk.py (survey
                      answers), causes.py (cause of death), events.py (life events), links.py
                      (deaths after cancer, heart attack and stroke), marriage.py and disability.py
@@ -273,6 +290,10 @@ Each assumption's weaknesses are listed in [`docs/assumptions.md`](docs/assumpti
 - Retirement means starting the CPP retirement pension, which is not always the same as stopping work.
 - Marriage means legal marriage; common-law unions are not covered by the marriage and divorce tables.
 - Territories are not modelled.
+- Lifetimes are long, mostly because of the CIA MI-2024 improvement scale, which projects strong future gains.
+- A simulated population with today's habits outlives the 2017–2019 life table by about 2 years from age 25, mainly because simulated smokers quit as Canadian smokers do while the table reflects older generations who smoked more (see the population check in `docs/assumptions.md`).
+- Survival after a lung cancer diagnosis comes out higher than published for women (about 35–45% at 5 years against 26%).
+- Habits are modelled independently of each other, and activity, weight and smoking follow typical Canadian paths rather than your own plans (A26, A27).
 
 </details>
 

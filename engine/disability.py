@@ -23,7 +23,6 @@ from functools import lru_cache
 import numpy as np
 import pandas as pd
 
-from engine.data import load
 from engine.events import (
     DISABILITY_MAX_AGE,
     disability_end_probability,
