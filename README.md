@@ -43,17 +43,12 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 
 The structure follows how life insurers underwrite: a base mortality table, personal risk multipliers, future mortality improvement, competing risks between events, and an actual-to-expected check against official data. Published data is used where insurers use proprietary underwriting manuals. Every assumption, its source and its weakness is listed in [`docs/assumptions.md`](docs/assumptions.md).
 
-```mermaid
-flowchart TD
-    A["Your answers<br/>smoking, activity, BMI, drinks, fruit and veg"] --> B["Your death rates by age and cause"]
-    C["StatCan life table + CIA MI-2024 improvement"] --> B
-    B --> D(["One year of life"])
-    D --> E["Events this year<br/>crash · cancer · heart attack · stroke<br/>disability · marriage · child · retirement"]
-    E --> F{"Death this year?<br/>uses everything that has happened"}
-    F -- "survives: next year" --> D
-    F -- "dies" --> G["Age and cause of death"]
-    G --> H["Repeat 1,000 times"]
-```
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/figures/how-dark.svg">
+    <img src="docs/figures/how-light.svg" width="900" alt="How one life is lived: 1, your survey answers; 2, your death rates (StatCan life table times your habits, improved with CIA MI-2024); 3, live one year (crash, cancer, heart attack, stroke, disability, marriage, child, retirement); 4, the chance of death this year depends on everything that has happened so far, and if you survive, go back to step 3 for the next year; 5, repeat 1,000 times for the range of ages and causes.">
+  </picture>
+</p>
 
 | Event | How it works in the model |
 | --- | --- |
