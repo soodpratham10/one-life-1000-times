@@ -250,6 +250,12 @@ Rscript -e 'testthat::test_file("crosscheck/r/tests/test_risk.R")'
 
 The Excel VBA check: open `crosscheck/excel/one_life_crosscheck.xlsm`, enable macros, and run `CheckAllCases` (Developer → Macros).
 
+The browser engine's tests need [Node.js](https://nodejs.org/) 20 or later (no packages to install):
+
+```bash
+node --test web/tests/engine.test.mjs
+```
+
 ## Repository layout
 
 ```
@@ -276,7 +282,8 @@ crosscheck/          independent rebuilds that must match the engine (Phase 4): 
                      the engine's answers to reference/; r/ and vba/ rebuild them in R and Excel VBA;
                      excel/ holds the workbook (data sheets and a one-year hand check)
 web/                 the website (Phase 5, in progress): build_data.py exports what the browser
-                     engine needs to data/engine-data.json
+                     needs to data/engine-data.json; engine/engine.js is the engine in JavaScript
+                     (no libraries), checked by tests/engine.test.mjs against crosscheck/reference/
 ```
 
 ## Known limits

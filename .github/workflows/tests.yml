@@ -1,4 +1,5 @@
-# Runs the full test suite on GitHub for every push and pull request.
+# Runs the full test suite on GitHub for every push and pull request: the Python
+# engine and data (pytest), then the browser engine (Node's test runner).
 # The CIA MI-2024 tests skip here (that file is never committed); everything else runs
 # against the cleaned data in data/clean/.
 name: tests
@@ -19,3 +20,5 @@ jobs:
         run: pip install "numpy>=2.0" "pandas>=2.2" "openpyxl>=3.1" "pytest>=8.0" "pypdf>=6.0"
       - name: Run tests
         run: pytest -v
+      - name: Run the browser engine's tests (Node, already on the runner)
+        run: node --test web/tests/engine.test.mjs

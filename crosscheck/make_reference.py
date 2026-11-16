@@ -26,6 +26,12 @@ Also writes:
         the default improvement scale (CPP report, A28): the fitted 2019-2025 scales,
         improvement factors by sex, age and year, and each person's death rates and
         life expectancy with improvement. Public, so it is committed.
+    crosscheck/reference/life_reference.csv
+        whole lives on the default basis (CPP improvement, from 2026), for the browser
+        engine: each person's cause-of-death mix and own first-cancer, heart attack and
+        stroke rates at every age, and the exact year-by-year results (chance of dying
+        at each age, expected age at death, cause mix, chance of each first event,
+        expected crash injuries), starting never married and, for two people, married.
     crosscheck/reference/cia_reference.csv   (only if the CIA file is on this computer)
         improvement factors by sex, age and year, and each person's death rates and
         life expectancy with improvement. Derived from the CIA's scale, so it is
@@ -50,6 +56,8 @@ OUT = ROOT / "crosscheck" / "reference" / "risk_reference.csv"
 CANCER_OUT = ROOT / "crosscheck" / "reference" / "cancer_reference.csv"
 CIA_OUT = ROOT / "crosscheck" / "reference" / "cia_reference.csv"
 CPP_OUT = ROOT / "crosscheck" / "reference" / "cpp_reference.csv"
+LIFE_OUT = ROOT / "crosscheck" / "reference" / "life_reference.csv"
+MARRIED_CASES = ("never_typical_M25", "former_35_44_F62")
 START_YEAR = 2026
 IMPROVEMENT_YEARS = (2018, 2019, 2026, 2040, 2075, 2119, 2120, 2150)
 
@@ -108,6 +116,7 @@ def main() -> None:
         print(f"  {name:<22} life expectancy {e:6.2f}")
     cancer_reference()
     improved_reference("cpp", CPP_OUT)
+    life_reference()
     if has_improvement_scale():
         cia_reference()
     else:
@@ -127,6 +136,37 @@ def cancer_reference() -> None:
                              "value": five_year_survival(sex, site, a)})
     pd.DataFrame(rows).to_csv(CANCER_OUT, index=False, float_format="%.15g")
     print(f"Wrote {len(rows):,} cancer link values to {CANCER_OUT.relative_to(ROOT)}")
+
+
+def life_reference() -> None:
+    from dataclasses import replace
+
+    from engine.causes import CAUSES
+    from engine.simulate import build_schedule, exact
+    rows = []
+
+    def add(case, start, measure, at_age, index, value):
+        rows.append({"case": case, "start_marital": start, "measure": measure, "at_age": at_age,
+                     "index": index, "value": float(value)})
+
+    for name, p in CASES.items():
+        sch = build_schedule(p, START_YEAR)
+        for k, a in enumerate(sch.ages):
+            for j, c in enumerate(CAUSES):
+                add(name, "never", "cause_probability", int(a), c, sch.causes[k][j])
+            for key in ("cancer_lung", "cancer_other", "heart_attack", "stroke"):
+                add(name, "never", "incidence", int(a), key, sch.fixed[key][k])
+        for start in ("never", "married") if name in MARRIED_CASES else ("never",):
+            e = exact(replace(sch, start_marital=start))
+            for k, a in enumerate(sch.ages):
+                add(name, start, "die", int(a), "", e["die"][k])
+            for j, c in enumerate(CAUSES):
+                add(name, start, "cause", None, c, e["cause"][j])
+            add(name, start, "mean_death_age", None, "", e["mean_death_age"])
+            for key in ("ever_cancer", "ever_heart_attack", "ever_stroke", "ever_disability", "crashes"):
+                add(name, start, key, None, "", e[key])
+    pd.DataFrame(rows).to_csv(LIFE_OUT, index=False, float_format="%.15g")
+    print(f"Wrote {len(rows):,} whole-life values to {LIFE_OUT.relative_to(ROOT)}")
 
 
 def cia_reference() -> None:

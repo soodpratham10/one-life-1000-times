@@ -302,6 +302,7 @@ The engine's answers for 12 reference people (every level of every survey answer
 | R | Cancer link (A22): the synthetic cohort run in R with the engine's solved rates reproduces official total, lung and other-cancer deaths at every age 18–109 | 184 ages | 1×10⁻¹² (relative) |
 | R | CIA MI-2024 improvement (A05): factors, improved death rates and life expectancy from 2026 (on a computer with the CIA file; results not committed) | 2,217 | 6×10⁻¹⁴ |
 | Excel VBA (`crosscheck/vba/OneLifeCheck.bas`, workbook `crosscheck/excel/`) | Same as the first R row, from the workbook's data sheets only | 1,632 | 6×10⁻¹⁴ |
+| JavaScript, the website's engine (`web/engine/engine.js`, `web/tests/engine.test.mjs`) | The whole person-level engine on the default CPP basis: risk, drift, quitting, death rates with improvement, cause mix, own first-event rates, death tables, exact year-by-year results (chance of dying at each age, causes, first events) for 12 people, two also starting married; simulated lives average to the exact results within four standard errors | 1,632 risk values, 2,221 improvement values, 11,845 whole-life values | 5×10⁻¹³ (expected age at death); 6×10⁻¹⁴ or less for the rest |
 | Excel formulas (`HandCheck` sheet) | One year for one person (woman, 62, quit at 40) as visible formulas: population mix, averages, her multiplier, r, q | 2 | 5×10⁻¹⁷ |
 
 These show the code does what this register says; they do not test whether the assumptions are right (that is the population check above and the study comparisons in the engine checks).

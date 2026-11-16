@@ -399,6 +399,18 @@ The engine's default improvement scale (CPP report, A28), for the R check: the f
 | `year` | Calendar year (blank for the scales) |
 | `value` | The engine's value |
 
+### `crosscheck/reference/life_reference.csv`
+Whole lives on the default basis (CPP improvement, from 2026), for the browser engine to reproduce: each reference person's cause-of-death mix and own first-cancer, heart attack and stroke rates at every age, and the exact year-by-year results. Built by `python crosscheck/make_reference.py`; checked by `web/tests/engine.test.mjs`.
+
+| Column | Meaning |
+| --- | --- |
+| `case` | Reference person's name, as in `risk_reference.csv` |
+| `start_marital` | Marital state the life starts in: `never`, or `married` for two people |
+| `measure` | `cause_probability` (cause mix if they die at that age), `incidence` (their own chance of a first event that year), `die` (chance of dying at that age), `cause` (share of deaths from each cause), `mean_death_age`, `ever_cancer`, `ever_heart_attack`, `ever_stroke`, `ever_disability`, `crashes` (expected crash injuries) |
+| `at_age` | Age (blank for whole-life results) |
+| `index` | The cause or event the value is for (blank where there is only one) |
+| `value` | The engine's value |
+
 ### `crosscheck/results/r_vs_python.csv`
 The R rebuild against the engine, one row per reference value. Built by `Rscript crosscheck/r/run_crosscheck.R`.
 
