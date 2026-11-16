@@ -95,7 +95,8 @@ def test_fast_probabilities_match_events_module(sch, state):
         age, year = int(sch.ages[i]), int(sch.years[i])
         fast = probabilities(sch, state, i)
         cancer = (sch.fixed["cancer_lung"][i], sch.fixed["cancer_other"][i])
-        slow = event_probabilities(PERSON, state, age, year, cancer=cancer)
+        cardio = (sch.fixed["heart_attack"][i], sch.fixed["stroke"][i])
+        slow = event_probabilities(PERSON, state, age, year, cancer=cancer, cardio=cardio)
         assert fast.keys() == slow.keys(), age
         for k in fast:
             assert fast[k] == pytest.approx(slow[k], rel=1e-12), (age, k)
@@ -116,9 +117,9 @@ def test_mean_age_at_death_matches_exact(sch, lives):
 
 def test_life_expectancy_close_to_risk_model(sch):
     """
-    The cancer link (A22) moves cancer deaths onto diagnosed people but keeps
-    each person's own cancer death ratio, so life expectancy stays within half
-    a year of engine/risk.py (this person is cancer-free at 40, so slightly longer).
+    The links (A22, A23) move cancer, heart and stroke deaths onto people with that
+    diagnosis or event but keep each person's own death ratios, so life expectancy
+    stays within half a year of engine/risk.py (this person starts free of all three).
     """
     assert abs(exact(sch)["mean_death_age"] - PERSON.age - life_expectancy(sch.q)) < 0.5
 
@@ -140,6 +141,23 @@ def test_first_cancer_matches_exact_expectation(sch, lives):
     expected = exact(sch)["ever_cancer"]
     observed = np.mean([any(e.startswith("cancer") for _, _, e in lf.events) for lf in lives])
     assert abs(observed - expected) < 4 * np.sqrt(expected * (1 - expected) / N)
+
+
+@pytest.mark.parametrize("event", ["heart_attack", "stroke"])
+def test_first_heart_attack_and_stroke_match_exact_expectation(sch, lives, event):
+    expected = exact(sch)["ever_" + event]
+    observed = np.mean([any(e == event for _, _, e in lf.events) for lf in lives])
+    assert abs(observed - expected) < 4 * np.sqrt(expected * (1 - expected) / N)
+
+
+def test_some_deaths_come_in_the_year_of_a_heart_attack_or_stroke(lives):
+    """A23: acute deaths exist, and an acute death is always of the event's own cause."""
+    acute = 0
+    for lf in lives:
+        for age, year, e in lf.events:
+            if e in ("heart_attack", "stroke") and year == lf.death_year and lf.cause == ("heart" if e == "heart_attack" else "stroke"):
+                acute += 1
+    assert acute > 0
 
 
 def test_cancer_deaths_follow_a_diagnosis(lives):

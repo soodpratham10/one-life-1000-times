@@ -1,5 +1,6 @@
 """
-Checks on engine/links.py: cancer deaths follow a cancer diagnosis (A22).
+Checks on engine/links.py: cancer deaths follow a cancer diagnosis (A22), and
+deaths after a heart attack or stroke (A23).
 
 Run from the project folder:
     pytest tests/test_links.py -v
@@ -10,7 +11,7 @@ import pytest
 
 from engine.causes import CAUSES, base_shares
 from engine.events import cancer_probabilities
-from engine.links import LUNG, OTHER, S_MAX, W, calibration, five_year_survival, shift, state_tables
+from engine.links import LUNG, OTHER, S_MAX, W, calibration, five_year_survival, shift
 from engine.mortality import base_qx
 from engine.risk import Person
 
@@ -85,18 +86,95 @@ def test_other_cancer_survival_close_to_published(sex):
         assert 0.6 < five_year_survival(sex, "other", age) < 0.92
 
 
-def test_state_tables():
-    """Probabilities valid; cause mixes add to 1; diagnosed people die more than undiagnosed; no cancer deaths in U at 40-80."""
+# ================================================================ heart attack and stroke (A23)
+
+from engine.links import (  # noqa: E402
+    ACUTE_CAP, FATALITY_LEVEL, HEART, STROKE, SURVIVOR_RR, _cardio_year, _fatality_scale, _next_grid,
+    _shape, acute_fatality, cardio_calibration, death_tables, person_incidence,
+)
+from engine.data import load  # noqa: E402
+from engine.events import heart_stroke_probabilities  # noqa: E402
+
+
+@pytest.mark.parametrize("event", ["heart", "stroke"])
+def test_fatality_level_matches_published_average(event):
+    """Before the cap, the age curve averages over all Canadian cases to 6.5% (heart attack) and 13.2% (stroke)."""
+    t = load("heart_stroke_rates.csv")
+    col = "cases_heart_attack" if event == "heart" else "cases_stroke"
+    mid = (t["age_lo"] + t["age_hi"].clip(upper=95)) / 2
+    avg = (t[col] * mid.map(_shape)).sum() / t[col].sum() * _fatality_scale(event)
+    assert avg == pytest.approx(FATALITY_LEVEL[event])
+
+
+def test_fatality_age_shape_by_hand():
+    """Log-linear through 2.1% at 50 and 26.3% at 88 (Quebec registry)."""
+    assert _shape(50) == pytest.approx(0.021)
+    assert _shape(88) == pytest.approx(0.263)
+    assert _shape(69) == pytest.approx((0.021 * 0.263) ** 0.5)       # halfway: geometric mean
+
+
+@pytest.mark.parametrize("sex", ["M", "F"])
+@pytest.mark.parametrize("event", ["heart", "stroke"])
+def test_acute_deaths_never_exceed_the_cap(sex, event):
+    f = acute_fatality(sex, event)
+    q = base_qx("CA", sex)
+    idx, col = (HEART, 0) if event == "heart" else (STROKE, 1)
+    for age in range(18, 110):
+        inc = heart_stroke_probabilities(sex, age)[col]
+        assert inc * f[age] <= ACUTE_CAP * q[age] * base_shares(sex, age)[idx] * (1 + 1e-12)
+        assert 0 <= f[age] < 1
+
+
+@pytest.mark.parametrize("sex", ["M", "F"])
+def test_cardio_calibration_reproduces_official_deaths(sex):
+    """Re-run the cohort with the solved rates: total, heart and stroke deaths match 2017-2019 at every age."""
+    cc = cardio_calibration(sex)
+    q = base_qx("CA", sex)
+    fa, fs = acute_fatality(sex, "heart"), acute_fatality(sex, "stroke")
+    p = np.array([[1.0, 0.0], [0.0, 0.0]])
+    for age in range(18, 110):
+        ia, ist = heart_stroke_probabilities(sex, age)
+        shares = base_shares(sex, age)
+        mu = -np.log(1 - q[age])
+        mass = p.sum()
+        r, acute_h, acute_s, move_a, move_s = _cardio_year(p, ia, ist, fa[age], fs[age])
+        deaths = np.array([0.0, acute_h, acute_s])
+        qg = np.zeros((2, 2))
+        for i in (0, 1):
+            for j in (0, 1):
+                f = np.array([mu * (1 - shares[HEART] - shares[STROKE]) * cc["eta"][age],
+                              cc["b_heart"][age] * mu * shares[HEART] + (cc["rr_heart"][age] - 1) * mu * i,
+                              cc["b_stroke"][age] * mu * shares[STROKE] + (cc["rr_stroke"][age] - 1) * mu * j])
+                qg[i, j] = 1 - np.exp(-f.sum())
+                deaths += r[i, j] * qg[i, j] * f / f.sum()
+        target = mass * q[age] * np.array([1 - shares[HEART] - shares[STROKE], shares[HEART], shares[STROKE]])
+        assert deaths == pytest.approx(target, rel=1e-8)
+        p = _next_grid(r * (1 - qg), move_a, move_s)
+
+
+@pytest.mark.parametrize("sex", ["M", "F"])
+def test_cardio_rates_are_sensible(sex):
+    cc = cardio_calibration(sex)
+    ages = slice(18, 110)
+    for k in ("b_heart", "b_stroke"):
+        assert (cc[k][ages] >= 0).all() and (cc[k][ages] <= 1.05).all()
+    for k in ("rr_heart", "rr_stroke"):
+        assert (cc[k][ages] >= 1).all() and (cc[k][ages] <= SURVIVOR_RR + 1e-9).all()
+    assert np.abs(cc["eta"][ages] - 1).max() < 0.02
+    assert (cc["rr_heart"][18:100] == SURVIVOR_RR).all()            # heart: the full 1.5 fits at every age to 99
+
+
+def test_person_tables():
+    """Probabilities valid; survivors die more than others; a lung cancer diagnosis raises the death rate."""
     from engine.causes import cause_probabilities
-    from engine.links import cancer_incidence
     from engine.risk import personal_qx
-    p = Person("M", 40, smoking="current")
+    p = Person("F", 45, smoking="current")
     q = personal_qx(p, 2026, improve=False)
-    causes = np.array([cause_probabilities(p, a) for a in range(40, 111)])
-    q_u, q_l, q_o, c_u, c_l, c_o = state_tables(q, causes, "M", 40, cancer_incidence(q, causes, "M", 40))
-    assert ((q_u >= 0) & (q_u <= 1)).all() and ((q_l >= 0) & (q_l <= 1)).all()
-    for c in (c_u, c_l, c_o):
-        assert np.allclose(c.sum(axis=-1), 1)
-    assert (q_l[:-1, 0] > q_u[:-1]).all() and (q_o[:-1, 0] > q_u[:-1]).all()
-    assert (q_l[:-1, 5] < q_l[:-1, 0]).all()                 # 5+ years after diagnosis: lower
-    assert (c_u[:41, LUNG] == 0).all() and (c_u[:41, OTHER] == 0).all()   # ages 40-80
+    causes = np.array([cause_probabilities(p, a) for a in range(45, 111)])
+    qs, cs, ah, ast = death_tables(q, causes, "F", 45)
+    assert ((qs >= 0) & (qs <= 1)).all() and np.allclose(cs.sum(axis=-1), 1)
+    assert (qs[:-1, 0, 1, 0] > qs[:-1, 0, 0, 0]).all()               # heart attack survivor
+    assert (qs[:-1, 1, 0, 0] > qs[:-1, 0, 0, 0]).all()               # lung cancer, first year
+    inc = person_incidence(q, causes, "F", 45)
+    assert all(((v >= 0) & (v <= 1)).all() for v in inc.values())
+    assert ((ah >= 0) & (ah < 1)).all() and ((ast >= 0) & (ast < 1)).all()

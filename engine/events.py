@@ -170,11 +170,14 @@ def smoking_incidence_multiplier(p: Person, cause: str, age: int) -> float:
 # ---------------------------------------------------------------- one year
 
 def event_probabilities(p: Person, s: State, age: int, year: int,
-                        cancer: tuple[float, float] | None = None) -> dict[str, float]:
+                        cancer: tuple[float, float] | None = None,
+                        cardio: tuple[float, float] | None = None) -> dict[str, float]:
     """
     Chance of each event this year that can happen in this state. The simulation
-    passes the person's own cancer diagnosis chances (engine/links.py, A22) as
-    `cancer`; without them, lung cancer is the population rate scaled for smoking.
+    passes the person's own chances of a first cancer (lung, other) and of a first
+    heart attack and stroke (engine/links.py, A22, A23) as `cancer` and `cardio`;
+    without them, lung cancer, heart attack and stroke are the population rates
+    scaled for smoking.
     """
     out = {"crash_injury": crash_probability(p.sex, age)}
 
@@ -183,11 +186,14 @@ def event_probabilities(p: Person, s: State, age: int, year: int,
             lung, other = cancer_probabilities(p.sex, age)
             cancer = (min(1.0, lung * smoking_incidence_multiplier(p, "lung_cancer", age)), other)
         out["cancer_lung"], out["cancer_other"] = cancer
-    heart_attack, stroke = heart_stroke_probabilities(p.sex, age)
+    if cardio is None:
+        heart_attack, stroke = heart_stroke_probabilities(p.sex, age)
+        cardio = (min(1.0, heart_attack * smoking_incidence_multiplier(p, "heart", age)),
+                  min(1.0, stroke * smoking_incidence_multiplier(p, "stroke", age)))
     if not s.had_heart_attack:
-        out["heart_attack"] = min(1.0, heart_attack * smoking_incidence_multiplier(p, "heart", age))
+        out["heart_attack"] = cardio[0]
     if not s.had_stroke:
-        out["stroke"] = min(1.0, stroke * smoking_incidence_multiplier(p, "stroke", age))
+        out["stroke"] = cardio[1]
 
     if s.disabled and age <= DISABILITY_MAX_AGE:
         out["disability_end"] = disability_end_probability(p.sex, s.disability_onset_age, s.disability_years, year)
