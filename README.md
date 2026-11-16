@@ -253,7 +253,8 @@ engine/              simulation engine: mortality.py (base rates and improvement
                      demo.py (try it)
 validation/          population check against StatCan (Phase 4); results in validation/results/
 crosscheck/          independent rebuilds that must match the engine (Phase 4): make_reference.py writes
-                     the engine's answers to reference/, r/ rebuilds them in R (Excel VBA next)
+                     the engine's answers to reference/; r/ and vba/ rebuild them in R and Excel VBA;
+                     excel/ holds the workbook (data sheets and a one-year hand check)
 web/                 survey and visuals (Phase 5, not built yet)
 ```
 

@@ -282,6 +282,20 @@ Heart attack and stroke tests in `tests/test_links.py` (11) and `tests/test_simu
 - After A27 (smokers may quit), from 25: life expectancy +2.0 years (men) and +1.7 (women); deaths at 45–64 are about 78–81% of StatCan's and COPD deaths about 63%. The cohort quits as Canadian smokers do, while the period table reflects today's older Canadians, about 20% of whom still smoke up to 64 (CCHS), many from generations that smoked more. A cohort with fewer smokers should outlive a period table, so this gap is expected, not an error; the event machinery itself matches StatCan when every risk multiplier is 1
 - The check is therefore a test of the machinery (passed) and a measure of how far today's habits, projected forward, move a cohort away from the period table (about 2 years)
 
+## Validation: independent rebuilds (Phase 4)
+
+The engine's answers for 12 reference people (every level of every survey answer, both sexes, every CCHS age group, smokers who may quit and who keep smoking, the cap, the PEI table) are written by `crosscheck/make_reference.py` and worked out again from the raw data in two other languages. `tests/test_crosscheck_reference.py` fails if the engine changes without the reference files being rebuilt.
+
+| Rebuild | What it covers | Values | Largest difference |
+| --- | --- | --- | --- |
+| R (`crosscheck/r/`, 115 testthat checks) | Base rates, population mix, hazard ratios, taper, cap, A26 drift, A27 quitting, death rates, life expectancy (no improvement) | 1,632 | 6×10⁻¹⁴ |
+| R | Cancer link (A22): the synthetic cohort run in R with the engine's solved rates reproduces official total, lung and other-cancer deaths at every age 18–109 | 184 ages | 1×10⁻¹² (relative) |
+| R | CIA MI-2024 improvement (A05): factors, improved death rates and life expectancy from 2026 (on a computer with the CIA file; results not committed) | 2,217 | 6×10⁻¹⁴ |
+| Excel VBA (`crosscheck/vba/OneLifeCheck.bas`, workbook `crosscheck/excel/`) | Same as the first R row, from the workbook's data sheets only | 1,632 | 6×10⁻¹⁴ |
+| Excel formulas (`HandCheck` sheet) | One year for one person (woman, 62, quit at 40) as visible formulas: population mix, averages, her multiplier, r, q | 2 | 5×10⁻¹⁷ |
+
+These show the code does what this register says; they do not test whether the assumptions are right (that is the population check above and the study comparisons in the engine checks).
+
 ## Open items for later phases
 
 | Item | Why it matters | Plan |
@@ -299,6 +313,7 @@ Heart attack and stroke tests in `tests/test_links.py` (11) and `tests/test_simu
 
 | Date | ID | Change |
 | --- | --- | --- |
+| 2026-11-16 | Phase 4 | Independent rebuilds in R and Excel VBA match the engine (risk engine, cancer link, CIA improvement) |
 | 2026-11-16 | A27, A07, A20, A21 | Quitting smoking: current smokers quit at 5% a year from 25 unless they keep smoking; smoking ratio, cause mix and event adjustment use the expected path; population check rerun |
 | 2026-11-16 | A26, A07 | Habits that change with age: activity and BMI keep the person's rank as the age group's mix moves; population check added (Phase 4) |
 | 2026-11-16 | A25 | Disability and mortality: disabled death ratio from OCA Study No. 16, recovery = termination − deaths, calibrated rate for everyone else; termination duration convention fixed |
