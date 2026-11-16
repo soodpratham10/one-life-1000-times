@@ -7,9 +7,9 @@ Each simulated year, from the person's age now to 110 (A01-A03):
   2. after a first heart attack or stroke this year, its acute fatality is
      drawn (engine/links.py, A23);
   3. death is drawn with this year's death probability for the person's state
-     at the start of the year: cancer state (A22) and whether they survived an
-     earlier heart attack or stroke (A23), built on engine/risk.py and
-     engine/causes.py. If it happens, the cause is drawn and the life ends.
+     at the start of the year: cancer state (A22), whether they survived an
+     earlier heart attack or stroke (A23), marital state (A24) and whether
+     they are disabled (A25), built on engine/risk.py and engine/causes.py. If it happens, the cause is drawn and the life ends.
      Exact age at death = age + a uniform fraction of the year (A03).
 
 Events within a year are not ordered (A03). If the same year draws both lung
@@ -22,22 +22,21 @@ per person (Schedule), which keeps 1,000 lives fast.
 """
 
 from dataclasses import dataclass, field, replace
-from functools import lru_cache
 
 import numpy as np
 
 from engine.causes import CAUSE_LABELS, CAUSES, cause_probabilities
+from engine.disability import recovery_probability, work_transition
 from engine.events import (
     DISABILITY_MAX_AGE,
     State,
     crash_probability,
-    disability_end_probability,
     disability_start_probability,
     family_probability,
     first_child_probability,
     retire_probability,
 )
-from engine.links import N_CANCER, death_tables, person_incidence, shift
+from engine.links import MARITAL_STATES, N_CANCER, death_tables, person_incidence, shift
 from engine.mortality import MAX_AGE
 from engine.risk import Person, personal_qx
 
@@ -56,8 +55,9 @@ class Schedule:
     q: np.ndarray                    # personal death probability at each age (engine/risk.py)
     causes: np.ndarray               # personal cause probabilities, one row per age
     fixed: dict[str, np.ndarray]     # state-independent event chances by age
-    q_state: np.ndarray = None       # death probability [age, cancer state, heart attack survivor, stroke survivor]
-    c_state: np.ndarray = None       # cause mix, same index plus cause
+    start_marital: str = "never"     # marital state at the start (A24)
+    q_state: np.ndarray = None       # death probability [age, cancer, heart attack survivor, stroke survivor, marital, disabled]
+    c_state: np.ndarray = None       # cause mix [age, cancer, heart attack survivor, stroke survivor, cause]
     acute_heart: np.ndarray = None   # acute fatality of a first heart attack, by age
     acute_stroke: np.ndarray = None
 
@@ -68,13 +68,14 @@ class Schedule:
         d = min(s.cancer_years, 5)
         return 1 + d if s.cancer_site == "lung" else 7 + d
 
-    def death(self, i: int, s: State, heart_survivor: bool, stroke_survivor: bool):
-        """This year's death probability and cause mix."""
+    def death(self, i: int, s: State, heart_survivor: bool, stroke_survivor: bool, marital: str, disabled: bool):
+        """This year's death probability and cause mix (states as at the start of the year)."""
         key = (i, self.cancer_state(s), int(heart_survivor), int(stroke_survivor))
-        return self.q_state[key], self.c_state[key]
+        return self.q_state[key + (MARITAL_STATES.index(marital), int(disabled))], self.c_state[key]
 
 
-def build_schedule(p: Person, start_year: int = START_YEAR, improve: bool = True) -> Schedule:
+def build_schedule(p: Person, start_year: int = START_YEAR, improve: bool = True,
+                   start_marital: str = "never") -> Schedule:
     ages = np.arange(p.age, MAX_AGE + 1)
     years = start_year + (ages - p.age)
     fixed = {k: np.zeros(len(ages)) for k in
@@ -92,12 +93,7 @@ def build_schedule(p: Person, start_year: int = START_YEAR, improve: bool = True
     q = personal_qx(p, start_year, improve=improve)
     fixed.update(person_incidence(q, causes, p.sex, p.age))
     q_state, c_state, acute_h, acute_s = death_tables(q, causes, p.sex, p.age)
-    return Schedule(p, start_year, ages, years, q, causes, fixed, q_state, c_state, acute_h, acute_s)
-
-
-@lru_cache(maxsize=None)
-def _disability_end(sex: str, onset: int, duration: int, year: int) -> float:
-    return disability_end_probability(sex, onset, duration, year)
+    return Schedule(p, start_year, ages, years, q, causes, fixed, start_marital, q_state, c_state, acute_h, acute_s)
 
 
 def probabilities(sch: Schedule, s: State, i: int) -> dict[str, float]:
@@ -116,7 +112,7 @@ def probabilities(sch: Schedule, s: State, i: int) -> dict[str, float]:
     if not s.had_stroke:
         out["stroke"] = f["stroke"][i]
     if s.disabled and age <= DISABILITY_MAX_AGE:
-        out["disability_end"] = _disability_end(sex, s.disability_onset_age, s.disability_years, year)
+        out["disability_end"] = recovery_probability(sex, s.disability_onset_age, s.disability_years, year, age)
     elif not s.disabled and not s.retired:
         out["disability_start"] = f["disability_start"][i]
     if not s.retired:
@@ -139,17 +135,18 @@ class Life:
     final: State = field(default_factory=State)
 
 
-def starting_state(p: Person) -> State:
+def starting_state(sch: "Schedule") -> State:
     """Default state today until the survey asks (Phase 5): anyone over 70 has retired."""
-    return State(retired=p.age > 70)
+    return State(retired=sch.person.age > 70, marital=sch.start_marital)
 
 
 def live(sch: Schedule, rng: np.random.Generator, start: State | None = None) -> Life:
-    s = replace(start) if start is not None else starting_state(sch.person)
+    s = replace(start) if start is not None else starting_state(sch)
     life = Life()
     for i, age in enumerate(sch.ages):
         age, year = int(age), int(sch.years[i])
         heart_survivor, stroke_survivor = s.had_heart_attack, s.had_stroke   # as at the start of the year
+        marital_now, disabled_now = s.marital, s.disabled
         probs = probabilities(sch, s, i)
         happened = {k for k, v in probs.items() if rng.random() < v}
 
@@ -190,7 +187,7 @@ def live(sch: Schedule, rng: np.random.Generator, start: State | None = None) ->
                     life.final = s
                     return life
 
-        q, cause_mix = sch.death(i, s, heart_survivor, stroke_survivor)
+        q, cause_mix = sch.death(i, s, heart_survivor, stroke_survivor, marital_now, disabled_now)
         if rng.random() < q:
             life.death_age = age + rng.random()
             life.death_year = year
@@ -212,65 +209,81 @@ def exact(sch: Schedule) -> dict:
     dying in each year, the expected age at death, the cause mix, the chance of
     a first cancer, heart attack and stroke, and the expected crash injuries.
     """
-    p = np.zeros((N_CANCER, 2, 2))
-    p[0, 0, 0] = 1.0
+    # work state (0 working age, 1-24 disabled, 25 retired), cancer, heart attack survivor,
+    # stroke survivor, marital
+    p = np.zeros((26, N_CANCER, 2, 2, 3))
+    p[25 if sch.person.age > 70 else 0, 0, 0, 0, MARITAL_STATES.index(sch.start_marital)] = 1.0
     n = len(sch.ages)
     die, cause = np.zeros(n), np.zeros(len(CAUSES))
-    ever = {"cancer": 0.0, "heart_attack": 0.0, "stroke": 0.0}
+    ever = {"cancer": 0.0, "heart_attack": 0.0, "stroke": 0.0, "disability": 0.0}
     crashes = 0.0
     lung_idx, other_idx = slice(1, 7), slice(7, 13)
     heart, stroke = CAUSES.index("heart"), CAUSES.index("stroke")
     for i in range(n):
         f = sch.fixed
         crashes += p.sum() * f["crash_injury"][i]
+        working_at_start = p[0].sum()          # new disabilities are drawn before deaths, as in live()
         # cancer: first diagnoses, then everyone diagnosed moves one year on
         lung, other = f["cancer_lung"][i], f["cancer_other"][i]
-        new_l, new_o = p[0] * lung, p[0] * (1 - lung) * other
+        new_l, new_o = p[:, 0] * lung, p[:, 0] * (1 - lung) * other
         ever["cancer"] += new_l.sum() + new_o.sum()
         nxt = np.zeros_like(p)
-        nxt[0] = p[0] - new_l - new_o
+        nxt[:, 0] = p[:, 0] - new_l - new_o
         for block, new in ((lung_idx, new_l), (other_idx, new_o)):
-            old = p[block]
-            nxt[block.start] = new
-            nxt[block.start + 1:block.start + 5] = old[:4]
-            nxt[block.start + 5] = old[4] + old[5]
+            old = p[:, block]
+            nxt[:, block.start] = new
+            nxt[:, block.start + 1:block.start + 5] = old[:, :4]
+            nxt[:, block.start + 5] = old[:, 4] + old[:, 5]
         p = nxt
         # heart attack, then stroke: first events and acute deaths
-        new_a = p[:, 0, :] * f["heart_attack"][i]
+        new_a = p[:, :, 0, :, :] * f["heart_attack"][i]
         acute_a = new_a * sch.acute_heart[i]
         ever["heart_attack"] += new_a.sum()
-        p[:, 0, :] -= acute_a
-        move_a = np.divide(new_a - acute_a, p[:, 0, :], out=np.zeros_like(new_a), where=p[:, 0, :] > 0)
-        new_s = p[:, :, 0] * f["stroke"][i]
+        p[:, :, 0, :, :] -= acute_a
+        move_a = np.divide(new_a - acute_a, p[:, :, 0, :, :], out=np.zeros_like(new_a), where=p[:, :, 0, :, :] > 0)
+        new_s = p[:, :, :, 0, :] * f["stroke"][i]
         acute_s = new_s * sch.acute_stroke[i]
         ever["stroke"] += new_s.sum()
-        p[:, :, 0] -= acute_s
-        move_s = np.divide(new_s - acute_s, p[:, :, 0], out=np.zeros_like(new_s), where=p[:, :, 0] > 0)
+        p[:, :, :, 0, :] -= acute_s
+        move_s = np.divide(new_s - acute_s, p[:, :, :, 0, :], out=np.zeros_like(new_s), where=p[:, :, :, 0, :] > 0)
         cause[heart] += acute_a.sum()
         cause[stroke] += acute_s.sum()
-        # regular deaths in the state held at the start of the year
-        d = p * sch.q_state[i]
-        cause += np.einsum("kas,kasc->c", d, sch.c_state[i])
+        # regular deaths in the state held at the start of the year (disabled: work states 1-24)
+        disabled = np.zeros(26, dtype=int)
+        disabled[1:25] = 1
+        q_now = sch.q_state[i][..., disabled]                    # cancer, a, s, marital, work
+        q_now = np.moveaxis(q_now, -1, 0)                         # work, cancer, a, s, marital
+        d = p * q_now
+        cause += np.einsum("wkasm,kasc->c", d, sch.c_state[i])
         die[i] = acute_a.sum() + acute_s.sum() + d.sum()
         alive = p - d
-        # survivors of this year's events move state
+        # survivors of this year's events move state: heart attack, stroke, marital status, work
         p = np.zeros_like(alive)
         for a in (0, 1):
             for s_ in (0, 1):
-                pa = move_a[:, s_] if a == 0 else 0.0
-                ps = move_s[:, a] if s_ == 0 else 0.0
+                pa = move_a[:, :, s_, :] if a == 0 else 0.0
+                ps = move_s[:, :, a, :] if s_ == 0 else 0.0
                 for da, wa in ((0, 1 - pa), (1, pa)):
                     for ds, ws in ((0, 1 - ps), (1, ps)):
-                        p[:, min(a + da, 1), min(s_ + ds, 1)] += alive[:, a, s_] * wa * ws
+                        p[:, :, min(a + da, 1), min(s_ + ds, 1), :] += alive[:, :, a, s_, :] * wa * ws
+        marry, divorce, remarry = f["first_marriage"][i], f["divorce"][i], f["remarriage"][i]
+        never, married, divorced = p[..., 0].copy(), p[..., 1].copy(), p[..., 2].copy()
+        p[..., 0] = never * (1 - marry)
+        p[..., 1] = married * (1 - divorce) + never * marry + divorced * remarry
+        p[..., 2] = divorced * (1 - remarry) + married * divorce
+        age, year = int(sch.ages[i]), int(sch.years[i])
+        t = work_transition(sch.person.sex, age, year, f["disability_start"][i], f["retire"][i])
+        ever["disability"] += working_at_start * t[0, 1:25].sum()
+        p = np.tensordot(t.T, p, axes=1)
     return {"die": die, "mean_death_age": float(die @ (sch.ages + 0.5)), "cause": cause,
             "ever_cancer": ever["cancer"], "ever_heart_attack": ever["heart_attack"],
-            "ever_stroke": ever["stroke"], "crashes": crashes}
+            "ever_stroke": ever["stroke"], "ever_disability": ever["disability"], "crashes": crashes}
 
 
 def simulate(p: Person, n: int = 1000, seed: int = 0, start_year: int = START_YEAR,
              start: State | None = None, improve: bool = True) -> list[Life]:
     """n lives for this person, reproducible from the seed."""
-    sch = build_schedule(p, start_year, improve)
+    sch = build_schedule(p, start_year, improve, start_marital=start.marital if start else "never")
     rng = np.random.default_rng(seed)
     return [live(sch, rng, start) for _ in range(n)]
 

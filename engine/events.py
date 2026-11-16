@@ -8,7 +8,8 @@ answers and where their life has got to (A11, A13-A17, A21).
     heart_attack     first heart attack                                        (A14)
     stroke           first stroke                                              (A14)
     disability_start becomes entitled to a CPP disability pension, ages 18-64  (A15)
-    disability_end   a disability spell ends (CPP termination rates)           (A15)
+    disability_end   recovery from a disability spell (CPP termination minus
+                     the death rate of disabled people)                        (A15, A25)
     retire           starts the CPP retirement pension, ages 60-70             (A16)
     first_marriage, divorce, remarriage, first_child                           (A17)
 
@@ -101,20 +102,36 @@ def disability_start_probability(sex: str, age: int, year: int) -> float:
     return per_1000 / 1000 * eligible_share(sex, year)
 
 
-def disability_end_probability(sex: str, onset_age: int, duration: int, year: int) -> float:
-    """
-    Chance a spell ends this year, given the age it began and the years already
-    completed. Onset ages use the nearest published age (30, 40, 50, 60);
-    duration 6 covers 6 and more; years between 2025 and 2035 are interpolated.
-    """
+@lru_cache(maxsize=None)
+def _termination_table() -> tuple[np.ndarray, dict]:
+    """Published onset ages, and {(sex, onset, duration): (rate 2025, rate 2035)} per 1,000."""
     t = load("cpp_disability_termination.csv")
     ages = np.array(sorted(t["age"].unique()))
-    onset = int(ages[np.abs(ages - onset_age).argmin()])
-    d = min(max(duration + 1, 1), 6)                 # 0 years completed = first year
-    rows = t[(t["sex"] == sex) & (t["age"] == onset) & (t["duration"] == d)].set_index("year")["per_1000"]
+    rates = {}
+    for (sex, age, dur), g in t.groupby(["sex", "age", "duration"]):
+        by_year = dict(zip(g["year"], g["per_1000"]))
+        rates[(sex, int(age), int(dur))] = (float(by_year[2025]), float(by_year[2035]))
+    return ages, rates
+
+
+def onset_band(onset_age: int) -> int:
+    """Nearest onset age the termination table publishes (30, 40, 50, 60; ties go to the younger)."""
+    ages = _termination_table()[0]
+    return int(ages[np.abs(ages - onset_age).argmin()])
+
+
+def disability_end_probability(sex: str, onset_age: int, completed_years: int, year: int) -> float:
+    """
+    CPP termination rate (recovery or death) for a spell that began at onset_age and
+    has run completed_years full years: the rate for duration 1 applies in the first
+    year in which the spell can end (the year after it began), and duration 6 covers 6
+    and more. Onset ages use the nearest published age; years between 2025 and 2035
+    are interpolated.
+    """
+    d = min(max(completed_years, 1), 6)
+    r2025, r2035 = _termination_table()[1][(sex, onset_band(onset_age), d)]
     y = min(max(year, 2025), 2035)
-    rate = rows[2025] + (rows[2035] - rows[2025]) * (y - 2025) / 10
-    return float(rate) / 1000
+    return (r2025 + (r2035 - r2025) * (y - 2025) / 10) / 1000
 
 
 def retire_probability(sex: str, age: int) -> float:
@@ -196,7 +213,8 @@ def event_probabilities(p: Person, s: State, age: int, year: int,
         out["stroke"] = cardio[1]
 
     if s.disabled and age <= DISABILITY_MAX_AGE:
-        out["disability_end"] = disability_end_probability(p.sex, s.disability_onset_age, s.disability_years, year)
+        from engine.disability import recovery_probability
+        out["disability_end"] = recovery_probability(p.sex, s.disability_onset_age, s.disability_years, year, age)
     elif not s.disabled and not s.retired:
         out["disability_start"] = disability_start_probability(p.sex, age, year)
     if not s.retired:

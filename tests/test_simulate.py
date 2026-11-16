@@ -118,10 +118,19 @@ def test_mean_age_at_death_matches_exact(sch, lives):
 def test_life_expectancy_close_to_risk_model(sch):
     """
     The links (A22, A23) move cancer, heart and stroke deaths onto people with that
-    diagnosis or event but keep each person's own death ratios, so life expectancy
-    stays within half a year of engine/risk.py (this person starts free of all three).
+    diagnosis or event but keep each person's own death ratios, and marriage (A24)
+    averages out over Canada's marital mix. This person starts free of all three
+    conditions and never married at 40, which costs a little: within one year of
+    engine/risk.py.
     """
-    assert abs(exact(sch)["mean_death_age"] - PERSON.age - life_expectancy(sch.q)) < 0.5
+    assert abs(exact(sch)["mean_death_age"] - PERSON.age - life_expectancy(sch.q)) < 1.0
+
+
+def test_married_start_lives_longer():
+    """A24: same answers, starting married rather than never married, gives a later expected death."""
+    never = exact(build_schedule(PERSON, improve=False))
+    married = exact(build_schedule(PERSON, improve=False, start_marital="married"))
+    assert married["mean_death_age"] > never["mean_death_age"]
 
 
 def test_cause_mix_matches_exact_expectation(sch, lives):
@@ -148,6 +157,18 @@ def test_first_heart_attack_and_stroke_match_exact_expectation(sch, lives, event
     expected = exact(sch)["ever_" + event]
     observed = np.mean([any(e == event for _, _, e in lf.events) for lf in lives])
     assert abs(observed - expected) < 4 * np.sqrt(expected * (1 - expected) / N)
+
+
+def test_first_disability_matches_exact_expectation(sch, lives):
+    expected = exact(sch)["ever_disability"]
+    observed = np.mean([any(e == "disability_start" for _, _, e in lf.events) for lf in lives])
+    assert abs(observed - expected) < 4 * np.sqrt(expected * (1 - expected) / N)
+
+
+def test_disabled_people_die_more(sch):
+    """A25: in every other state, a disabled person's death rate at 40-64 is higher than a non-disabled one's."""
+    for i in range(0, 25):
+        assert (sch.q_state[i][..., 1] > sch.q_state[i][..., 0]).all()
 
 
 def test_some_deaths_come_in_the_year_of_a_heart_attack_or_stroke(lives):

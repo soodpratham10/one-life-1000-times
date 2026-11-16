@@ -66,15 +66,18 @@ def test_eligibility_between_published_years():
 
 def test_disability_end_by_hand():
     """
-    Men, onset 40, in the 2nd year (1 year completed): 59 per 1,000 in 2025.
-    Onset 43 uses the nearest published age (40); 2030 is halfway to the 2035 value.
+    Termination rate for a spell by completed years (the first chance to end is the
+    year after it began, at the duration-1 rate). Men, onset 40: duration 1 = 38 and
+    duration 2 = 59 per 1,000 in 2025. Onset 43 uses the nearest published age (40);
+    2030 is halfway to the 2035 value; 6 and more years share the duration-6 rate.
     """
     t = load("cpp_disability_termination.csv")
     v2035 = float(t.loc[(t["year"] == 2035) & (t["sex"] == "M") & (t["age"] == 40) & (t["duration"] == 2), "per_1000"].iloc[0])
-    assert disability_end_probability("M", 40, 1, 2025) == pytest.approx(0.059)
-    assert disability_end_probability("M", 43, 1, 2025) == pytest.approx(0.059)
-    assert disability_end_probability("M", 40, 1, 2030) == pytest.approx((59 + v2035) / 2 / 1000)
-    assert disability_end_probability("M", 40, 9, 2025) == disability_end_probability("M", 40, 5, 2025)  # 6+
+    assert disability_end_probability("M", 40, 1, 2025) == pytest.approx(0.038)
+    assert disability_end_probability("M", 40, 2, 2025) == pytest.approx(0.059)
+    assert disability_end_probability("M", 43, 2, 2025) == pytest.approx(0.059)
+    assert disability_end_probability("M", 40, 2, 2030) == pytest.approx((59 + v2035) / 2 / 1000)
+    assert disability_end_probability("M", 40, 9, 2025) == disability_end_probability("M", 40, 6, 2025)
 
 
 def test_retirement():

@@ -325,15 +325,22 @@ def person_incidence(q_person, causes_person, sex: str, first_age: int) -> dict[
     return out
 
 
+MARITAL_STATES = ("never", "married", "divorced")
+
+
 def death_tables(q_person: np.ndarray, causes_person: np.ndarray, sex: str, first_age: int):
     """
-    For each age: death probability q[i, cancer_state, heart_attack_survivor, stroke_survivor]
-    and cause mix c[i, cancer_state, a, s, cause]; plus the acute fatality of a first heart
-    attack and of a first stroke at each age.
+    For each age: death probability q[i, cancer_state, heart_attack_survivor, stroke_survivor,
+    marital_state, disabled] and cause mix c[i, cancer_state, a, s, cause] (the marital and
+    disability multipliers scale every cause alike, so they do not change the mix); plus the
+    acute fatality of a first heart attack and of a first stroke at each age. Marital states
+    follow MARITAL_STATES (A24); disabled is 0 or 1 (A25).
     """
+    from engine.disability import death_multipliers
+    from engine.marriage import marital_ratio
     cal, cc = calibration(sex), cardio_calibration(sex)
     n, k = len(q_person), len(CAUSES)
-    q = np.ones((n, N_CANCER, 2, 2))
+    q = np.ones((n, N_CANCER, 2, 2, 3, 2))
     c = np.zeros((n, N_CANCER, 2, 2, k))
     acute_h = np.array([acute_fatality(sex, "heart")[min(first_age + i, MAX_AGE)] for i in range(n)])
     acute_s = np.array([acute_fatality(sex, "stroke")[min(first_age + i, MAX_AGE)] for i in range(n)])
@@ -349,6 +356,8 @@ def death_tables(q_person: np.ndarray, causes_person: np.ndarray, sex: str, firs
             c[i, 0] = mix_u
             c[i, 1:] = cp
             continue
+        m_ratio = [marital_ratio(st, sex, age) for st in MARITAL_STATES]
+        d_mult = death_multipliers(sex, age)
         mu = -np.log(1 - q_person[i])
         base = np.zeros(k)
         base[other_causes] = mu * cp[other_causes] * cal["eta"][age] * cc["eta"][age]
@@ -367,6 +376,8 @@ def death_tables(q_person: np.ndarray, causes_person: np.ndarray, sex: str, firs
                     f[LUNG], f[OTHER] = cancer[cs]
                     f[HEART] = heart_bg + extra_h * a
                     f[STROKE] = stroke_bg + extra_s * s_
-                    q[i, cs, a, s_] = 1 - np.exp(-f.sum())
                     c[i, cs, a, s_] = f / f.sum()
+                    for m in range(3):
+                        for dis in (0, 1):
+                            q[i, cs, a, s_, m, dis] = 1 - np.exp(-f.sum() * m_ratio[m] * d_mult[dis])
     return q, c, acute_h, acute_s

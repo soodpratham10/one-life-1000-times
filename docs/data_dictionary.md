@@ -247,6 +247,19 @@ One row per year x region x sex x age group x risk factor: the share of people w
 | `quality` | Blank = fine; E = use with caution; F = too unreliable to publish; x = suppressed; .. = not collected that year |
 | `base` | True on the rows of the year the engine uses for that factor: the latest year up to 2019 with complete Canadian data (A18) |
 
+### `marital_status.csv`
+One row per year x region x sex x single age 15–100 x legal marital status: the number of people and their share of that age. 2015–2022 (the engine uses 2019). Source: Statistics Canada, Table 17-10-0060-01. Built by `pipeline/16_marital_status.py`. Tests: `tests/test_marital_status.py`. Assumption A24.
+
+| Column | Meaning |
+| --- | --- |
+| `year` | July 1 of this year |
+| `region` | `CA` Canada or a province |
+| `sex` | M, F or B |
+| `age` | Single age 15–100 (100 = 100 and over) |
+| `status` | Legal marital status: single (including common law), married (not separated), separated, widowed, divorced |
+| `population` | People of this age and status |
+| `share` | Population ÷ all statuses at this age |
+
 ---
 
 ## Assumption tables (`data/assumptions/`)
@@ -258,7 +271,7 @@ One row per risk factor x level (x sex where the study gives one). Read by `engi
 
 | Column | Meaning |
 | --- | --- |
-| `factor` | smoking, activity, bmi, alcohol or fruit_veg |
+| `factor` | smoking, activity, bmi, alcohol, fruit_veg or marital |
 | `level` | The answer group, e.g. quit_35_44, 150_299 (minutes a week), 25_27.5 (BMI), 25_44g (grams of alcohol a day), 5_plus (servings a day) |
 | `sex` | M, F, or B where the same ratio is used for both |
 | `hr` | Hazard ratio against the factor's reference level (which has 1.00) |
@@ -285,6 +298,18 @@ Current smokers' death-rate ratio against never smokers for each cause of death.
 | `sex` | M, F, or B where the same ratio is used for both |
 | `hr_current` | Ratio for current smokers (former smokers are derived from it, see A20) |
 | `source` | Study the number comes from |
+
+### `assumptions/disabled_mortality.csv`
+Death rates of CPP disability beneficiaries by sex and single age 20–64, and their ratio to the general population, 2011. Typed in from the Office of the Chief Actuary, Actuarial Study No. 16 (2015), Table 40. Read by `engine/disability.py`. Tests: `tests/test_disability.py`. Assumption A25.
+
+| Column | Meaning |
+| --- | --- |
+| `sex` | M or F |
+| `age` | 20–64 |
+| `disabled_per_1000` | Graduated deaths per 1,000 disability beneficiaries a year |
+| `population_per_1000` | General population deaths per 1,000 a year (the study's comparison) |
+| `ratio` | Disabled ÷ population, as published |
+| `source` | Study and table |
 
 ---
 
