@@ -411,6 +411,20 @@ The R rebuild against the engine, one row per reference value. Built by `Rscript
 | `r_value` | R's value |
 | `difference` | R minus the engine |
 
+### `crosscheck/results/r_cpp_vs_python.csv`
+The R rebuild of the CPP improvement basis (A28) against the engine, one row per value in `cpp_reference.csv`. Built by `Rscript crosscheck/r/run_crosscheck.R`.
+
+| Column | Meaning |
+| --- | --- |
+| `case` | As in `cpp_reference.csv` |
+| `sex` | M or F |
+| `measure` | As in `cpp_reference.csv` |
+| `at_age` | Age (blank for the scales) |
+| `year` | Calendar year (blank for the scales) |
+| `value` | The engine's value |
+| `r_value` | R's value |
+| `difference` | R minus the engine |
+
 ### `crosscheck/results/r_cancer_cohort.csv`
 The synthetic cohort run in R with the engine's solved cancer rates, against the official deaths, ages 18–109. Built by `Rscript crosscheck/r/run_crosscheck.R`.
 
