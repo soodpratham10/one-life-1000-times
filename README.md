@@ -107,7 +107,13 @@ Both figures are drawn from the engine's own simulated lives by [`docs/figures/m
 
 ## Data
 
-All inputs come from official public sources. Every cleaned file and column is described in [`docs/data_dictionary.md`](docs/data_dictionary.md).
+All inputs come from official public sources, and every source below links straight to the original so you can check it yourself. Every cleaned file and column is described in [`docs/data_dictionary.md`](docs/data_dictionary.md).
+
+> [!TIP]
+> The three sections below are folded to keep the page short. **Click a heading (▶) to open it.**
+
+<details>
+<summary><h3>📊 Data sources (14) <sub><i>· click to open</i></sub></h3></summary>
 
 | Source | Used for |
 | --- | --- |
@@ -126,7 +132,10 @@ All inputs come from official public sources. Every cleaned file and column is d
 | Health Canada, [Canadian Tobacco and Nicotine Survey 2019, detailed tables](https://www.canada.ca/en/health-canada/services/canadian-tobacco-nicotine-survey/2019-summary/2019-detailed-tables.html) | How common former smokers are, by age and sex |
 | Statistics Canada, [Adult obesity in Canada: measured height and weight (CCHS 2004)](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/article/adults-adultes/8060-eng.htm) | Split of obesity into classes I–III |
 
-### Studies
+</details>
+
+<details>
+<summary><h3>📚 Studies behind the hazard ratios and checks (17) <sub><i>· click to open</i></sub></h3></summary>
 
 Every hazard ratio and published figure the engine uses, with a link to the paper. The exact numbers taken from each are in [`data/assumptions/`](data/assumptions/) and [`docs/assumptions.md`](docs/assumptions.md).
 
@@ -150,8 +159,10 @@ Every hazard ratio and published figure the engine uses, with a link to the pape
 | Shor et al. (2012), [Widowhood and mortality: a meta-analysis and meta-regression](https://academiccommons.columbia.edu/doi/10.7916/D8DR2VR9), *Demography* | Widowed |
 | Statistics Canada, [Health Fact Sheet: Smoking, 2019](https://www150.statcan.gc.ca/n1/pub/82-625-x/2020001/article/00003-eng.htm) | Check on the smoking figures |
 
+</details>
+
 <details>
-<summary><b>Full source details, and how to get the hand-downloaded files</b></summary>
+<summary><h3>🛠️ Full source details, and how to get the hand-downloaded files <sub><i>· click to open</i></sub></h3></summary>
 
 | Source | What it gives | In this repo? |
 | --- | --- | --- |
