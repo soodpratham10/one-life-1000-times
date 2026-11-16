@@ -73,19 +73,44 @@ All inputs come from official public sources. Every cleaned file and column is d
 
 | Source | Used for |
 | --- | --- |
-| Statistics Canada life tables (13-10-0114-01; PEI abridged 13-10-0140-01) | Base death rates by age, sex and province |
-| Canadian Institute of Actuaries, MI-2024 | Future mortality improvement (not committed; see below) |
-| Statistics Canada causes of death (13-10-0392-01) | Splitting deaths into 12 cause groups |
-| Transport Canada, National Collision Database | Car crash injuries |
-| Statistics Canada cancer incidence (13-10-0111-01) | Cancer diagnoses |
-| Public Health Agency of Canada, CCDSS | Heart attacks and strokes |
-| Office of the Chief Actuary, 32nd CPP Actuarial Report | Disability and retirement |
-| Office of the Chief Actuary, Actuarial Study No. 16 (2015) | Death rates of CPP disability beneficiaries |
-| Statistics Canada marriages, divorces, births (39-10-0057-01, 39-10-0053-01, 13-10-0421-01) | Marriage, divorce, remarriage, first child |
-| Statistics Canada population (17-10-0005-01) | Denominators for event rates |
-| Statistics Canada population by legal marital status (17-10-0060-01) | Canada's marital mix by age, to apply marriage death ratios |
-| Statistics Canada, Canadian Community Health Survey (13-10-0096-01) | How common smoking, inactivity, obesity and low fruit and vegetable intake are, by age and sex |
-| Health Canada, Canadian Tobacco and Nicotine Survey 2019 | How common former smokers are, by age and sex |
+| Statistics Canada, life tables: [13-10-0114-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011401); PEI abridged table [13-10-0140-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310014001) | Base death rates by age, sex and province |
+| Canadian Institute of Actuaries, [Mortality Improvements Research – Tables (MI-2024)](https://www.cia-ica.ca/?p=333613) and [report](https://www.cia-ica.ca/publications/224043e/) | Future mortality improvement (not committed; see below) |
+| Statistics Canada, deaths by cause: [13-10-0392-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310039201) | Splitting deaths into 12 cause groups |
+| Transport Canada, [National Collision Database (open data)](https://open.canada.ca/data/en/dataset/1eb9eba7-71d1-4b30-9fb1-30cbdab7e63a) | Car crash injuries |
+| Statistics Canada, new cancer cases: [13-10-0111-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310011101) | Cancer diagnoses |
+| Public Health Agency of Canada, [Canadian Chronic Disease Surveillance System data tool](https://health-infobase.canada.ca/ccdss/data-tool/) | Heart attacks and strokes |
+| Office of the Chief Actuary, [32nd Actuarial Report on the Canada Pension Plan (revised)](https://www.osfi-bsif.gc.ca/en/oca/actuarial-reports/actuarial-report-32nd-canada-pension-plan-revised-version) | Disability and retirement |
+| Office of the Chief Actuary, [Actuarial Study No. 16: CPP beneficiaries mortality study (2015)](https://publications.gc.ca/site/eng/9.804327/publication.html) | Death rates of CPP disability beneficiaries |
+| Statistics Canada, marriages [39-10-0057-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3910005701), divorces [39-10-0053-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3910005301), births by parity [13-10-0421-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310042101) | Marriage, divorce, remarriage, first child |
+| Statistics Canada, population: [17-10-0005-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710000501) | Denominators for event rates |
+| Statistics Canada, population by legal marital status: [17-10-0060-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710006001) | Canada's marital mix by age, to apply marriage death ratios |
+| Statistics Canada, Canadian Community Health Survey: [13-10-0096-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310009601) | How common smoking, inactivity, obesity and low fruit and vegetable intake are, by age and sex |
+| Health Canada, [Canadian Tobacco and Nicotine Survey 2019, detailed tables](https://www.canada.ca/en/health-canada/services/canadian-tobacco-nicotine-survey/2019-summary/2019-detailed-tables.html) | How common former smokers are, by age and sex |
+| Statistics Canada, [Adult obesity in Canada: measured height and weight (CCHS 2004)](https://www150.statcan.gc.ca/n1/pub/82-620-m/2005001/article/adults-adultes/8060-eng.htm) | Split of obesity into classes I–III |
+
+### Studies
+
+Every hazard ratio and published figure the engine uses, with a link to the paper. The exact numbers taken from each are in [`data/assumptions/`](data/assumptions/) and [`docs/assumptions.md`](docs/assumptions.md).
+
+| Study | Used for |
+| --- | --- |
+| Jha et al. (2013), [21st-century hazards of smoking and benefits of cessation in the United States](https://doi.org/10.1056/NEJMsa1211128), *NEJM* | Smoking: current smokers, quitting at 45–54, "other causes" ratio |
+| Pirie et al. (2013), [The 21st century hazards of smoking and benefits of stopping (Million Women Study)](https://doi.org/10.1016/S0140-6736(12)61720-6), *Lancet* | Quitting before 35 and at 35–44 |
+| Thun et al. (2013), [50-year trends in smoking-related mortality in the United States](https://doi.org/10.1056/NEJMsa1211127), *NEJM* | Smoking ratios by cause of death (lung cancer, COPD, heart disease, stroke) |
+| Arem et al. (2015), [Leisure time physical activity and mortality](https://doi.org/10.1001/jamainternmed.2015.0533), *JAMA Internal Medicine* | Physical activity |
+| Global BMI Mortality Collaboration (2016), [Body-mass index and all-cause mortality](https://doi.org/10.1016/S0140-6736(16)30175-1), *Lancet* | Body-mass index |
+| Zhao et al. (2023), [Association between daily alcohol intake and risk of all-cause mortality](https://doi.org/10.1001/jamanetworkopen.2023.6185), *JAMA Network Open* | Alcohol |
+| Wang et al. (2021), [Fruit and vegetable intake and mortality](https://doi.org/10.1161/CIRCULATIONAHA.120.048996), *Circulation* | Fruit and vegetables |
+| Manuel et al. (2016), [Life expectancy lost in Canada attributable to smoking, alcohol, physical inactivity, and diet (MPoRT)](https://doi.org/10.1371/journal.pmed.1002082), *PLOS Medicine* | Check: healthiest vs least healthy habits |
+| Canadian Cancer Society, [Canadian Cancer Statistics](https://cancer.ca/en/research/cancer-statistics/canadian-cancer-statistics) (2023) | Lung cancer survival (5 and 10 years), for the cancer link and its check |
+| Boucher et al. (2001), [Age-related differences in in-hospital mortality and the use of thrombolytic therapy for acute myocardial infarction](https://pmc.ncbi.nlm.nih.gov/articles/PMC81018), *CMAJ* | How heart attack fatality rises with age |
+| Li et al. (2022), [Impact of including out-of-hospital deaths on 30-day in-hospital mortality indicators](https://cmajopen.ca/content/10/4/E882), *CMAJ Open* (CIHI) | 30-day heart attack mortality, 6.5% |
+| Joundi et al. (2021), [Temporal trends in case fatality … after acute stroke](https://doi.org/10.1212/WNL.0000000000011791), *Neurology* | 30-day stroke case fatality, 13.2% |
+| [Mortality and morbidity trends after the first year in survivors of acute myocardial infarction: a systematic review](https://doi.org/10.1186/s12872-017-0482-9) (2017), *BMC Cardiovascular Disorders*; [Excess long-term mortality among hospital survivors of AMI (SAMI)](https://cris.bgu.ac.il/en/publications/excess-long-term-mortality-among-hospital-survivors-of-acute-myoc-2/) (2017), *Public Health* | Range for heart attack and stroke survivors' extra risk |
+| Roelfs et al. (2011), [The rising relative risk of mortality for singles](https://doi.org/10.1093/aje/kwr111), *American Journal of Epidemiology* | Never married |
+| Shor et al. (2012), [Meta-analysis of marital dissolution and mortality](https://pubmed.ncbi.nlm.nih.gov/22534377/), *Social Science & Medicine* | Divorced and separated |
+| Shor et al. (2012), [Widowhood and mortality: a meta-analysis and meta-regression](https://academiccommons.columbia.edu/doi/10.7916/D8DR2VR9), *Demography* | Widowed |
+| Statistics Canada, [Health Fact Sheet: Smoking, 2019](https://www150.statcan.gc.ca/n1/pub/82-625-x/2020001/article/00003-eng.htm) | Check on the smoking figures |
 
 <details>
 <summary><b>Full source details, and how to get the hand-downloaded files</b></summary>
@@ -109,7 +134,7 @@ All inputs come from official public sources. Every cleaned file and column is d
 
 ### Getting the CIA MI-2024 file
 
-1. Download "Mortality Improvements Research – Tables" from the CIA website (cia-ica.ca, publication 224043).
+1. Download "Mortality Improvements Research – Tables" from the [CIA website](https://www.cia-ica.ca/?p=333613) (publication 224043).
 2. Save it as `data/raw/cia_mi2024/224043te.xlsx`.
 3. Run `python pipeline/03_clean_mi2024.py`.
 
@@ -117,7 +142,7 @@ Without it, the MI-2024 tests are skipped rather than failed.
 
 ### Getting the CCDSS heart attack and stroke files
 
-1. Open the CCDSS data tool on health-infobase.canada.ca and choose the **Age Distribution** view.
+1. Open the [CCDSS data tool](https://health-infobase.canada.ca/ccdss/data-tool/) and choose the **Age Distribution** view.
 2. Condition **Acute myocardial infarction**, measure **Crude incidence rate**; click **Download Detailed Table**. Save as `data/raw/ccdss/ccdss_ami_by_age.csv`.
 3. Repeat for **Stroke**; save as `data/raw/ccdss/ccdss_stroke_by_age.csv`.
 4. Run `python pipeline/11_heart_stroke.py`.
@@ -126,7 +151,7 @@ The download contains every year, whatever year the tool shows on screen.
 
 ### Getting the CPP actuarial report
 
-1. Download the 32nd Actuarial Report on the Canada Pension Plan (revised version) PDF, `cpp32-rev-ed-en.pdf`, from osfi-bsif.gc.ca (Office of the Chief Actuary).
+1. Download the [32nd Actuarial Report on the Canada Pension Plan (revised version)](https://www.osfi-bsif.gc.ca/en/oca/actuarial-reports/actuarial-report-32nd-canada-pension-plan-revised-version) PDF, `cpp32-rev-ed-en.pdf`, from the Office of the Chief Actuary.
 2. Save it as `data/raw/oca/cpp32-rev-ed-en.pdf`.
 3. Run `python pipeline/12_cpp_disability.py` and `python pipeline/13_cpp_retirement.py` (they read the tables straight from the PDF).
 
