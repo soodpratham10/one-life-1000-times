@@ -22,7 +22,16 @@ How it works (A07, A08, A18 in docs/assumptions.md):
    separate studies overstates risk for people with many factors (A08).
 
 Factors are treated as independent, so the population average is the product
-of each factor's average. Answers are held for life (a smoker stays a smoker).
+of each factor's average.
+
+6. Habits that change with age (A26). Activity and BMI drift the way Canada's do:
+   a person keeps their place in their age group's distribution (someone heavier
+   than 60% of people their age stays heavier than 60% at every later age), so
+   their level moves as the age group's mix moves. Their hazard ratio at a later
+   age is the average over the part of that age group's distribution their
+   place covers. The population average is unchanged by this, exactly.
+   Smoking, alcohol and fruit and vegetables are held as answered (a smoker
+   stays a smoker; fruit and vegetable habits barely change with age).
 """
 
 from dataclasses import dataclass
@@ -130,6 +139,15 @@ def levels(p: Person) -> dict[str, str]:
             "alcohol": alcohol, "fruit_veg": fruit_veg}
 
 
+# Habits that drift with age (A26), with their levels in order of the answer
+# (least to most activity; lowest to highest BMI). Underweight is not in the
+# population mix (counted as normal, A18), so it is held as answered.
+DRIFTING = {
+    "activity": ("none", "under_150", "150_299", "300_449", "450_plus"),
+    "bmi": ("18.5_25", "25_27.5", "27.5_30", "30_35", "35_40", "40_plus"),
+}
+
+
 # ---------------------------------------------------------------- hazard ratios
 
 @lru_cache(maxsize=None)
@@ -210,10 +228,41 @@ def average_multiplier(sex: str, age: int) -> float:
     return total
 
 
+def _bounds(order: tuple[str, ...], shares: dict[str, float]) -> dict[str, tuple[float, float]]:
+    """Each level's slice of the age group's distribution, [lower, upper) cumulative share."""
+    out, lo = {}, 0.0
+    for level in order:
+        hi = lo + shares.get(level, 0.0)
+        out[level] = (lo, hi)
+        lo = hi
+    return out
+
+
+@lru_cache(maxsize=None)
+def drift_ratio(factor: str, level: str, sex: str, answer_age: int, age: int) -> float:
+    """
+    Hazard ratio (tapered) at `age` for someone at `level` when they answered at
+    `answer_age` (A26): the average over their slice of the distribution, read
+    against the distribution at `age`.
+    """
+    w = taper(age)
+    order = DRIFTING.get(factor)
+    if order is None or level not in order or age_group(age) == age_group(answer_age):
+        return hazard_ratio(factor, level, sex) ** w
+    lo, hi = _bounds(order, population_mix(sex, age_group(answer_age))[factor])[level]
+    if hi <= lo:                                   # nobody at this level in the survey's mix
+        return hazard_ratio(factor, level, sex) ** w
+    later = _bounds(order, population_mix(sex, age_group(age))[factor])
+    total = 0.0
+    for lvl, (a, b) in later.items():
+        overlap = max(0.0, min(hi, b) - max(lo, a))
+        total += overlap * hazard_ratio(factor, lvl, sex) ** w
+    return total / (hi - lo)
+
+
 def person_multiplier(p: Person, age: int) -> float:
     """This person's combined multiplier at a given age, before dividing out the average."""
-    w = taper(age)
-    return float(np.prod([hazard_ratio(f, lvl, p.sex) ** w for f, lvl in levels(p).items()]))
+    return float(np.prod([drift_ratio(f, lvl, p.sex, p.age, age) for f, lvl in levels(p).items()]))
 
 
 def relative_multiplier(p: Person, age: int) -> float:

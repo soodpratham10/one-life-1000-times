@@ -82,6 +82,8 @@ Each survey answer moves your death rates by a hazard ratio from a large publish
 | 🍺 Drinks a week | [Zhao et al., *JAMA Network Open* 2023](https://doi.org/10.1001/jamanetworkopen.2023.6185) |
 | 🥦 Servings of fruit and vegetables a day | [Wang et al., *Circulation* 2021](https://doi.org/10.1161/CIRCULATIONAHA.120.048996) |
 
+Your activity and weight are not frozen at today's answer: as you age, you keep your place among people your age (fitter or heavier than most, say) while Canada's mix shifts, the way it does for real people (A26). Smoking, drinking and diet stay as you answer them.
+
 Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. Smoking also changes what people die of (lung cancer and COPD far more than other causes), using cause-specific ratios from [Thun et al., *NEJM* 2013](https://doi.org/10.1056/NEJMsa1211127). A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study ([Manuel et al., *PLOS Medicine* 2016](https://doi.org/10.1371/journal.pmed.1002082)).
 
 Both figures are drawn from the engine's own simulated lives by [`docs/figures/make_figures.py`](docs/figures/make_figures.py); no number on them is typed in.
@@ -96,7 +98,7 @@ Both figures are drawn from the engine's own simulated lives by [`docs/figures/m
 | 1. Data | Pipeline, cleaned tables, assumptions register, data dictionary, tests | ✅ Done ([v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0)) |
 | 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | ✅ Done ([v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0)) |
 | 3. Links between events | Cancer deaths after a diagnosis, deaths after a heart attack or stroke, marriage effects, disability recovery vs death | ✅ Done ([v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0)) |
-| 4. Validation | Actual-to-expected checks against official figures; independent R and Excel cross-checks | 🔜 Next |
+| 4. Validation | Actual-to-expected checks against official figures; independent R and Excel VBA cross-checks | 🔨 In progress |
 | 5. Website | Survey and interactive visuals | ⬜ Planned |
 | 6. Launch | Write-up and release | ⬜ Planned |
 
@@ -249,7 +251,8 @@ engine/              simulation engine: mortality.py (base rates and improvement
                      (deaths after cancer, heart attack and stroke), marriage.py and disability.py
                      (marital status and disability and mortality), simulate.py (whole lives),
                      demo.py (try it)
-crosscheck/          independent R and Excel checks (Phase 4, not built yet)
+validation/          population check against StatCan (Phase 4); results in validation/results/
+crosscheck/          independent R and Excel VBA checks (Phase 4, not built yet)
 web/                 survey and visuals (Phase 5, not built yet)
 ```
 

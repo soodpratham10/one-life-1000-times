@@ -23,13 +23,16 @@ same period.
 What should match, and what should not
 --------------------------------------
 The habit mix is divided out age by age, so a population whose mix matched
-Canada's at every age would reproduce the life table closely. This check holds
-each person's habits for life instead (as the engine does): the cohort keeps
-its starting mix while real Canadians' mix changes with age (fewer smokers at
-older ages, partly because smokers die first). Everyone also starts cancer-free,
-with no heart attack or stroke and not disabled. So small differences are
-expected, mostly at older ages; this script measures them, it does not hide
-them. Results are written to validation/results/population_check.csv.
+Canada's at every age would reproduce the life table closely. Activity and BMI
+drift with age as Canada's do (A26), so they follow the mix. Three things still
+differ, and this script measures them rather than hiding them:
+  - smoking is held as answered, so a cohort keeps today's smoking mix for life,
+    while today's older Canadians include many more former smokers;
+  - healthier people survive longer, so the cohort's survivors at old ages are
+    healthier than the 65+ mix the engine divides out (one CCHS group, 65 to 110);
+  - everyone starts cancer-free, with no heart attack or stroke and not disabled,
+    which matters most for the start at age 65.
+Results are written to validation/results/population_check.csv.
 """
 
 import argparse

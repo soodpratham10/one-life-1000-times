@@ -20,10 +20,12 @@ from engine.data import has_improvement_scale
 from engine.mortality import cohort_qx, life_expectancy
 from engine.risk import (
     CAP_HIGH,
+    DRIFTING,
     FACTORS,
     Person,
     age_group,
     average_multiplier,
+    drift_ratio,
     hazard_ratio,
     levels,
     person_multiplier,
@@ -258,3 +260,61 @@ def test_quitting_earlier_gains_more(sex):
         gains.append(e_unimproved(quit) - e_unimproved(still))
     assert gains == sorted(gains, reverse=True)
     assert gains[0] > 7
+
+
+# ---------------------------------------------------------------- habits that drift with age (A26)
+
+LATER_AGES = (25, 40, 55, 70, 90)
+
+
+@pytest.mark.parametrize("sex", ["M", "F"])
+@pytest.mark.parametrize("factor", list(DRIFTING))
+@pytest.mark.parametrize("answer_age", (25, 40, 55, 70))
+def test_drift_keeps_the_population_average_exactly(sex, factor, answer_age):
+    """Averaged over everyone who answered at `answer_age`, the drifted ratio at a later
+    age equals that age group's own average, so dividing out the average still works."""
+    start = population_mix(sex, age_group(answer_age))[factor]
+    for age in LATER_AGES:
+        if age < answer_age:
+            continue
+        w = taper(age)
+        later = population_mix(sex, age_group(age))[factor]
+        drifted = sum(share * drift_ratio(factor, lvl, sex, answer_age, age) for lvl, share in start.items())
+        direct = sum(share * hazard_ratio(factor, lvl, sex) ** w for lvl, share in later.items())
+        assert drifted == pytest.approx(direct, rel=1e-12)
+
+
+@pytest.mark.parametrize("factor", list(DRIFTING))
+def test_no_drift_inside_the_answer_age_group(factor):
+    for lvl in DRIFTING[factor]:
+        assert drift_ratio(factor, lvl, "M", 25, 34) == pytest.approx(hazard_ratio(factor, lvl, "M"))
+
+
+@pytest.mark.parametrize("sex", ["M", "F"])
+@pytest.mark.parametrize("factor", list(DRIFTING))
+def test_drift_keeps_the_order_of_levels(sex, factor):
+    """Someone who answered a riskier level never ends up with a lower ratio than someone safer."""
+    for age in LATER_AGES:
+        ratios = [drift_ratio(factor, lvl, sex, 25, age) for lvl in DRIFTING[factor]]
+        if factor == "activity":
+            ratios = ratios[::-1]          # more activity, lower risk
+        assert ratios == sorted(ratios)
+
+
+def test_normal_bmi_at_25_drifts_up_by_middle_age():
+    """By hand: 44.2% of men 18-34 have a normal BMI, but only 25.4% of men 35-49 (21.9%
+    are 25-27.5). A normal-BMI 25-year-old fills the slice 0-0.442, so at 40 the part
+    0-0.254 stays normal (ratio 1) and 0.254-0.442 falls in 25-27.5 (ratio 1.07)."""
+    young = population_mix("M", (18, 34))["bmi"]["18.5_25"]
+    m35 = population_mix("M", (35, 49))["bmi"]
+    normal, over = m35["18.5_25"], m35["25_27.5"]
+    assert normal < young < normal + over
+    expected = (normal * 1.0 + (young - normal) * 1.07) / young
+    assert drift_ratio("bmi", "18.5_25", "M", 25, 40) == pytest.approx(expected, rel=1e-12)
+    assert 1.02 < expected < 1.04
+
+
+def test_held_factors_do_not_drift():
+    for factor, lvl in (("smoking", "current"), ("alcohol", "45_64g"), ("fruit_veg", "5_plus"),
+                        ("bmi", "under_18.5")):
+        assert drift_ratio(factor, lvl, "F", 25, 60) == pytest.approx(hazard_ratio(factor, lvl, "F"))
