@@ -21,6 +21,8 @@ from engine.mortality import cohort_qx, life_expectancy
 from engine.risk import (
     CAP_HIGH,
     DRIFTING,
+    QUIT_FROM_AGE,
+    QUIT_RATE,
     FACTORS,
     Person,
     age_group,
@@ -30,6 +32,7 @@ from engine.risk import (
     levels,
     person_multiplier,
     personal_qx,
+    smoking_path,
     population_mix,
     relative_multiplier,
     taper,
@@ -234,7 +237,7 @@ def test_best_vs_worst_habits_gap_close_to_mport(sex):
     diet profile. Engine (same four factors, normal BMI): men 18.8, women 17.4.
     """
     best = Person(sex, 18, activity_minutes=500, height_cm=175, weight_kg=70, fruit_veg_per_day=5)
-    worst = Person(sex, 18, smoking="current", height_cm=175, weight_kg=70,
+    worst = Person(sex, 18, smoking="current", keeps_smoking=True, height_cm=175, weight_kg=70,
                    drinks_per_week=40, fruit_veg_per_day=1)
     assert 13.9 < e_unimproved(best) - e_unimproved(worst) < 21.9
 
@@ -243,10 +246,10 @@ def test_best_vs_worst_habits_gap_close_to_mport(sex):
 def test_smokers_lose_about_a_decade(sex):
     """
     Jha et al. 2013: current smokers lose more than 10 years against never smokers
-    (US rates). Engine: about 9 years at 25 (men 9.2, women 8.8); the smaller loss
+    (US rates; people who kept smoking, so keeps_smoking=True here). Engine: about 9 years at 25 (men 9.2, women 8.8); the smaller loss
     comes mostly from tapering the ratio after age 79.
     """
-    gap = e_unimproved(Person(sex, 25, **TYPICAL)) - e_unimproved(Person(sex, 25, smoking="current", **TYPICAL))
+    gap = e_unimproved(Person(sex, 25, **TYPICAL)) - e_unimproved(Person(sex, 25, smoking="current", keeps_smoking=True, **TYPICAL))
     assert 8 < gap < 12
 
 
@@ -256,7 +259,7 @@ def test_quitting_earlier_gains_more(sex):
     gains = []
     for age in (30, 40, 50, 60):
         quit = Person(sex, age, smoking="former", quit_age=age, **TYPICAL)
-        still = Person(sex, age, smoking="current", **TYPICAL)
+        still = Person(sex, age, smoking="current", keeps_smoking=True, **TYPICAL)
         gains.append(e_unimproved(quit) - e_unimproved(still))
     assert gains == sorted(gains, reverse=True)
     assert gains[0] > 7
@@ -318,3 +321,44 @@ def test_held_factors_do_not_drift():
     for factor, lvl in (("smoking", "current"), ("alcohol", "45_64g"), ("fruit_veg", "5_plus"),
                         ("bmi", "under_18.5")):
         assert drift_ratio(factor, lvl, "F", 25, 60) == pytest.approx(hazard_ratio(factor, lvl, "F"))
+
+
+# ---------------------------------------------------------------- quitting smoking (A27)
+
+@pytest.mark.parametrize("answer_age", (18, 25, 40, 70))
+def test_smoking_path_adds_to_one_and_matches_the_quit_rate(answer_age):
+    p = Person("M", answer_age, smoking="current")
+    for age in range(answer_age, 111, 7):
+        path = dict(smoking_path(p, age))
+        assert sum(path.values()) == pytest.approx(1.0, rel=1e-12)
+        years_quitting = max(0, age - max(answer_age, QUIT_FROM_AGE))
+        assert path["current"] == pytest.approx((1 - QUIT_RATE) ** years_quitting, rel=1e-12)
+
+
+def test_smoking_path_by_hand():
+    """A smoker who answers at 33: quits at 33 or 34 (before 35) or 35-36 (35-44) by age 37."""
+    path = dict(smoking_path(Person("F", 33, smoking="current"), 37))
+    r = QUIT_RATE
+    assert path["quit_before_35"] == pytest.approx(r + (1 - r) * r, rel=1e-12)
+    assert path["quit_35_44"] == pytest.approx((1 - r) ** 2 * r + (1 - r) ** 3 * r, rel=1e-12)
+    assert path["current"] == pytest.approx((1 - r) ** 4, rel=1e-12)
+
+
+def test_no_quitting_before_25_or_when_keeping_smoking_or_for_others():
+    assert dict(smoking_path(Person("M", 18, smoking="current"), 25)) == {"current": 1.0}
+    assert smoking_path(Person("M", 30, smoking="current", keeps_smoking=True), 90) == (("current", 1.0),)
+    assert smoking_path(Person("M", 30), 90) == (("never", 1.0),)
+    assert smoking_path(Person("M", 50, smoking="former", quit_age=40), 90) == (("quit_35_44", 1.0),)
+    with pytest.raises(ValueError):
+        Person("M", 30, keeps_smoking=True)
+
+
+@pytest.mark.parametrize("sex", ["M", "F"])
+def test_a_smoker_who_may_quit_sits_between_keeping_on_and_never_smoking(sex):
+    may_quit = Person(sex, 30, smoking="current", **TYPICAL)
+    keeps = Person(sex, 30, smoking="current", keeps_smoking=True, **TYPICAL)
+    never = Person(sex, 30, **TYPICAL)
+    assert relative_multiplier(may_quit, 30) == pytest.approx(relative_multiplier(keeps, 30))   # no change yet
+    for age in (40, 60, 75):
+        assert relative_multiplier(never, age) < relative_multiplier(may_quit, age) < relative_multiplier(keeps, age)
+    assert e_unimproved(keeps) < e_unimproved(may_quit) < e_unimproved(never)

@@ -32,8 +32,8 @@ AGE_LO, AGE_HI = 25, 110
 BASE = dict(sex="M", age=25, region="MB", activity_minutes=60, height_cm=178, weight_kg=88,
             drinks_per_week=10, fruit_veg_per_day=2)
 PROFILES = [
-    ("Smokes, little exercise, 10 drinks a week",
-     Person(smoking="current", **BASE)),
+    ("Keeps smoking, little exercise, 10 drinks a week",
+     Person(smoking="current", keeps_smoking=True, **BASE)),
     ("Same habits, but quits smoking today",
      Person(smoking="former", quit_age=25, **BASE)),
     ("Never smoked, active, healthy weight, 3 drinks, 5 fruit and veg",

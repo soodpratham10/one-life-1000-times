@@ -89,7 +89,7 @@ def test_smokers_die_more_of_lung_disease(sex):
     lung, copd, dementia = (CAUSES.index(c) for c in ("lung_cancer", "copd", "dementia"))
     for age in (55, 62, 70):
         pop = base_shares(sex, age)
-        smoker = cause_probabilities(Person(sex, 50, smoking="current"), age)
+        smoker = cause_probabilities(Person(sex, 50, smoking="current", keeps_smoking=True), age)
         never = cause_probabilities(Person(sex, 50), age)
         for c in (lung, copd):
             assert smoker[c] > pop[c] > never[c]
@@ -101,3 +101,16 @@ def test_taper_brings_smokers_back_to_never_smokers():
     smoker = cause_probabilities(Person("M", 50, smoking="current"), 109)
     never = cause_probabilities(Person("M", 50), 109)
     assert np.abs(smoker - never).max() < 0.02
+
+
+@pytest.mark.parametrize("sex", ["M", "F"])
+def test_a_smoker_who_may_quit_gets_a_cause_mix_between_keeping_on_and_never(sex):
+    """A27: the cause mix follows the smoking path, so it lies between the two."""
+    lung = CAUSES.index("lung_cancer")
+    may_quit = Person(sex, 40, smoking="current")
+    keeps = Person(sex, 40, smoking="current", keeps_smoking=True)
+    assert np.allclose(cause_probabilities(may_quit, 40), cause_probabilities(keeps, 40))
+    for age in (55, 70):
+        mix = cause_probabilities(may_quit, age)
+        assert mix.sum() == pytest.approx(1.0)
+        assert cause_probabilities(Person(sex, 40), age)[lung] < mix[lung] < cause_probabilities(keeps, age)[lung]

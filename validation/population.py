@@ -24,10 +24,10 @@ What should match, and what should not
 --------------------------------------
 The habit mix is divided out age by age, so a population whose mix matched
 Canada's at every age would reproduce the life table closely. Activity and BMI
-drift with age as Canada's do (A26), so they follow the mix. Three things still
+drift with age as Canada's do (A26), so they follow the mix. Three things
 differ, and this script measures them rather than hiding them:
-  - smoking is held as answered, so a cohort keeps today's smoking mix for life,
-    while today's older Canadians include many more former smokers;
+  - current smokers quit over time (A27), so the cohort ends up with far fewer
+    smokers than today's older Canadians (a cohort vs period-table difference);
   - healthier people survive longer, so the cohort's survivors at old ages are
     healthier than the 65+ mix the engine divides out (one CCHS group, 65 to 110);
   - everyone starts cancer-free, with no heart attack or stroke and not disabled,

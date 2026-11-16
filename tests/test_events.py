@@ -133,7 +133,7 @@ def test_men_follow_womens_schedule_three_years_later():
 def test_smoking_adjustment_averages_to_one(cause, sex, age):
     """Across the population's smoking mix the multiplier averages to 1, keeping official rates."""
     mix = population_mix(sex, age_group(age))["smoking"]
-    examples = {"never": Person(sex, 25), "current": Person(sex, 25, smoking="current"),
+    examples = {"never": Person(sex, 25), "current": Person(sex, 25, smoking="current", keeps_smoking=True),
                 "quit_before_35": Person(sex, 25, smoking="former", quit_age=20),
                 "quit_35_44": Person(sex, 50, smoking="former", quit_age=40),
                 "quit_45_54": Person(sex, 60, smoking="former", quit_age=50),

@@ -82,7 +82,7 @@ Each survey answer moves your death rates by a hazard ratio from a large publish
 | 🍺 Drinks a week | [Zhao et al., *JAMA Network Open* 2023](https://doi.org/10.1001/jamanetworkopen.2023.6185) |
 | 🥦 Servings of fruit and vegetables a day | [Wang et al., *Circulation* 2021](https://doi.org/10.1161/CIRCULATIONAHA.120.048996) |
 
-Your activity and weight are not frozen at today's answer: as you age, you keep your place among people your age (fitter or heavier than most, say) while Canada's mix shifts, the way it does for real people (A26). Smoking, drinking and diet stay as you answer them.
+Your activity and weight are not frozen at today's answer: as you age, you keep your place among people your age (fitter or heavier than most, say) while Canada's mix shifts, the way it does for real people (A26). If you smoke, you may quit as most Canadian smokers eventually do, unless you say you'll keep smoking (A27). Drinking and diet stay as you answer them.
 
 Official death rates already include everyone, smokers and non-smokers alike, so the model first divides out the Canadian population's average mix of these habits (from the Canadian Community Health Survey) and then applies yours. Smoking also changes what people die of (lung cancer and COPD far more than other causes), using cause-specific ratios from [Thun et al., *NEJM* 2013](https://doi.org/10.1056/NEJMsa1211127). A check: with these ratios, the gap between the healthiest and least healthy habits comes out at about 18 years of life expectancy, close to the 17.9 years found for Canada by the MPoRT study ([Manuel et al., *PLOS Medicine* 2016](https://doi.org/10.1371/journal.pmed.1002082)).
 

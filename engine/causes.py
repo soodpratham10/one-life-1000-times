@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 from engine.data import load
-from engine.risk import ASSUMPTIONS, Person, age_group, hazard_ratio, levels, population_mix, taper
+from engine.risk import ASSUMPTIONS, Person, age_group, hazard_ratio, population_mix, smoking_path, taper
 
 BASE_YEARS = (2017, 2018, 2019)
 CAUSES = ("lung_cancer", "other_cancer", "heart", "stroke", "copd", "diabetes", "dementia",
@@ -98,7 +98,16 @@ def _calibration(sex: str, age: int) -> np.ndarray:
 
 
 def cause_probabilities(p: Person, age: int) -> np.ndarray:
-    """Given that this person dies at this age, the chance of each cause (order of CAUSES)."""
+    """
+    Given that this person dies at this age, the chance of each cause (order of CAUSES).
+    A smoker who may quit (A27) gets the mix over their smoking path, each level
+    weighted by its chance and its all-cause hazard (as in the calibration).
+    """
     shares = base_shares(p.sex, age)
-    split = shares * _ratios(levels(p)["smoking"], p.sex, age) / _calibration(p.sex, age)
-    return split / split.sum()
+    a = _calibration(p.sex, age)
+    w = taper(age)
+    out = np.zeros(len(CAUSES))
+    for level, chance in smoking_path(p, age):
+        split = shares * _ratios(level, p.sex, age) / a
+        out += chance * hazard_ratio("smoking", level, p.sex) ** w * split / split.sum()
+    return out / out.sum()

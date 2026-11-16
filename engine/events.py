@@ -26,7 +26,7 @@ import numpy as np
 
 from engine.causes import smoking_cause_ratio
 from engine.data import load
-from engine.risk import Person, age_group, levels, population_mix, taper
+from engine.risk import Person, age_group, population_mix, smoking_path, taper
 
 CRASH_YEAR = 2019
 DISABILITY_MAX_AGE = 64       # CPP disability ends at 65 (converts to retirement)
@@ -181,7 +181,8 @@ def smoking_incidence_multiplier(p: Person, cause: str, age: int) -> float:
     w = taper(age)
     mix = population_mix(p.sex, age_group(age))["smoking"]
     average = sum(share * smoking_cause_ratio(cause, lvl, p.sex) ** w for lvl, share in mix.items())
-    return smoking_cause_ratio(cause, levels(p)["smoking"], p.sex) ** w / average
+    own = sum(chance * smoking_cause_ratio(cause, lvl, p.sex) ** w for lvl, chance in smoking_path(p, age))
+    return own / average
 
 
 # ---------------------------------------------------------------- one year

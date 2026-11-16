@@ -14,6 +14,7 @@ from engine.simulate import simulate, story, summary
 ME = Person(
     sex="M", age=25, region="MB",
     smoking="current",              # never, former (then give quit_age) or current
+    keeps_smoking=False,            # current smokers: True = never quits; False = may quit (5% a year)
     activity_minutes=60,            # moderate or vigorous activity a week
     height_cm=178, weight_kg=88,
     drinks_per_week=10,

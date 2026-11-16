@@ -30,8 +30,14 @@ of each factor's average.
    their level moves as the age group's mix moves. Their hazard ratio at a later
    age is the average over the part of that age group's distribution their
    place covers. The population average is unchanged by this, exactly.
-   Smoking, alcohol and fruit and vegetables are held as answered (a smoker
-   stays a smoker; fruit and vegetable habits barely change with age).
+   Alcohol and fruit and vegetables are held as answered (fruit and vegetable
+   habits barely change with age).
+7. Quitting smoking (A27). A current smoker quits with chance QUIT_RATE a year
+   from age QUIT_FROM_AGE, and from then on has the former-smoker ratio for the
+   age they quit. The engine uses the expected path: the smoking ratio at each
+   age is the average over "still smoking" and "quit at each earlier age",
+   weighted by their chances. A smoker who answers that they will keep smoking
+   (keeps_smoking=True) stays a current smoker for life.
 """
 
 from dataclasses import dataclass
@@ -49,6 +55,8 @@ CAP_LOW = 0.35        # A08: lowest relative multiplier
 CAP_HIGH = 5.0        # A08: highest relative multiplier
 TAPER_START = 79      # full effect up to this age (Jha et al. cover ages 25-79)
 GRAMS_PER_DRINK = 13.45   # one Canadian standard drink, grams of alcohol
+QUIT_RATE = 0.05          # A27: chance a year that a current smoker quits for good
+QUIT_FROM_AGE = 25        # A27: lasting quits before 25 are rare; quitting starts at 25
 
 FACTORS = ("smoking", "activity", "bmi", "alcohol", "fruit_veg")
 AGE_GROUPS = ((18, 34), (35, 49), (50, 64), (65, 110))   # CCHS adult groups
@@ -82,6 +90,7 @@ class Person:
     weight_kg: float = 70.0
     drinks_per_week: float = 0.0
     fruit_veg_per_day: float = 2.0
+    keeps_smoking: bool = False       # current smokers only: never quits (A27)
 
     def __post_init__(self):
         if self.sex not in SEXES:
@@ -97,6 +106,8 @@ class Person:
                 raise ValueError("former smokers need a quit age between 10 and their age")
         elif self.quit_age is not None:
             raise ValueError("quit age is only for former smokers")
+        if self.keeps_smoking and self.smoking != "current":
+            raise ValueError("keeps_smoking is only for current smokers")
         if not 0 <= self.activity_minutes <= 3000:
             raise ValueError("activity must be 0-3000 minutes a week")
         if not 120 <= self.height_cm <= 230 or not 30 <= self.weight_kg <= 300:
@@ -260,9 +271,43 @@ def drift_ratio(factor: str, level: str, sex: str, answer_age: int, age: int) ->
     return total / (hi - lo)
 
 
+def quit_level(quit_age: int) -> str:
+    """Former-smoker level for someone who quit at this age (as in levels())."""
+    return ("quit_before_35" if quit_age < 35 else "quit_35_44" if quit_age < 45
+            else "quit_45_54" if quit_age < 55 else "quit_55_plus")
+
+
+@lru_cache(maxsize=None)
+def _smoking_path(level: str, keeps: bool, answer_age: int, age: int) -> tuple[tuple[str, float], ...]:
+    if level != "current" or keeps or age <= answer_age:
+        return ((level, 1.0),)
+    shares, still = {}, 1.0
+    for y in range(answer_age, age):             # quits during the year of age y: former from y + 1
+        quit = still * (QUIT_RATE if y >= QUIT_FROM_AGE else 0.0)
+        if quit > 0:
+            lvl = quit_level(y)
+            shares[lvl] = shares.get(lvl, 0.0) + quit
+            still -= quit
+    shares["current"] = still
+    return tuple(shares.items())
+
+
+def smoking_path(p: Person, age: int) -> tuple[tuple[str, float], ...]:
+    """Chance of each smoking level at `age` (A27): one level unless a current smoker may quit."""
+    return _smoking_path(levels(p)["smoking"], p.keeps_smoking, p.age, age)
+
+
+def factor_ratio(p: Person, factor: str, level: str, age: int) -> float:
+    """One factor's tapered ratio at `age`: expected over quitting for smoking (A27), drifted for activity and BMI (A26)."""
+    if factor == "smoking":
+        w = taper(age)
+        return sum(share * hazard_ratio("smoking", lvl, p.sex) ** w for lvl, share in smoking_path(p, age))
+    return drift_ratio(factor, level, p.sex, p.age, age)
+
+
 def person_multiplier(p: Person, age: int) -> float:
     """This person's combined multiplier at a given age, before dividing out the average."""
-    return float(np.prod([drift_ratio(f, lvl, p.sex, p.age, age) for f, lvl in levels(p).items()]))
+    return float(np.prod([factor_ratio(p, f, lvl, age) for f, lvl in levels(p).items()]))
 
 
 def relative_multiplier(p: Person, age: int) -> float:
