@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Life, 1,000 Times</title>
+  <meta name="description" content="Answer nine questions and see 1,000 versions of your life, worked out from Canadian data with the methods actuaries use.">
+  <meta name="color-scheme" content="light">
+  <link rel="preload" href="fonts/Lora-Variable.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231B2733'/%3E%3Cpath d='M5 9h22M5 13h20M5 17h17M5 21h12M5 25h6' stroke='%23EFF1EC' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the content</a>
+
+  <header class="masthead">
+    <a class="wordmark" href="#top" aria-label="One Life, 1,000 Times, back to the start">One Life, 1,000 Times</a>
+    <nav aria-label="Site">
+      <a href="#method">How it works</a>
+      <a href="https://github.com/soodpratham10/one-life-1000-times" rel="noopener">Source on GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Introduction -->
+    <section id="top" class="intro" aria-labelledby="intro-title">
+      <div class="intro-text">
+        <h1 id="intro-title">Nobody can tell you how your life will go. Here are 1,000 ways it could.</h1>
+        <p class="lede">Answer nine questions about yourself. The model then lives your life forward, year by year, from today to the end, using Canadian data and the methods actuaries use: health, accidents, family, work and how it ends. Then it does it again, a thousand times.</p>
+        <p class="lede">You see the realistic range of how things could go, and which of your choices actually move the odds.</p>
+        <div class="intro-actions">
+          <button type="button" class="button primary" id="start" disabled>
+            <span class="button-label">Start the survey</span>
+          </button>
+          <p class="fine">About two minutes. Nothing you enter leaves your browser.</p>
+        </div>
+        <p class="status" id="load-status" role="status">Loading the data</p>
+      </div>
+      <figure class="intro-figure" aria-labelledby="intro-caption">
+        <div class="chart" id="intro-chart" role="img" aria-label="1,000 simulated lives of an example person, one dot each, stacked at the age that life ends."></div>
+        <figcaption id="intro-caption">1,000 lives of one example person, a 40-year-old woman in Ontario who has never smoked. Each dot is one of her lives, stacked at the age it ends.</figcaption>
+      </figure>
+    </section>
+
+    <!-- Survey -->
+    <section id="survey" class="survey" aria-labelledby="survey-title" hidden>
+      <div class="survey-head">
+        <h2 id="survey-title" tabindex="-1">About you</h2>
+        <p class="progress-text" id="progress-text">Question 1 of 9</p>
+        <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+      </div>
+      <form class="question" id="question" novalidate>
+        <div id="question-body"></div>
+        <div class="question-actions">
+          <button type="button" class="button quiet" id="back">Back</button>
+          <button type="submit" class="button primary" id="next"><span class="button-label">Next</span></button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="results" aria-labelledby="results-title" hidden>
+      <div class="results-head">
+        <h2 id="results-title" tabindex="-1">Your 1,000 lives</h2>
+        <p class="lede" id="results-who"></p>
+      </div>
+
+      <div class="lives">
+        <figure class="lives-figure">
+          <div class="chart" id="lives-chart" role="img" aria-describedby="lives-summary"></div>
+          <figcaption>
+            <span>Each dot is one of your lives, stacked at the age it ends.</span>
+            <span class="toggle" role="group" aria-label="Line colour">
+              <button type="button" class="chip" aria-pressed="true" data-colour="ink">Ink</button>
+              <button type="button" class="chip" aria-pressed="false" data-colour="cause">By cause of death</button>
+            </span>
+          </figcaption>
+          <ul class="legend" id="lives-legend" hidden></ul>
+        </figure>
+        <dl class="stats" id="lives-summary" aria-live="polite"></dl>
+      </div>
+
+      <div class="band">
+        <section class="block" aria-labelledby="causes-title">
+          <h3 id="causes-title">How your lives end</h3>
+          <p class="note">Share of your lives ending in each cause, worked out exactly rather than from the 1,000 draws.</p>
+          <ol class="bars" id="causes"></ol>
+        </section>
+
+        <section class="block" aria-labelledby="along-title">
+          <h3 id="along-title">Along the way</h3>
+          <p class="note">How many of your 1,000 lives include each of these at least once.</p>
+          <ul class="chances" id="chances"></ul>
+        </section>
+      </div>
+
+      <section class="story" aria-labelledby="story-title">
+        <div class="story-head">
+          <h3 id="story-title">One of your lives</h3>
+          <button type="button" class="button quiet" id="another">Show another life</button>
+        </div>
+        <ol class="timeline" id="timeline" aria-live="polite"></ol>
+        <p class="note">One draw out of a thousand. Most of your lives look different; the range above is the honest picture.</p>
+      </section>
+
+      <section class="odds" aria-labelledby="odds-title">
+        <h3 id="odds-title">What moves the odds</h3>
+        <p class="note">Change a habit and see how all of your lives shift. Your answers are the outline; the change is the filled bars.</p>
+        <div class="odds-grid">
+          <form class="controls" id="controls" aria-describedby="odds-result"></form>
+          <figure class="odds-figure">
+            <p class="odds-result" id="odds-result" aria-live="polite"></p>
+            <div class="chart" id="odds-chart" role="img" aria-label="How many of your lives end at each age, with your answers and with the change."></div>
+          </figure>
+        </div>
+      </section>
+
+      <div class="results-actions">
+        <button type="button" class="button quiet" id="restart">Start again with different answers</button>
+      </div>
+    </section>
+
+    <!-- Method -->
+    <section id="method" class="method" aria-labelledby="method-title">
+      <h2 id="method-title">How it works</h2>
+      <div class="method-grid">
+        <div>
+          <h3>What this is</h3>
+          <p>A simulation built on official Canadian data. It starts from Statistics Canada's 2017–2019 life tables for your province, lowers future death rates the way the Chief Actuary of Canada assumes for the Canada Pension Plan, and adjusts them for your answers using large published studies of smoking, activity, weight, alcohol and diet.</p>
+          <p>Each simulated year, things can happen: a car crash, cancer, a heart attack or stroke, a disability, marriage, divorce, a first child, retirement. Each changes what comes later; a cancer diagnosis or a heart attack raises the risk of dying of it, a marriage lowers death rates a little. Then the year either ends in death or the life carries on.</p>
+        </div>
+        <div>
+          <h3>What this is not</h3>
+          <ul class="plain">
+            <li>Not a prediction of when or how you will die. No model can do that for one person; this shows the range.</li>
+            <li>Not medical, financial or insurance advice.</li>
+            <li>Not an insurance price.</li>
+          </ul>
+          <h3>How it was checked</h3>
+          <p>The model was first written in Python. The version running on this page is a JavaScript copy, tested against the Python results for a set of reference people. The core was also rebuilt separately in R and in Excel VBA, and they agree with Python to at least ten decimal places. A simulated population was compared with Canada's actual deaths. Every assumption, its source and its weakness is written down.</p>
+          <p><a href="https://github.com/soodpratham10/one-life-1000-times/blob/main/docs/validation.md" rel="noopener">Read the validation report</a> or <a href="https://github.com/soodpratham10/one-life-1000-times/blob/main/docs/assumptions.md" rel="noopener">every assumption and its source</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Made by <a href="https://github.com/soodpratham10" rel="noopener">Pratham Sood</a>, Actuarial Mathematics and Statistics, University of Manitoba. Data: Statistics Canada, the Office of the Chief Actuary, Health Canada, Transport Canada and the Public Health Agency of Canada, under the Open Government Licence – Canada. Code under the MIT licence.</p>
+  </footer>
+
+  <button type="button" class="to-top" id="to-top" aria-label="Back to the top" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</body>
+</html>

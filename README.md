@@ -256,6 +256,13 @@ The browser engine's tests need [Node.js](https://nodejs.org/) 20 or later (no p
 node --test web/tests/engine.test.mjs
 ```
 
+To try the website on your own computer, serve the `web/` folder (the browser will not run the engine from a file opened directly) and open <http://localhost:8000>:
+
+```bash
+cd web
+python -m http.server 8000
+```
+
 ## Repository layout
 
 ```
@@ -281,9 +288,11 @@ validation/          population check against StatCan (Phase 4); results in vali
 crosscheck/          independent rebuilds that must match the engine (Phase 4): make_reference.py writes
                      the engine's answers to reference/; r/ and vba/ rebuild them in R and Excel VBA;
                      excel/ holds the workbook (data sheets and a one-year hand check)
-web/                 the website (Phase 5, in progress): build_data.py exports what the browser
-                     needs to data/engine-data.json; engine/engine.js is the engine in JavaScript
-                     (no libraries), checked by tests/engine.test.mjs against crosscheck/reference/
+web/                 the website (Phase 5, in progress): index.html, styles.css and app.js are the page;
+                     worker.js runs the engine off the page's main thread; build_data.py exports what
+                     the browser needs to data/engine-data.json; engine/engine.js is the engine in
+                     JavaScript (no libraries), checked by tests/engine.test.mjs against
+                     crosscheck/reference/; fonts/ holds Lora (SIL Open Font Licence, in OFL.txt)
 ```
 
 ## Known limits
