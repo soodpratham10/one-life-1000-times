@@ -275,7 +275,8 @@ validation/          population check against StatCan (Phase 4); results in vali
 crosscheck/          independent rebuilds that must match the engine (Phase 4): make_reference.py writes
                      the engine's answers to reference/; r/ and vba/ rebuild them in R and Excel VBA;
                      excel/ holds the workbook (data sheets and a one-year hand check)
-web/                 survey and visuals (Phase 5, not built yet)
+web/                 the website (Phase 5, in progress): build_data.py exports what the browser
+                     engine needs to data/engine-data.json
 ```
 
 ## Known limits
