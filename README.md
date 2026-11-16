@@ -7,8 +7,11 @@
 
 <h3 align="center"><i>Nobody can tell you how your life will go. Here are 1,000 ways it could.</i></h3>
 
+<p align="center"><b><a href="https://soodpratham10.github.io/one-life-1000-times/">Try it in your browser</a></b>: nine questions, about two minutes, and nothing you enter leaves your browser.</p>
+
 <p align="center">
   <a href="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml"><img src="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
+  <a href="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/pages.yml"><img src="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/pages.yml/badge.svg" alt="website"></a>
   <a href="https://github.com/soodpratham10/one-life-1000-times/releases"><img src="https://img.shields.io/github/v/release/soodpratham10/one-life-1000-times" alt="release"></a>
   <img src="https://img.shields.io/badge/python-3.13-3776ab" alt="Python 3.13">
   <img src="https://img.shields.io/badge/data-Statistics%20Canada%20%C2%B7%20Chief%20Actuary%20(CPP)-c8102e" alt="data: Statistics Canada, Office of the Chief Actuary (CPP)">
@@ -16,6 +19,7 @@
 </p>
 
 <p align="center">
+  <a href="https://soodpratham10.github.io/one-life-1000-times/">Try it</a> ·
   <a href="#what-this-is">What this is</a> ·
   <a href="#how-a-life-is-lived">How a life is lived</a> ·
   <a href="#which-choices-move-the-odds">Choices</a> ·
@@ -25,7 +29,7 @@
 </p>
 
 > [!NOTE]
-> **In development.** The engine is built and tested: it lives a person's life forward year by year, 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk. The survey and website are not built yet. Releases: [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) (data), [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0) (engine), [v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0) (links between events), [v0.4.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.4.0) (validation: see the [validation report](docs/validation.md)).
+> **In development.** The engine is built and tested: it lives a person's life forward year by year, 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk. The survey and website are [live](https://soodpratham10.github.io/one-life-1000-times/); the write-up is still to come. Releases: [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) (data), [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0) (engine), [v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0) (links between events), [v0.4.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.4.0) (validation: see the [validation report](docs/validation.md)).
 
 ## What this is
 
@@ -90,7 +94,7 @@ Both figures are drawn from the engine's own simulated lives by [`docs/figures/m
 
 ## Roadmap
 
-![progress: 5 of 7 phases done](https://img.shields.io/badge/progress-5%20of%207%20phases%20done-2ea44f)
+![progress: 6 of 7 phases done](https://img.shields.io/badge/progress-6%20of%207%20phases%20done-2ea44f)
 
 | Phase | What it covers | Status |
 | --- | --- | --- |
@@ -99,8 +103,8 @@ Both figures are drawn from the engine's own simulated lives by [`docs/figures/m
 | 2. Engine | Mortality projection, survey risk multipliers, competing risks, 1,000 simulated lives | ✅ Done ([v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0)) |
 | 3. Links between events | Cancer deaths after a diagnosis, deaths after a heart attack or stroke, marriage effects, disability recovery vs death | ✅ Done ([v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0)) |
 | 4. Validation | Actual-to-expected checks against official figures; independent R and Excel VBA cross-checks ([report](docs/validation.md)) | ✅ Done ([v0.4.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.4.0)) |
-| 5. Website | Survey and interactive visuals | 🔜 Next |
-| 6. Launch | Write-up and release | ⬜ Planned |
+| 5. Website | Survey, your 1,000 lives, causes, one life as a story, what moves the odds; the engine rebuilt in JavaScript and run in the browser | ✅ Done ([live site](https://soodpratham10.github.io/one-life-1000-times/)) |
+| 6. Launch | Write-up and release | 🔜 Next |
 
 ## Data
 
@@ -288,7 +292,7 @@ validation/          population check against StatCan (Phase 4); results in vali
 crosscheck/          independent rebuilds that must match the engine (Phase 4): make_reference.py writes
                      the engine's answers to reference/; r/ and vba/ rebuild them in R and Excel VBA;
                      excel/ holds the workbook (data sheets and a one-year hand check)
-web/                 the website (Phase 5, in progress): index.html, styles.css and app.js are the page;
+web/                 the website (Phase 5, live on GitHub Pages): index.html, styles.css and app.js are the page;
                      worker.js runs the engine off the page's main thread; build_data.py exports what
                      the browser needs to data/engine-data.json; engine/engine.js is the engine in
                      JavaScript (no libraries), checked by tests/engine.test.mjs against
