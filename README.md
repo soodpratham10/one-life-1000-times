@@ -44,13 +44,13 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 The structure follows how life insurers underwrite: a base mortality table, personal risk multipliers, future mortality improvement, competing risks between events, and an actual-to-expected check against official data. Published data is used where insurers use proprietary underwriting manuals. Every assumption, its source and its weakness is listed in [`docs/assumptions.md`](docs/assumptions.md).
 
 ```mermaid
-flowchart LR
-    A["Your answers<br/>smoking, activity, BMI,<br/>drinks, fruit and veg"] --> B["Your death rates<br/>by age and cause"]
-    C["StatCan life table<br/>+ CIA MI-2024 improvement"] --> B
+flowchart TD
+    A["Your answers<br/>smoking, activity, BMI, drinks, fruit and veg"] --> B["Your death rates by age and cause"]
+    C["StatCan life table + CIA MI-2024 improvement"] --> B
     B --> D(["One year of life"])
-    D --> E["Events this year<br/>crash, cancer, heart attack, stroke,<br/>disability, marriage, child, retirement"]
-    E --> F{"Death this year?<br/>uses everything<br/>that has happened"}
-    F -- "survives" --> D
+    D --> E["Events this year<br/>crash · cancer · heart attack · stroke<br/>disability · marriage · child · retirement"]
+    E --> F{"Death this year?<br/>uses everything that has happened"}
+    F -- "survives: next year" --> D
     F -- "dies" --> G["Age and cause of death"]
     G --> H["Repeat 1,000 times"]
 ```
@@ -93,7 +93,7 @@ Both figures are drawn from the engine's own simulated lives by [`docs/figures/m
 
 ## Roadmap
 
-**▰▰▰▰▱▱▱ 4 of 7 phases done**
+![progress: 4 of 7 phases done](https://img.shields.io/badge/progress-4%20of%207%20phases%20done-2ea44f)
 
 | Phase | What it covers | Status |
 | --- | --- | --- |
