@@ -1,13 +1,13 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/figures/lives-dark.svg">
-    <img src="docs/figures/lives-light.svg" width="900" alt="One Life, 1,000 Times: 1,000 simulated lives of one 25-year-old man in Manitoba, each drawn as a line from today to the age it ends, coloured by cause of death and sorted by length so that together they form a survival curve.">
-  </picture>
+  <a href="https://soodpratham10.github.io/one-life-1000-times/"><img src="docs/figures/site-preview.png" width="900" alt="One Life, 1,000 Times, the website: the five-card reading of a 45-year-old man in Manitoba who smokes, and his 1,000 lives being cast year by year. Click to open the site."></a>
 </p>
 
 <h3 align="center"><i>Nobody can tell you how your life will go. Here are 1,000 ways it could.</i></h3>
 
-<p align="center"><b><a href="https://soodpratham10.github.io/one-life-1000-times/">Try it in your browser</a></b>: nine questions, about two minutes, and nothing you enter leaves your browser.</p>
+<p align="center">
+  <a href="https://soodpratham10.github.io/one-life-1000-times/"><img src="docs/figures/try-it.svg" width="420" alt="Try it in your browser"></a>
+</p>
+<p align="center">Nine questions, about two minutes. Nothing you enter leaves your browser.</p>
 
 <p align="center">
   <a href="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml"><img src="https://github.com/soodpratham10/one-life-1000-times/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
@@ -29,11 +29,19 @@
 </p>
 
 > [!NOTE]
-> **In development.** The engine is built and tested: it lives a person's life forward year by year, 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk. The survey and website are [live](https://soodpratham10.github.io/one-life-1000-times/); the write-up is still to come. Releases: [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) (data), [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0) (engine), [v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0) (links between events), [v0.4.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.4.0) (validation: see the [validation report](docs/validation.md)).
+> **Live:** [soodpratham10.github.io/one-life-1000-times](https://soodpratham10.github.io/one-life-1000-times/). The engine lives a person's life forward year by year, 1,000 times, with cancer, heart attacks, strokes, marriage and disability all changing later death risk; the website runs it in your browser. Releases: [v0.1.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.1.0) (data), [v0.2.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.2.0) (engine), [v0.3.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.3.0) (links between events), [v0.4.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.4.0) (validation: see the [validation report](docs/validation.md)), [v0.5.0](https://github.com/soodpratham10/one-life-1000-times/releases/tag/v0.5.0) (the website).
 
 ## What this is
 
 A life simulator built on real Canadian data. You answer a short survey; the model lives your life forward year by year (health, accidents, family, work, and how it ends), then does it again, 1,000 times, so you can see the realistic range of how things could go and which of your choices move the odds.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/figures/lives-dark.svg">
+    <img src="docs/figures/lives-light.svg" width="820" alt="1,000 simulated lives of one 25-year-old man in Manitoba, each drawn as a line from today to the age it ends, coloured by cause of death and sorted by length so that together they form a survival curve.">
+  </picture>
+</p>
+<p align="center"><sub>1,000 lives of one 25-year-old man in Manitoba. Each line runs from today to the age that life ends, coloured by what it ends with; sorted by length, the lines draw his survival curve.</sub></p>
 
 **Aim (draft):** show someone the realistic range of how their life could unfold, using the data and methods actuaries use, and show which of their choices actually change the odds.
 
