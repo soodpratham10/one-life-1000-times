@@ -1,156 +1,206 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en-CA">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>One Life, 1,000 Times</title>
-  <meta name="description" content="Answer nine questions and see 1,000 versions of your life, worked out from Canadian data with the methods actuaries use.">
-  <meta name="color-scheme" content="light">
+  <title>One Life, 1,000 Times: your reading</title>
+  <meta name="description" content="Answer nine questions and an actuarial model built on Canadian data lives your life forward 1,000 times: how long, how it ends, what happens along the way, and which habits move the odds.">
+  <meta property="og:title" content="One Life, 1,000 Times">
+  <meta property="og:description" content="Your life, read 1,000 times by an actuarial model built on Canadian data.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c1626'/%3E%3Cpath d='M16 5l2.2 8.8L27 16l-8.8 2.2L16 27l-2.2-8.8L5 16l8.8-2.2z' fill='%23d9a648'/%3E%3C/svg%3E">
   <link rel="preload" href="fonts/Lora-Variable.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231B2733'/%3E%3Cpath d='M5 9h22M5 13h20M5 17h17M5 21h12M5 25h6' stroke='%23EFF1EC' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
-  <script type="module" src="app.js"></script>
 </head>
 <body>
-  <a class="skip" href="#main">Skip to the content</a>
+  <a class="skip" href="#reading">Skip to the reading</a>
 
-  <header class="masthead">
-    <a class="wordmark" href="#top" aria-label="One Life, 1,000 Times, back to the start">One Life, 1,000 Times</a>
-    <nav aria-label="Site">
-      <a href="#method">How it works</a>
-      <a href="https://github.com/soodpratham10/one-life-1000-times" rel="noopener">Source on GitHub</a>
+  <!-- I. The sky, and the consultation over it -->
+  <header class="sky" id="sky">
+    <canvas id="sky-canvas" aria-hidden="true"></canvas>
+    <nav class="masthead" aria-label="Site">
+      <span class="wordmark">One Life, 1,000 Times</span>
+      <span class="links"><a href="#method">How it’s cast</a><a href="https://github.com/soodpratham10/one-life-1000-times">Source</a></span>
     </nav>
+
+    <div class="stagebox">
+      <div class="sky-copy act" id="intro">
+        <h1>In 1693 an astronomer read the length of human lives from the records of one city.<br><em>Here is yours, read 1,000 times.</em></h1>
+        <p class="sky-lede">Each light here is one life of a 40-year-old woman in Ontario, drawn by the model and lived out in a few seconds. It never repeats. Answer nine questions and the sky becomes yours.</p>
+        <button class="begin" id="begin" type="button" disabled><span class="label">Loading the tables</span></button>
+        <p class="samples">Or see a sample reading:
+          <button type="button" class="link" data-sample="smoker">a 45-year-old smoker in Manitoba</button>,
+          <button type="button" class="link" data-sample="young">a 22-year-old in British Columbia</button>,
+          <button type="button" class="link" data-sample="retired">a 67-year-old in Quebec</button>.</p>
+        <p class="private">About two minutes. Nothing you enter leaves your browser.</p>
+      </div>
+
+      <section class="consult act" id="consult" hidden aria-labelledby="q-title">
+        <div class="constellation" aria-hidden="true"><svg id="constellation" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg></div>
+        <p class="q-count" id="q-count"></p>
+        <form id="q-form" novalidate>
+          <div class="q" id="q-body"></div>
+          <div class="q-nav">
+            <button type="button" class="ghost" id="q-back">Back</button>
+            <button type="submit" class="begin" id="q-next" disabled><span class="label">Continue</span></button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div class="tally" aria-live="off">
+      <p id="tally-text">Drawing the first lives…</p>
+      <button class="icon-button" id="sky-pause" type="button" aria-pressed="false">Pause</button>
+    </div>
   </header>
 
-  <main id="main">
-    <!-- Introduction -->
-    <section id="top" class="intro" aria-labelledby="intro-title">
-      <div class="intro-text">
-        <h1 id="intro-title">Nobody can tell you how your life will go. Here are 1,000 ways it could.</h1>
-        <p class="lede">Answer nine questions about yourself. The model then lives your life forward, year by year, from today to the end, using Canadian data and the methods actuaries use: health, accidents, family, work and how it ends. Then it does it again, a thousand times.</p>
-        <p class="lede">You see the realistic range of how things could go, and which of your choices actually move the odds.</p>
-        <div class="intro-actions">
-          <button type="button" class="button primary" id="start" disabled>
-            <span class="button-label">Start the survey</span>
-          </button>
-          <p class="fine">About two minutes. Nothing you enter leaves your browser.</p>
-        </div>
-        <p class="status" id="load-status" role="status">Loading the data</p>
+  <!-- II. The casting -->
+  <section class="casting" id="casting" hidden aria-labelledby="casting-title">
+    <div class="casting-head">
+      <h2 id="casting-title"><em>Casting 1,000 lives</em></h2>
+      <p id="casting-who"></p>
+      <div class="casting-controls">
+        <button class="icon-button" id="cast-pause" type="button" aria-pressed="false">Pause</button>
+        <button class="icon-button" id="cast-skip" type="button">Skip to the end</button>
       </div>
-      <figure class="intro-figure" aria-labelledby="intro-caption">
-        <div class="chart" id="intro-chart" role="img" aria-label="1,000 simulated lives of an example person, one dot each, stacked at the age that life ends."></div>
-        <figcaption id="intro-caption">1,000 lives of one example person, a 40-year-old woman in Ontario who has never smoked. Each dot is one of her lives, stacked at the age it ends.</figcaption>
-      </figure>
+    </div>
+    <div class="stage"><canvas id="cast-canvas" role="img" aria-label="Your 1,000 lives, lived out year by year. Each life that ends falls into the chart of ages at death."></canvas></div>
+    <div class="casting-foot">
+      <p class="clock" id="clock" aria-live="off"></p>
+      <p class="ticker" id="ticker" aria-live="off"></p>
+      <button class="begin small" id="to-cards" type="button" hidden><span class="label">Turn the cards</span></button>
+    </div>
+  </section>
+
+  <!-- III. The reading -->
+  <main class="reading" id="reading" hidden aria-labelledby="reading-title">
+    <div class="reading-head">
+      <h2 id="reading-title"></h2>
+      <p class="reading-lede" id="reading-lede"></p>
+    </div>
+    <ol class="spread" id="spread"></ol>
+    <p class="spread-note">Each card shows its working on request, in actuarial notation.</p>
+
+    <section class="part rise" aria-labelledby="words-title">
+      <div class="part-head">
+        <h3 id="words-title"><em>The reading, in words</em></h3>
+      </div>
+      <div class="words">
+        <div class="words-text" id="words-text"></div>
+        <aside class="words-key" aria-labelledby="key-title">
+          <h4 id="key-title">How sure each word is</h4>
+          <p>Every word below has a fixed meaning, the way forecasters use them.</p>
+          <dl>
+            <div><dt>almost certain</dt><dd>over 90%</dd></div>
+            <div><dt>likely</dt><dd>66 to 90%</dd></div>
+            <div><dt>about as likely as not</dt><dd>33 to 66%</dd></div>
+            <div><dt>unlikely</dt><dd>10 to 33%</dd></div>
+            <div><dt>rare</dt><dd>under 10%</dd></div>
+          </dl>
+        </aside>
+      </div>
     </section>
 
-    <!-- Survey -->
-    <section id="survey" class="survey" aria-labelledby="survey-title" hidden>
-      <div class="survey-head">
-        <h2 id="survey-title" tabindex="-1">About you</h2>
-        <p class="progress-text" id="progress-text">Question 1 of 9</p>
-        <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+    <section class="part rise" aria-labelledby="chart-title">
+      <div class="part-head">
+        <h3 id="chart-title"><em>Your life chart</em></h3>
+        <p>Your age today sits at the top and the years run clockwise to 110. Each dot is one of your 1,000 lives, placed at the age it ends. The marks on the rim are the moments your lives share, placed at the age each is most likely.</p>
       </div>
-      <form class="question" id="question" novalidate>
-        <div id="question-body"></div>
-        <div class="question-actions">
-          <button type="button" class="button quiet" id="back">Back</button>
-          <button type="submit" class="button primary" id="next"><span class="button-label">Next</span></button>
-        </div>
-      </form>
+      <div class="wheel-grid">
+        <figure class="wheel" id="wheel"></figure>
+        <ul class="planets" id="planets"></ul>
+      </div>
     </section>
 
-    <!-- Results -->
-    <section id="results" class="results" aria-labelledby="results-title" hidden>
-      <div class="results-head">
-        <h2 id="results-title" tabindex="-1">Your 1,000 lives</h2>
-        <p class="lede" id="results-who"></p>
+    <section class="part rise" aria-labelledby="others-title">
+      <div class="part-head">
+        <h3 id="others-title"><em>Four of your other lives</em></h3>
+        <p>The longest, the shortest, the most ordinary, and one with no serious illness at all. Each is a real draw from your 1,000.</p>
       </div>
+      <ol class="others" id="others"></ol>
+      <p class="again"><button class="quiet" id="another" type="button">Draw another life</button></p>
+      <div class="drawn" id="drawn" aria-live="polite"></div>
+    </section>
 
-      <div class="lives">
-        <figure class="lives-figure">
-          <div class="chart" id="lives-chart" role="img" aria-describedby="lives-summary"></div>
-          <figcaption>
-            <span>Each dot is one of your lives, stacked at the age it ends.</span>
-            <span class="toggle" role="group" aria-label="Line colour">
-              <button type="button" class="chip" aria-pressed="true" data-colour="ink">Ink</button>
-              <button type="button" class="chip" aria-pressed="false" data-colour="cause">By cause of death</button>
-            </span>
-          </figcaption>
-          <ul class="legend" id="lives-legend" hidden></ul>
+    <section class="part rise" aria-labelledby="fate-title">
+      <div class="part-head">
+        <h3 id="fate-title"><em>Change your fate</em></h3>
+        <p>Move a habit and the reading is worked out again, exactly. Your answers are the outline; the change is the filled bars.</p>
+      </div>
+      <div class="fate-grid">
+        <form class="controls" id="controls" onsubmit="return false"></form>
+        <div class="fate-out">
+          <dl class="compare" id="compare"></dl>
+          <div class="chart" id="odds-chart" aria-label="Ages at death, before and after the change" role="img"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="part rise table-part" aria-labelledby="table-title">
+      <div class="part-head">
+        <h3 id="table-title"><em>Your table, in Halley’s form</em></h3>
+        <p>Halley’s 1693 table listed, for each age, how many of a group were still living. Here is the same table for your 1,000 lives: the number the model expects beside the number actually living in your draws, and your yearly death rate against the population table on the same basis.</p>
+      </div>
+      <div class="table-grid">
+        <div class="table-wrap">
+          <table id="life-table">
+            <caption class="visually-hidden">Your lives still living at each age, expected and drawn, with death rates</caption>
+            <thead><tr>
+              <th scope="col">Age <i>x</i></th>
+              <th scope="col">Expected living, <i>l<sub>x</sub></i></th>
+              <th scope="col">Living in your draws</th>
+              <th scope="col">Your <i>q<sub>x</sub></i></th>
+              <th scope="col">Table <i>q<sub>x</sub></i></th>
+              <th scope="col">Yours as % of table</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <figure class="q-chart">
+          <div id="q-chart"></div>
+          <figcaption>Yearly death rate <i>q<sub>x</sub></i> on a log scale: yours (solid) and the population table on the same CPP basis (dashed).</figcaption>
         </figure>
-        <dl class="stats" id="lives-summary" aria-live="polite"></dl>
       </div>
-
-      <div class="band">
-        <section class="block" aria-labelledby="causes-title">
-          <h3 id="causes-title">How your lives end</h3>
-          <p class="note">Share of your lives ending in each cause, worked out exactly rather than from the 1,000 draws.</p>
-          <ol class="bars" id="causes"></ol>
-        </section>
-
-        <section class="block" aria-labelledby="along-title">
-          <h3 id="along-title">Along the way</h3>
-          <p class="note">How many of your 1,000 lives include each of these at least once.</p>
-          <ul class="chances" id="chances"></ul>
-        </section>
-      </div>
-
-      <section class="story" aria-labelledby="story-title">
-        <div class="story-head">
-          <h3 id="story-title">One of your lives</h3>
-          <button type="button" class="button quiet" id="another">Show another life</button>
-        </div>
-        <ol class="timeline" id="timeline" aria-live="polite"></ol>
-        <p class="note">One draw out of a thousand. Most of your lives look different; the range above is the honest picture.</p>
-      </section>
-
-      <section class="odds" aria-labelledby="odds-title">
-        <h3 id="odds-title">What moves the odds</h3>
-        <p class="note">Change a habit and see how all of your lives shift. Your answers are the outline; the change is the filled bars.</p>
-        <div class="odds-grid">
-          <form class="controls" id="controls" aria-describedby="odds-result"></form>
-          <figure class="odds-figure">
-            <p class="odds-result" id="odds-result" aria-live="polite"></p>
-            <div class="chart" id="odds-chart" role="img" aria-label="How many of your lives end at each age, with your answers and with the change."></div>
-          </figure>
-        </div>
-      </section>
-
-      <div class="results-actions">
-        <button type="button" class="button quiet" id="restart">Start again with different answers</button>
-      </div>
+      <div class="notes" id="actuary-notes"></div>
     </section>
 
-    <!-- Method -->
-    <section id="method" class="method" aria-labelledby="method-title">
-      <h2 id="method-title">How it works</h2>
-      <div class="method-grid">
+    <section class="part rise share-part" aria-labelledby="share-title">
+      <div class="part-head">
+        <h3 id="share-title"><em>Take your reading</em></h3>
+        <p>A card with your constellation and your two main numbers, sized for Instagram and LinkedIn. It is drawn here in your browser; your answers are not uploaded.</p>
+      </div>
+      <div class="share-grid">
+        <canvas id="share-canvas" width="1080" height="1350" aria-label="Your reading card"></canvas>
         <div>
-          <h3>What this is</h3>
-          <p>A simulation built on official Canadian data. It starts from Statistics Canada's 2017–2019 life tables for your province, lowers future death rates the way the Chief Actuary of Canada assumes for the Canada Pension Plan, and adjusts them for your answers using large published studies of smoking, activity, weight, alcohol and diet.</p>
-          <p>Each simulated year, things can happen: a car crash, cancer, a heart attack or stroke, a disability, marriage, divorce, a first child, retirement. Each changes what comes later; a cancer diagnosis or a heart attack raises the risk of dying of it, a marriage lowers death rates a little. Then the year either ends in death or the life carries on.</p>
-        </div>
-        <div>
-          <h3>What this is not</h3>
-          <ul class="plain">
-            <li>Not a prediction of when or how you will die. No model can do that for one person; this shows the range.</li>
-            <li>Not medical, financial or insurance advice.</li>
-            <li>Not an insurance price.</li>
-          </ul>
-          <h3>How it was checked</h3>
-          <p>The model was first written in Python. The version running on this page is a JavaScript copy, tested against the Python results for a set of reference people. The core was also rebuilt separately in R and in Excel VBA, and they agree with Python to at least ten decimal places. A simulated population was compared with Canada's actual deaths. Every assumption, its source and its weakness is written down.</p>
-          <p><a href="https://github.com/soodpratham10/one-life-1000-times/blob/main/docs/validation.md" rel="noopener">Read the validation report</a> or <a href="https://github.com/soodpratham10/one-life-1000-times/blob/main/docs/assumptions.md" rel="noopener">every assumption and its source</a>.</p>
+          <button class="begin dark" id="download" type="button"><span class="label">Download the card</span></button>
+          <p class="again left"><button class="quiet" id="again" type="button">Start a new reading</button></p>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Made by <a href="https://github.com/soodpratham10" rel="noopener">Pratham Sood</a>, Actuarial Mathematics and Statistics, University of Manitoba. Data: Statistics Canada, the Office of the Chief Actuary, Health Canada, Transport Canada and the Public Health Agency of Canada, under the Open Government Licence – Canada. Code under the MIT licence.</p>
+  <footer class="method" id="method">
+    <div class="method-grid">
+      <div>
+        <h2><em>How it’s cast</em></h2>
+        <p>The model starts from Statistics Canada’s 2017–2019 life tables for your province and lowers future death rates the way the Office of the Chief Actuary assumes in the 32nd CPP Actuarial Report. Your answers adjust those rates using large published studies of smoking, activity, weight, alcohol and diet. Each simulated year, things can happen: a car crash, cancer, a heart attack or stroke, disability, marriage, divorce, a first child, retirement. Each one changes what comes later. Then the year ends in death, or the life carries on.</p>
+        <p>Edmond Halley, the astronomer, published one of the first life tables in 1693, from the births and deaths of Breslau. This site follows the same idea with today’s data.</p>
+      </div>
+      <div>
+        <h3>What this is not</h3>
+        <ul>
+          <li>Not a prediction of when or how you will die. No model can do that for one person; this shows the range.</li>
+          <li>Not medical, financial or insurance advice.</li>
+          <li>Not an insurance price.</li>
+        </ul>
+        <h3>Controls</h3>
+        <p>The model was first written in Python. The engine on this page is a JavaScript copy, tested against the Python results for a set of reference people. The core was also rebuilt separately in R and in Excel VBA, and they agree with Python to at least ten decimal places. A simulated population was compared with Canada’s actual deaths.</p>
+        <p><a href="https://github.com/soodpratham10/one-life-1000-times/blob/main/docs/validation.md">Read the validation report</a> or <a href="https://github.com/soodpratham10/one-life-1000-times/blob/main/docs/assumptions.md">every assumption and its source</a>.</p>
+      </div>
+    </div>
+    <p class="credit">Made by <a href="https://github.com/soodpratham10">Pratham Sood</a>, Actuarial Mathematics and Statistics, University of Manitoba. Data: Statistics Canada, the Office of the Chief Actuary, Health Canada, Transport Canada and the Public Health Agency of Canada, under the Open Government Licence – Canada. Code under the MIT licence.</p>
   </footer>
 
-  <button type="button" class="to-top" id="to-top" aria-label="Back to the top" hidden>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
+  <button class="to-top" id="to-top" type="button" hidden aria-label="Back to top">↑</button>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
