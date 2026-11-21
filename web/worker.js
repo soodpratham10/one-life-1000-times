@@ -2,18 +2,21 @@
 // Messages in:  { id, type: "lives" | "exact" | "batch" | "reading", answers, startMarital, n, seed }
 // Messages out: { id, result } or { id, error }
 
-import { createEngine } from "./engine/engine.js";
+// The page passes its version tag (?v=...) in this script's address; the engine and the data are
+// fetched with the same tag, so an update never mixes old and new files.
+const VERSION = new URL(import.meta.url).search;
 
 let enginePromise = null;
 let tables = null;
 
 function getEngine() {
-  enginePromise ??= fetch(new URL("./data/engine-data.json", import.meta.url))
-    .then((r) => {
+  enginePromise ??= Promise.all([
+    import(`./engine/engine.js${VERSION}`),
+    fetch(new URL(`./data/engine-data.json${VERSION}`, import.meta.url)).then((r) => {
       if (!r.ok) throw new Error(`could not load the data (HTTP ${r.status})`);
       return r.json();
-    })
-    .then((data) => { tables = data; return createEngine(data); });
+    }),
+  ]).then(([{ createEngine }, data]) => { tables = data; return createEngine(data); });
   return enginePromise;
 }
 
