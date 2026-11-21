@@ -12,7 +12,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
 
 // The version tag makes every browser fetch new files after an update, instead of mixing old and new.
 // Change it whenever the site changes (it must match the tags in index.html).
-const VERSION = "2026-11-20";
+const VERSION = "2026-11-20.2";
 const worker = new Worker(new URL(`./worker.js?v=${VERSION}`, import.meta.url), { type: "module" });
 let nextId = 1;
 const pending = new Map();
@@ -105,8 +105,9 @@ function topUp() {
   ask({ type: "batch", answers: EXAMPLE, n: 600, seed: sky.seed++ }).then((r) => { sky.queue.push(...r.lives); sky.startAge = r.startAge; sky.asking = false; })
     .catch(() => { sky.asking = false; });
 }
-function avoidBox() {
-  const c = $(".stagebox").getBoundingClientRect(), s = sky.canvas.getBoundingClientRect();
+function avoidBox() {                                  // keep new lives out from behind whatever is showing
+  const shown = $("#consult").hidden ? $("#intro") : $("#consult");
+  const c = shown.getBoundingClientRect(), s = sky.canvas.getBoundingClientRect();
   return { x0: c.left - s.left - 20, x1: Math.min(c.left - s.left + 760, c.right - s.left) + 20, y0: c.top - s.top - 20, y1: c.bottom - s.top + 10 };
 }
 function spawn(now, w, h, box, random) {
@@ -722,7 +723,7 @@ function observeRises() {
 $("#to-cards").addEventListener("click", () => current && showReading(current.person, current.r));
 $("#again").addEventListener("click", async () => {
   $("#sky").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
-  qStep = 0; await swap($("#intro"), $("#consult")); showQuestion(false);
+  qStep = 0; await swap($("#intro"), $("#consult")); showQuestion(false); sky.rebox && sky.rebox();
 });
 ask({ type: "batch", answers: EXAMPLE, n: 600, seed: sky.seed++ }).then((r) => {
   sky.queue.push(...r.lives); sky.startAge = r.startAge;

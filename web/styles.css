@@ -242,13 +242,13 @@ a:hover { text-decoration-thickness: 2px; }
 .link:hover { color: #fff; text-decoration-thickness: 2px; }
 .link:focus-visible { outline: 2px solid var(--ochre); outline-offset: 2px; }
 
+/* the consultation: a panel in the middle of the sky, with stars on every side */
+.stagebox:has(.consult:not([hidden])) { align-self: center; }
 .consult {
-  max-width: 44rem; padding: 0 clamp(1.25rem, 5vw, 4rem) 1.5rem; position: relative;
-}
-.consult::before {            /* a quiet backing so the questions stay readable over the moving sky */
-  content: ""; position: absolute; inset: -1.5rem 0 0 0; z-index: -1;
-  background: rgba(12, 22, 38, 0.86); border-top: 1px solid var(--night-rule); border-right: 1px solid var(--night-rule);
-  border-radius: 0 6px 0 0;
+  justify-self: center; width: min(46rem, calc(100% - 2.5rem)); margin: 1.5rem auto;
+  padding: 1.6rem clamp(1.25rem, 4vw, 2.6rem) 1.5rem; position: relative;
+  background: rgba(12, 22, 38, 0.9); border: 1px solid var(--night-rule); border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
 }
 .constellation svg { width: 100%; height: 92px; display: block; overflow: visible; }
 .constellation .c-line { stroke: var(--ochre); stroke-opacity: 0.55; stroke-width: 1; fill: none; }
