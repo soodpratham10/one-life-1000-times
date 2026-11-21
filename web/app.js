@@ -12,7 +12,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
 
 // The version tag makes every browser fetch new files after an update, instead of mixing old and new.
 // Change it whenever the site changes (it must match the tags in index.html).
-const VERSION = "2026-11-20.2";
+const VERSION = "2026-11-20.3";
 const worker = new Worker(new URL(`./worker.js?v=${VERSION}`, import.meta.url), { type: "module" });
 let nextId = 1;
 const pending = new Map();

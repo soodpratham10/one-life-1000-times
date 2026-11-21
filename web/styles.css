@@ -243,7 +243,12 @@ a:hover { text-decoration-thickness: 2px; }
 .link:focus-visible { outline: 2px solid var(--ochre); outline-offset: 2px; }
 
 /* the consultation: a panel in the middle of the sky, with stars on every side */
-.stagebox:has(.consult:not([hidden])) { align-self: center; }
+.stagebox { align-self: center; }
+/* the opening words: a centred column in the middle of the sky, where the survey panel will appear */
+.sky-copy { justify-self: center; text-align: center; max-width: 48rem; padding: 1.5rem clamp(1.25rem, 5vw, 2.5rem); position: relative; }
+.sky-copy::before { content: ""; position: absolute; inset: -2rem -4rem; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(12, 22, 38, 0.92), rgba(12, 22, 38, 0.6) 70%, rgba(12, 22, 38, 0)); }
+.sky-copy .sky-lede, .sky-copy .samples { margin-left: auto; margin-right: auto; }
 .consult {
   justify-self: center; width: min(46rem, calc(100% - 2.5rem)); margin: 1.5rem auto;
   padding: 1.6rem clamp(1.25rem, 4vw, 2.6rem) 1.5rem; position: relative;
