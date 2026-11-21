@@ -43,7 +43,7 @@ A life simulator built on real Canadian data. You answer a short survey; the mod
 </p>
 <p align="center"><sub>1,000 lives of one 25-year-old man in Manitoba. Each line runs from today to the age that life ends, coloured by what it ends with; sorted by length, the lines draw his survival curve.</sub></p>
 
-**Aim (draft):** show someone the realistic range of how their life could unfold, using the data and methods actuaries use, and show which of their choices actually change the odds.
+**Aim:** to take the tools actuaries use every day (life tables, risk factors, mortality improvement and simulation) and turn them into something anyone can try: a way to see the realistic range of how one life could go, and which of their own choices actually change it.
 
 > [!IMPORTANT]
 > **What this is not**
